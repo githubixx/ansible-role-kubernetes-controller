@@ -1,0 +1,15 @@
+galaxy_info:
+  author: Robert Wimmer
+  description: Installs the Kubernetes API server, scheduler and controller manager.
+  license: license (GPLv2, CC-BY, etc)
+  min_ansible_version: 2.2
+  platforms:
+  - name: Ubuntu
+    versions:
+    - xenial
+  galaxy_tags:
+    - kubernetes
+    - scheduler
+    - api
+    - controller
+    - high availbility

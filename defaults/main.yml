@@ -1,0 +1,19 @@
+---
+local_cert_dir: /etc/cfssl
+
+etcd_client_port: 2379
+etcd_interface: tap0
+
+k8s_conf_dir: /var/lib/kubernetes
+k8s_bin_dir: /usr/local/bin
+k8s_release: 1.5.1
+k8s_interface: tap0
+k8s_certificates:
+  - ca.pem
+  - kubernetes-key.pem
+  - kubernetes.pem
+k8s_binaries:
+  - kube-apiserver
+  - kube-controller-manager
+  - kube-scheduler
+  - kubectl

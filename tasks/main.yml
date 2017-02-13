@@ -1,0 +1,118 @@
+---
+- name: Create Kubernetes config directory
+  file:
+    path: "{{k8s_conf_dir}}"
+    state: directory
+    mode: 0700
+    owner: root
+    group: root
+  tags:
+    - k8s-controller
+
+- name: Copy certificates
+  copy:
+    src: "{{local_cert_dir}}/{{item}}"
+    dest: "{{k8s_conf_dir}}/{{item}}"
+    mode: 0640
+    owner: root
+    group: root
+  with_items:
+    - "{{k8s_certificates}}"
+  tags:
+    - k8s-controller
+
+- name: Downloading official Kubernetes binaries
+  get_url:
+    url: https://storage.googleapis.com/kubernetes-release/release/v{{k8s_release}}/bin/linux/amd64/{{item}}
+    dest: "{{k8s_bin_dir}}"
+    mode: 0755
+  with_items:
+    - "{{k8s_binaries}}"
+  tags:
+    - k8s-controller
+
+- name: Copy authentication token
+  template:
+    src: var/lib/kubernetes/token.csv.j2
+    dest: "{{k8s_conf_dir}}/token.csv"
+    mode: 0644
+    owner: root
+    group: root
+  tags:
+    - k8s-controller
+
+- name: Copy authorization policy file
+  copy:
+    src: var/lib/kubernetes/authorization-policy.jsonl
+    dest: "{{k8s_conf_dir}}/authorization-policy.jsonl"
+    mode: 0644
+    owner: root
+    group: root
+  tags:
+    - k8s-controller
+
+- name: Create systemd unit file for kube-apiserver
+  template:
+    src: etc/systemd/system/kube-apiserver.service.j2
+    dest: /etc/systemd/system/kube-apiserver.service
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload systemd
+  tags:
+    - k8s-controller
+
+- meta: flush_handlers
+
+- name: Enable and start kube-apiserver
+  service:
+    name: kube-apiserver
+    enabled: yes
+    state: started
+  tags:
+    - k8s-controller
+
+- name: Create systemd unit file for kube-controller-manager
+  template:
+    src: etc/systemd/system/kube-controller-manager.service.j2
+    dest: /etc/systemd/system/kube-controller-manager.service
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload systemd
+  tags:
+    - k8s-controller
+
+- meta: flush_handlers
+
+- name: Enable and start kube-controller-manager
+  service:
+    name: kube-controller-manager
+    enabled: yes
+    state: started
+  tags:
+    - k8s-controller
+ 
+- name: Create systemd unit file for kube-scheduler
+  template:
+    src: etc/systemd/system/kube-scheduler.service.j2
+    dest: /etc/systemd/system/kube-scheduler.service
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload systemd
+  tags:
+    - k8s-controller
+
+- meta: flush_handlers
+
+- name: Enable and start kube-scheduler
+  service:
+    name: kube-scheduler
+    enabled: yes
+    state: started
+  tags:
+    - k8s-controller
