@@ -1,12 +1,12 @@
 ansible-role-kubernetes-controller
 ==================================
 
-This playbook installes the Kubernetes API server, scheduler and controller manager. 
+This playbook is used in [Kubernetes the not so hard way with Ansible (at scaleway) - part 6 - control plane](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-at-scaleway-part-6/). It installes the Kubernetes API server, scheduler and controller manager.
 
 Requirements
 ------------
 
-This playbook requires that you already created some certificates for kubernetes-controller (see [ansible-role-cfssl](https://github.com/githubixx/ansible-role-cfssl)). The playbook searches the certificates in `local_cert_dir` on the host this playbook runs.
+This playbook requires that you already created some certificates for kubernetes-controller (see [ansible-role-cfssl](https://github.com/githubixx/ansible-role-cfssl)). The playbook copies the certificates from `local_cert_dir` on the host this playbook runs to the destination host.
 
 Role Variables
 --------------
