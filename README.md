@@ -36,10 +36,10 @@ Example Playbook
 ----------------
 
 ```
-- hosts: kube-controller
+- hosts: kubernetes-controller
 
   roles:
-    - githubixx.kube-controller
+    - githubixx.kubernetes-controller
 ```
 
 License
