@@ -1,5 +1,5 @@
 {% macro cluster_hosts() %}
-{%- for host in groups['controller'] -%}
+{%- for host in groups['k8s-controller'] -%}
 https://{{hostvars[host]['ansible_' + k8s_interface].ipv4.address}}:{{etcd_client_port}}{% if not loop.last %},{% endif %}
 {%- endfor -%}
 {% endmacro %}
@@ -18,15 +18,15 @@ ExecStart={{k8s_bin_dir}}/kube-apiserver \
   --authorization-policy-file={{k8s_conf_dir}}/authorization-policy.jsonl \
   --bind-address=0.0.0.0 \
   --enable-swagger-ui=true \
-  --etcd-cafile={{k8s_conf_dir}}/ca.pem \
+  --etcd-cafile={{k8s_conf_dir}}/ca-etcd.pem \
   --insecure-bind-address=0.0.0.0 \
-  --kubelet-certificate-authority={{k8s_conf_dir}}/ca.pem \
+  --kubelet-certificate-authority={{k8s_conf_dir}}/ca-k8s-apiserver.pem \
   --etcd-servers={{cluster_hosts()}} \
-  --service-account-key-file={{k8s_conf_dir}}/kubernetes-key.pem \
+  --service-account-key-file={{k8s_conf_dir}}/cert-k8s-apiserver-key.pem \
   --service-cluster-ip-range=10.32.0.0/24 \
   --service-node-port-range=30000-32767 \
-  --tls-cert-file={{k8s_conf_dir}}/kubernetes.pem \
-  --tls-private-key-file={{k8s_conf_dir}}/kubernetes-key.pem \
+  --tls-cert-file={{k8s_conf_dir}}/cert-k8s-apiserver.pem \
+  --tls-private-key-file={{k8s_conf_dir}}/cert-k8s-apiserver-key.pem \
   --token-auth-file={{k8s_conf_dir}}/token.csv \
   --v=2
 Restart=on-failure

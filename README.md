@@ -1,12 +1,12 @@
 ansible-role-kubernetes-controller
 ==================================
 
-This playbook is used in [Kubernetes the not so hard way with Ansible (at scaleway) - part 6 - control plane](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-at-scaleway-part-6/). It installes the Kubernetes API server, scheduler and controller manager.
+This playbook is used in [Kubernetes the not so hard way with Ansible (at scaleway) - Part 6 - Control plane](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-at-scaleway-part-6/). It installes the Kubernetes API server, scheduler and controller manager.
 
 Requirements
 ------------
 
-This playbook requires that you already created some certificates for kubernetes-controller (see [ansible-role-cfssl](https://github.com/githubixx/ansible-role-cfssl)). The playbook copies the certificates from `local_cert_dir` on the host this playbook runs to the destination host.
+This playbook requires that you already created some certificates for Kubernetes API server (see [ansible-role-kubernetes-ca](https://github.com/githubixx/ansible-role-kubernetes-ca)). The playbook copies the certificates from `local_cert_dir` on the host this playbook runs to the destination host (can be a local directory or a network share).
 
 Role Variables
 --------------
@@ -17,19 +17,30 @@ local_cert_dir: /etc/cfssl
 etcd_client_port: 2379
 etcd_interface: tap0
 
+etcd_certificates:
+  - ca-etcd.pem
+  - ca-etcd-key.pem
+  - cert-etcd.pem
+  - cert-etcd-key.pem
+
 k8s_conf_dir: /var/lib/kubernetes
 k8s_bin_dir: /usr/local/bin
 k8s_release: 1.5.1
 k8s_interface: tap0
 k8s_certificates:
-  - ca.pem
-  - kubernetes-key.pem
-  - kubernetes.pem
+  - ca-k8s-apiserver.pem
+  - ca-k8s-apiserver-key.pem
+  - cert-k8s-apiserver.pem
+  - cert-k8s-apiserver-key.pem
 k8s_binaries:
   - kube-apiserver
   - kube-controller-manager
   - kube-scheduler
   - kubectl
+k8s_auth_tokens:
+  - chAng3m3,admin,admin
+  - chAng3m3,scheduler,scheduler
+  - chAng3m3,kubelet,kubelet
 ```
 
 Example Playbook

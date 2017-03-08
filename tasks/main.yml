@@ -9,7 +9,19 @@
   tags:
     - k8s-controller
 
-- name: Copy certificates
+- name: Copy etcd certificates
+  copy:
+    src: "{{local_cert_dir}}/{{item}}"
+    dest: "{{k8s_conf_dir}}/{{item}}"
+    mode: 0640
+    owner: root
+    group: root
+  with_items:
+    - "{{etcd_certificates}}"
+  tags:
+    - k8s-controller
+
+- name: Copy Kubernetes certificates
   copy:
     src: "{{local_cert_dir}}/{{item}}"
     dest: "{{k8s_conf_dir}}/{{item}}"
@@ -35,7 +47,7 @@
   template:
     src: var/lib/kubernetes/token.csv.j2
     dest: "{{k8s_conf_dir}}/token.csv"
-    mode: 0644
+    mode: 0640
     owner: root
     group: root
   tags:
