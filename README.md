@@ -6,7 +6,7 @@ This playbook is used in [Kubernetes the not so hard way with Ansible (at scalew
 Requirements
 ------------
 
-This playbook requires that you already created some certificates for Kubernetes API server (see [ansible-role-kubernetes-ca](https://github.com/githubixx/ansible-role-kubernetes-ca)). The playbook copies the certificates from `local_cert_dir` on the host this playbook runs to the destination host (can be a local directory or a network share).
+This playbook requires that you already created some certificates for Kubernetes API server (see [Kubernetes the not so hard way with Ansible (at Scaleway) - Part 4 - Certificate authority (CA)](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-at-scaleway-part-4/)). The playbook copies the certificates from `local_cert_dir` on the host this playbook runs to the destination host.
 
 Role Variables
 --------------
@@ -47,8 +47,7 @@ Example Playbook
 ----------------
 
 ```
-- hosts: kubernetes-controller
-
+- hosts: k8s-controller
   roles:
     - githubixx.kubernetes-controller
 ```
