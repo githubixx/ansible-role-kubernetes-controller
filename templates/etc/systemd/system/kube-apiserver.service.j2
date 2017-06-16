@@ -1,5 +1,5 @@
 {% macro cluster_hosts() %}
-{%- for host in groups['k8s-controller'] -%}
+{%- for host in groups['k8s_controller'] -%}
 https://{{hostvars[host]['ansible_' + k8s_interface].ipv4.address}}:{{etcd_client_port}}{% if not loop.last %},{% endif %}
 {%- endfor -%}
 {% endmacro %}

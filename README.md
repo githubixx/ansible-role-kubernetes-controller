@@ -47,7 +47,7 @@ Example Playbook
 ----------------
 
 ```
-- hosts: k8s-controller
+- hosts: k8s_controller
   roles:
     - githubixx.kubernetes-controller
 ```
