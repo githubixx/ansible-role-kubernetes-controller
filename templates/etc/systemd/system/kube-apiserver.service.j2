@@ -10,7 +10,7 @@ Documentation=https://github.com/GoogleCloudPlatform/kubernetes
 
 [Service]
 ExecStart={{k8s_bin_dir}}/kube-apiserver \
-  --admission-control=NamespaceLifecycle,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota \
+  --admission-control={{k8s_admission_control}} \
   --advertise-address={{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}} \
   --allow-privileged=true \
   --apiserver-count=3 \
