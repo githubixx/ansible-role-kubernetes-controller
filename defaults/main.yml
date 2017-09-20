@@ -1,5 +1,5 @@
 ---
-local_cert_dir: /etc/cfssl
+k8s_ca_conf_directory: /etc/k8s/certs
 
 etcd_client_port: 2379
 etcd_interface: tap0
