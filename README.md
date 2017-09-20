@@ -37,10 +37,6 @@ k8s_binaries:
   - kube-controller-manager
   - kube-scheduler
   - kubectl
-k8s_auth_tokens:
-  - chAng3m3,admin,admin
-  - chAng3m3,scheduler,scheduler
-  - chAng3m3,kubelet,kubelet
 ```
 
 Example Playbook

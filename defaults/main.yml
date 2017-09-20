@@ -1,5 +1,6 @@
 ---
 k8s_ca_conf_directory: "/etc/k8s/certs"
+k8s_config_directory: "/etc/k8s/configs"
 
 etcd_client_port: "2379"
 etcd_interface: "tap0"
@@ -24,8 +25,18 @@ k8s_binaries:
   - kube-controller-manager
   - kube-scheduler
   - kubectl
-k8s_auth_tokens:
-  - chAng3m3,admin,admin
-  - chAng3m3,scheduler,scheduler
-  - chAng3m3,kubelet,kubelet
-k8s_admission_control: "NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
+
+k8s_apiserver_admission_control: "NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
+k8s_apiserver_allow_privileged: "true"
+k8s_apiserver_apiserver_count: "3"
+k8s_apiserver_authorization_mode: "Node,RBAC"
+k8s_apiserver_audit_log_maxage: "30"
+k8s_apiserver_audit_log_maxbackup: "3"
+k8s_apiserver_audit_log_maxsize: "100"
+k8s_apiserver_audit_log_path: "/var/log/audit.log"
+k8s_apiserver_enable_swagger_ui: "true"
+k8s_apiserver_event_ttl: "1h"
+k8s_apiserver_kubelet_https: "true"
+k8s_apiserver_runtime_config: "rbac.authorization.k8s.io/v1alpha1"
+k8s_apiserver_service_cluster_ip_range: "10.32.0.0/24"
+k8s_apiserver_service_node_port_range: "30000-32767"

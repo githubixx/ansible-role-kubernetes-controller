@@ -43,20 +43,10 @@
   tags:
     - k8s-controller
 
-- name: Copy authentication token
-  template:
-    src: var/lib/kubernetes/token.csv.j2
-    dest: "{{k8s_conf_dir}}/token.csv"
-    mode: 0640
-    owner: root
-    group: root
-  tags:
-    - k8s-controller
-
-- name: Copy authorization policy file
+- name: Copy encryption provider config file
   copy:
-    src: var/lib/kubernetes/authorization-policy.jsonl
-    dest: "{{k8s_conf_dir}}/authorization-policy.jsonl"
+    src: "{{k8s_config_directory}}/encryption-config.yaml"
+    dest: "{{k8s_conf_dir}}/encryption-config.yaml"
     mode: 0644
     owner: root
     group: root
