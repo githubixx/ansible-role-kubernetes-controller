@@ -19,7 +19,6 @@ ExecStart={{k8s_bin_dir}}/kube-apiserver \
   --audit-log-maxsize={{k8s_apiserver_audit_log_maxsize}} \
   --audit-log-path={{k8s_apiserver_audit_log_path}} \
   --authorization-mode={{k8s_apiserver_authorization_mode}} \
-  --authorization-policy-file={{k8s_conf_dir}}/authorization-policy.jsonl \
   --bind-address={{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}} \
   --client-ca-file={{k8s_conf_dir}}/ca-k8s-apiserver.pem \
   --enable-swagger-ui={{k8s_apiserver_enable_swagger_ui}} \
