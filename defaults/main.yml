@@ -46,3 +46,5 @@ k8s_controller_manager_cluser_name: "kubernetes"
 k8s_controller_manager_leader_elect: "true"
 k8s_controller_manager_conf_dir: "{{k8s_conf_dir}}"
 k8s_controller_manager_service_cluster_ip_range: "{{k8s_apiserver_service_cluster_ip_range}}"
+
+k8s_scheduler_leader_elect: "{{k8s_controller_manager_leader_elect}}"

@@ -1,11 +1,13 @@
+{% set k8s_apiserver_inventory_name = groups['k8s_controller']|first %}
+{% set k8s_apiserver_ip = hostvars[k8s_apiserver_inventory_name]['ansible_' + k8s_interface].ipv4.address %}
 [Unit]
 Description=Kubernetes Scheduler
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
 
 [Service]
 ExecStart={{k8s_bin_dir}}/kube-scheduler \
-  --leader-elect=true \
-  --master=http://{{hostvars[inventory_hostname]['ansible_' + etcd_interface].ipv4.address}}:8080 \
+  --leader-elect={{k8s_scheduler_leader_elect}} \
+  --master=http://{{k8s_apiserver_ip}}:8080 \
   --v=2
 Restart=on-failure
 RestartSec=5
