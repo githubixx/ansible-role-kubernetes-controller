@@ -39,7 +39,7 @@
     dest: "{{k8s_bin_dir}}"
     mode: 0755
   with_items:
-    - "{{k8s_binaries}}"
+    - "{{k8s_controller_binaries}}"
   tags:
     - k8s-controller
 

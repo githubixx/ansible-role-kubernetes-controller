@@ -32,7 +32,7 @@ k8s_certificates:
   - ca-k8s-apiserver-key.pem
   - cert-k8s-apiserver.pem
   - cert-k8s-apiserver-key.pem
-k8s_binaries:
+k8s_controller_binaries:
   - kube-apiserver
   - kube-controller-manager
   - kube-scheduler

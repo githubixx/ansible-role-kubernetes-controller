@@ -7,7 +7,7 @@ k8s_interface: "tap0"
 k8s_ca_conf_directory: "/etc/k8s/certs"
 k8s_config_directory: "/etc/k8s/configs"
 
-k8s_binaries:
+k8s_controller_binaries:
   - kube-apiserver
   - kube-controller-manager
   - kube-scheduler
