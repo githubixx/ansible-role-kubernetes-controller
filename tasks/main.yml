@@ -118,3 +118,58 @@
     state: started
   tags:
     - k8s-controller
+
+# TODO: Check if ClusterRole + ClusterRoleBinding are already configured
+
+- name: Copy kube-apiserver-to-kubelet ClusterRole
+  copy:
+    src: "files/kube-apiserver-to-kubelet_cluster_role.yaml"
+    dest: "/tmp/kube-apiserver-to-kubelet_cluster_role.yaml"
+    mode: 0600
+  # when: kubectl.rc == 1
+  tags:
+    - k8s-controller
+
+- name: Copy kube-apiserver-to-kubelet ClusterRoleBinding
+  copy:
+    src: "files/kube-apiserver-to-kubelet_cluster_role_binding.yaml"
+    dest: "/tmp/kube-apiserver-to-kubelet_cluster_role_binding.yaml"
+    mode: 0600
+  # when: kubectl.rc == 1
+  tags:
+    - k8s-controller
+
+- name: Wait 300 seconds for kube-apiserver port 6443 to become open on the host
+  wait_for:
+    port: 6443
+    delay: 5
+    host: "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
+
+- name: Apply kube-apiserver-to-kubelet ClusterRole
+  shell: "kubectl --server={{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}:8080 apply -f /tmp/kube-apiserver-to-kubelet_cluster_role.yaml"
+  register: kube_apiserver_to_kubelet_cluster_role
+  run_once: true
+  delegate_to: "{{groups.k8s_etcd|first}}"
+  tags:
+    - k8s-controller
+    - blub
+
+- name: Apply kube-apiserver-to-kubelet ClusterRoleBinding
+  shell: "kubectl --server={{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}:8080 apply -f /tmp/kube-apiserver-to-kubelet_cluster_role_binding.yaml"
+  register: kube_apiserver_to_kubelet_cluster_role_binding
+  run_once: true
+  delegate_to: "{{groups.k8s_etcd|first}}"
+  tags:
+    - k8s-controller
+    - blub
+
+- name: Remove temporary files
+  file:
+    path: "{{item}}"
+    state: absent
+  with_items:
+    - "/tmp/kube-apiserver-to-kubelet_cluster_role.yaml"
+    - "/tmp/kube-apiserver-to-kubelet_cluster_role_binding.yaml"
+  tags:
+    - k8s-controller
+    - blub
