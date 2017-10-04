@@ -1,5 +1,3 @@
-{% set k8s_apiserver_inventory_name = groups['k8s_controller']|first %}
-{% set k8s_apiserver_ip = hostvars[k8s_apiserver_inventory_name]['ansible_' + k8s_interface].ipv4.address %}
 [Unit]
 Description=Kubernetes Controller Manager
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
@@ -12,7 +10,7 @@ ExecStart={{k8s_bin_dir}}/kube-controller-manager \
   --cluster-signing-cert-file={{k8s_controller_manager_conf_dir}}/ca-k8s-apiserver.pem \
   --cluster-signing-key-file={{k8s_controller_manager_conf_dir}}/cert-k8s-apiserver-key.pem \
   --leader-elect={{k8s_controller_manager_leader_elect}} \
-  --master=http://{{k8s_apiserver_ip}}:8080 \
+  --master=http://{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}:8080 \
   --root-ca-file={{k8s_controller_manager_conf_dir}}/ca-k8s-apiserver.pem \
   --cluster-signing-cert-file={{k8s_controller_manager_conf_dir}}/ca-k8s-apiserver.pem \
   --service-account-private-key-file={{k8s_controller_manager_conf_dir}}/cert-k8s-apiserver-key.pem \
