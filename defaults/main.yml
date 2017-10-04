@@ -19,7 +19,7 @@ k8s_certificates:
   - cert-k8s-apiserver.pem
   - cert-k8s-apiserver-key.pem
 
-k8s_apiserver_admission_control: "NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
+k8s_apiserver_admission_control: "Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
 k8s_apiserver_allow_privileged: "true"
 k8s_apiserver_apiserver_count: "3"
 k8s_apiserver_authorization_mode: "Node,RBAC"
@@ -30,7 +30,7 @@ k8s_apiserver_audit_log_path: "/var/log/audit.log"
 k8s_apiserver_enable_swagger_ui: "true"
 k8s_apiserver_event_ttl: "1h"
 k8s_apiserver_kubelet_https: "true"
-k8s_apiserver_runtime_config: "rbac.authorization.k8s.io/v1alpha1"
+k8s_apiserver_runtime_config: "api/all"
 k8s_apiserver_service_cluster_ip_range: "10.32.0.0/16"
 k8s_apiserver_service_node_port_range: "30000-32767"
 
