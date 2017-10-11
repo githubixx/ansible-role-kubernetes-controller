@@ -1,30 +1,52 @@
 ---
-local_cert_dir: /etc/cfssl
+k8s_conf_dir: "/var/lib/kubernetes"
+k8s_bin_dir: "/usr/local/bin"
+k8s_release: "1.8.0"
+k8s_interface: "tap0"
 
-etcd_client_port: 2379
-etcd_interface: tap0
+k8s_ca_conf_directory: "/etc/k8s/certs"
+k8s_config_directory: "/etc/k8s/configs"
+
+k8s_controller_binaries:
+  - kube-apiserver
+  - kube-controller-manager
+  - kube-scheduler
+  - kubectl
+
+k8s_certificates:
+  - ca-k8s-apiserver.pem
+  - ca-k8s-apiserver-key.pem
+  - cert-k8s-apiserver.pem
+  - cert-k8s-apiserver-key.pem
+
+k8s_apiserver_admission_control: "Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
+k8s_apiserver_allow_privileged: "true"
+k8s_apiserver_apiserver_count: "3"
+k8s_apiserver_authorization_mode: "Node,RBAC"
+k8s_apiserver_audit_log_maxage: "30"
+k8s_apiserver_audit_log_maxbackup: "3"
+k8s_apiserver_audit_log_maxsize: "100"
+k8s_apiserver_audit_log_path: "/var/log/audit.log"
+k8s_apiserver_enable_swagger_ui: "true"
+k8s_apiserver_event_ttl: "1h"
+k8s_apiserver_kubelet_https: "true"
+k8s_apiserver_runtime_config: "api/all"
+k8s_apiserver_service_cluster_ip_range: "10.32.0.0/16"
+k8s_apiserver_service_node_port_range: "30000-32767"
+
+k8s_controller_manager_cluster_cidr: "10.200.0.0/16"
+k8s_controller_manager_cluser_name: "kubernetes"
+k8s_controller_manager_leader_elect: "true"
+k8s_controller_manager_conf_dir: "{{k8s_conf_dir}}"
+k8s_controller_manager_service_cluster_ip_range: "{{k8s_apiserver_service_cluster_ip_range}}"
+
+k8s_scheduler_leader_elect: "{{k8s_controller_manager_leader_elect}}"
+
+etcd_client_port: "2379"
+etcd_interface: "tap0"
 
 etcd_certificates:
   - ca-etcd.pem
   - ca-etcd-key.pem
   - cert-etcd.pem
   - cert-etcd-key.pem
-
-k8s_conf_dir: /var/lib/kubernetes
-k8s_bin_dir: /usr/local/bin
-k8s_release: 1.5.1
-k8s_interface: tap0
-k8s_certificates:
-  - ca-k8s-apiserver.pem
-  - ca-k8s-apiserver-key.pem
-  - cert-k8s-apiserver.pem
-  - cert-k8s-apiserver-key.pem
-k8s_binaries:
-  - kube-apiserver
-  - kube-controller-manager
-  - kube-scheduler
-  - kubectl
-k8s_auth_tokens:
-  - chAng3m3,admin,admin
-  - chAng3m3,scheduler,scheduler
-  - chAng3m3,kubelet,kubelet
