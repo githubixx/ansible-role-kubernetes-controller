@@ -40,6 +40,10 @@
     mode: 0755
   with_items:
     - "{{k8s_controller_binaries}}"
+  notify:
+    - restart kube-apiserver
+    - restart kube-controller-manager
+    - restart kube-scheduler
   tags:
     - k8s-controller
 
@@ -152,7 +156,6 @@
   delegate_to: "{{groups.k8s_etcd|first}}"
   tags:
     - k8s-controller
-    - blub
 
 - name: Apply kube-apiserver-to-kubelet ClusterRoleBinding
   shell: "kubectl --server={{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}:8080 apply -f /tmp/kube-apiserver-to-kubelet_cluster_role_binding.yaml"
@@ -161,7 +164,6 @@
   delegate_to: "{{groups.k8s_etcd|first}}"
   tags:
     - k8s-controller
-    - blub
 
 - name: Remove temporary files
   file:
@@ -172,4 +174,3 @@
     - "/tmp/kube-apiserver-to-kubelet_cluster_role_binding.yaml"
   tags:
     - k8s-controller
-    - blub
