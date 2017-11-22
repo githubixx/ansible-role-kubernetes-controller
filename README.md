@@ -19,7 +19,7 @@ Role Variables
 ```
 k8s_conf_dir: "/var/lib/kubernetes"
 k8s_bin_dir: "/usr/local/bin"
-k8s_release: "1.8.0"
+k8s_release: "1.8.4"
 k8s_interface: "tap0"
 
 k8s_ca_conf_directory: "/etc/k8s/certs"
@@ -48,6 +48,7 @@ k8s_apiserver_audit_log_path: "/var/log/audit.log"
 k8s_apiserver_enable_swagger_ui: "true"
 k8s_apiserver_event_ttl: "1h"
 k8s_apiserver_kubelet_https: "true"
+k8s_apiserver_kubelet_preferred_address_types: "InternalIP,Hostname,ExternalIP"
 k8s_apiserver_runtime_config: "api/all"
 k8s_apiserver_service_cluster_ip_range: "10.32.0.0/16"
 k8s_apiserver_service_node_port_range: "30000-32767"
