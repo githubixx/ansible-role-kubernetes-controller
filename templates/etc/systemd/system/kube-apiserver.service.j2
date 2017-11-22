@@ -33,6 +33,7 @@ ExecStart={{k8s_bin_dir}}/kube-apiserver \
   --kubelet-client-certificate={{k8s_conf_dir}}/cert-k8s-apiserver.pem \
   --kubelet-client-key={{k8s_conf_dir}}/cert-k8s-apiserver-key.pem \
   --kubelet-https={{k8s_apiserver_kubelet_https}} \
+  --kubelet-preferred-address-types={{k8s_apiserver_kubelet_preferred_address_types}} \
   --runtime-config={{k8s_apiserver_runtime_config}} \
   --service-account-key-file={{k8s_conf_dir}}/cert-k8s-apiserver-key.pem \
   --service-cluster-ip-range={{k8s_apiserver_service_cluster_ip_range}} \

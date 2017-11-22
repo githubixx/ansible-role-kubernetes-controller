@@ -69,8 +69,6 @@
   tags:
     - k8s-controller
 
-- meta: flush_handlers
-
 - name: Enable and start kube-apiserver
   service:
     name: kube-apiserver
@@ -91,8 +89,6 @@
   tags:
     - k8s-controller
 
-- meta: flush_handlers
-
 - name: Enable and start kube-controller-manager
   service:
     name: kube-controller-manager
@@ -112,8 +108,6 @@
     - reload systemd
   tags:
     - k8s-controller
-
-- meta: flush_handlers
 
 - name: Enable and start kube-scheduler
   service:
