@@ -37,27 +37,40 @@ k8s_certificates:
   - cert-k8s-apiserver.pem
   - cert-k8s-apiserver-key.pem
 
-k8s_apiserver_admission_control: "Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
-k8s_apiserver_allow_privileged: "true"
-k8s_apiserver_apiserver_count: "3"
-k8s_apiserver_authorization_mode: "Node,RBAC"
-k8s_apiserver_audit_log_maxage: "30"
-k8s_apiserver_audit_log_maxbackup: "3"
-k8s_apiserver_audit_log_maxsize: "100"
-k8s_apiserver_audit_log_path: "/var/log/audit.log"
-k8s_apiserver_enable_swagger_ui: "true"
-k8s_apiserver_event_ttl: "1h"
-k8s_apiserver_kubelet_https: "true"
-k8s_apiserver_kubelet_preferred_address_types: "InternalIP,Hostname,ExternalIP"
-k8s_apiserver_runtime_config: "api/all"
-k8s_apiserver_service_cluster_ip_range: "10.32.0.0/16"
-k8s_apiserver_service_node_port_range: "30000-32767"
+k8s_apiserver_settings:
+  "admission-control": "Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
+  "allow-privileged": "true"
+  "apiserver-count": "3"
+  "authorization-mode": "Node,RBAC"
+  "audit-log-maxage": "30"
+  "audit-log-maxbackup": "3"
+  "audit-log-maxsize": "100"
+  "audit-log-path": "/var/log/audit.log"
+  "enable-swagger-ui": "true"
+  "event-ttl": "1h"
+  "kubelet-https": "true"
+  "kubelet-preferred-address-types": "InternalIP,Hostname,ExternalIP"
+  "runtime-config": "api/all"
+  "service-cluster-ip-range": "10.32.0.0/16"
+  "service-node-port-range": "30000-32767"
+  "client-ca-file": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
+  "etcd-cafile": "{{k8s_conf_dir}}/ca-etcd.pem"
+  "etcd-certfile": "{{k8s_conf_dir}}/cert-etcd.pem"
+  "etcd-keyfile": "{{k8s_conf_dir}}/cert-etcd-key.pem"
+  "experimental-encryption-provider-config": "{{k8s_conf_dir}}/encryption-config.yaml"
+  "kubelet-certificate-authority": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
+  "kubelet-client-certificate": "{{k8s_conf_dir}}/cert-k8s-apiserver.pem"
+  "kubelet-client-key": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"
+  "service-account-key-file": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"
+  "tls-ca-file": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
+  "tls-cert-file": "{{k8s_conf_dir}}/cert-k8s-apiserver.pem"
+  "tls-private-key-file": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"
 
 k8s_controller_manager_cluster_cidr: "10.200.0.0/16"
 k8s_controller_manager_cluser_name: "kubernetes"
 k8s_controller_manager_leader_elect: "true"
 k8s_controller_manager_conf_dir: "{{k8s_conf_dir}}"
-k8s_controller_manager_service_cluster_ip_range: "{{k8s_apiserver_service_cluster_ip_range}}"
+k8s_controller_manager_service_cluster_ip_range: "10.32.0.0/16"
 
 k8s_scheduler_leader_elect: "{{k8s_controller_manager_leader_elect}}"
 
@@ -69,6 +82,15 @@ etcd_certificates:
   - ca-etcd-key.pem
   - cert-etcd.pem
   - cert-etcd-key.pem
+```
+
+The Kubernetes API server settings defined in `k8s_apiserver_settings` can be overriden by defining a variable called `k8s_apiserver_settings_user`. You can alse add additional settings by using this variable. E.g. to override `audit-log-maxage` and `audit-log-maxbackup` default values and add `watch-cache` add the following settings to `group_vars/k8s.yml`:
+
+```
+k8s_apiserver_settings_user:
+  "audit-log-maxage": "40"
+  "audit-log-maxbackup": "4"
+  "watch-cache": "false"
 ```
 
 Example Playbook
