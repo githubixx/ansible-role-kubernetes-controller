@@ -83,6 +83,12 @@
   tags:
     - k8s-controller
 
+- name: Combine k8s_controller_manager_settings and k8s_controller_manager_settings_user (if defined)
+  set_fact:
+    k8s_controller_manager_settings: "{{k8s_controller_manager_settings | combine(k8s_controller_manager_settings_user|default({})) }}"
+  tags:
+    - k8s-controller
+
 - name: Create systemd unit file for kube-controller-manager
   template:
     src: etc/systemd/system/kube-controller-manager.service.j2

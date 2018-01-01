@@ -11,32 +11,46 @@ I tag every release and try to stay with [semantic versioning](http://semver.org
 Requirements
 ------------
 
-This role requires that you already created some certificates for Kubernetes API server (see [Kubernetes the not so hard way with Ansible (at Scaleway) - Part 4 - Certificate authority (CA)](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-at-scaleway-part-4/)). The role copies the certificates from `k8s_ca_conf_directory` to the destination host.
+This role requires that you already created some certificates for Kubernetes API server (see [Kubernetes the not so hard way with Ansible (at Scaleway) - Part 4 - Certificate authority (CA)](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-at-scaleway-part-4/)). The role copies the certificates from `k8s_ca_conf_directory` to the destination host. You should also setup PeerVPN (see [Kubernetes the not so hard way with Ansible (at Scaleway) - Part 3 - Peervpn](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-at-scaleway-part-3/) and of course a etcd cluster (see [Kubernetes the not so hard way with Ansible (at Scaleway) - Part 5 - etcd cluster](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-at-scaleway-part-5/)
 
 Role Variables
 --------------
 
 ```
+# The directory to store the K8s certificates and other configuration
 k8s_conf_dir: "/var/lib/kubernetes"
+# The directory to store the K8s binaries
 k8s_bin_dir: "/usr/local/bin"
+# K8s release
 k8s_release: "1.8.4"
+# The interface on which the K8s services should listen on. As all cluster
+# communication should use the PeerVPN interface the interface name is
+# normally "tap0" or "peervpn0".
 k8s_interface: "tap0"
 
+# The directory from where to copy the K8s certificates (needs to be
+# accessable from the host you run Ansible on)
 k8s_ca_conf_directory: "/etc/k8s/certs"
+# Directory where kubeconfig for Kubernetes worker nodes and kube-proxy
+# is stored among other configuration files.
 k8s_config_directory: "/etc/k8s/configs"
 
+# K8s control plane binaries to download
 k8s_controller_binaries:
   - kube-apiserver
   - kube-controller-manager
   - kube-scheduler
   - kubectl
 
+# K8s API daemon certificates
 k8s_certificates:
   - ca-k8s-apiserver.pem
   - ca-k8s-apiserver-key.pem
   - cert-k8s-apiserver.pem
   - cert-k8s-apiserver-key.pem
 
+# kube-apiserver settings (can be overriden or additional added by defining
+# "k8s_apiserver_settings_user" - see text below)
 k8s_apiserver_settings:
   "admission-control": "Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
   "allow-privileged": "true"
@@ -66,17 +80,32 @@ k8s_apiserver_settings:
   "tls-cert-file": "{{k8s_conf_dir}}/cert-k8s-apiserver.pem"
   "tls-private-key-file": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"
 
-k8s_controller_manager_cluster_cidr: "10.200.0.0/16"
-k8s_controller_manager_cluser_name: "kubernetes"
-k8s_controller_manager_leader_elect: "true"
+# The directory to store controller manager configuration.
 k8s_controller_manager_conf_dir: "{{k8s_conf_dir}}"
-k8s_controller_manager_service_cluster_ip_range: "10.32.0.0/16"
 
+# kube-controller-manager settings (can be overriden or additional added by defining
+# "k8s_controller_manager_settings_user" - see text below)
+k8s_controller_manager_settings:
+  "cluster-cidr": "10.200.0.0/16"
+  "cluster-name": "kubernetes"
+  "leader-elect": "true"
+  "service-cluster-ip-range": "10.32.0.0/16"
+  "cluster-signing-cert-file": "{{k8s_controller_manager_conf_dir}}/ca-k8s-apiserver.pem"
+  "cluster-signing-key-file": "{{k8s_controller_manager_conf_dir}}/cert-k8s-apiserver-key.pem"
+  "root-ca-file": "{{k8s_controller_manager_conf_dir}}/ca-k8s-apiserver.pem"
+  "cluster-signing-cert-file": "{{k8s_controller_manager_conf_dir}}/ca-k8s-apiserver.pem"
+  "service-account-private-key-file": "{{k8s_controller_manager_conf_dir}}/cert-k8s-apiserver-key.pem"
+
+# kube-scheduler settings
 k8s_scheduler_leader_elect: "{{k8s_controller_manager_leader_elect}}"
 
+# The port the control plane componentes should connect to etcd cluster
 etcd_client_port: "2379"
+# The interface the etcd cluster is listening on
 etcd_interface: "tap0"
 
+# The etcd certificates needed for the control plane componentes to be able
+# to connect to the etcd cluster.
 etcd_certificates:
   - ca-etcd.pem
   - ca-etcd-key.pem
@@ -84,7 +113,7 @@ etcd_certificates:
   - cert-etcd-key.pem
 ```
 
-The Kubernetes API server settings defined in `k8s_apiserver_settings` can be overriden by defining a variable called `k8s_apiserver_settings_user`. You can alse add additional settings by using this variable. E.g. to override `audit-log-maxage` and `audit-log-maxbackup` default values and add `watch-cache` add the following settings to `group_vars/k8s.yml`:
+The kube-apiserver settings defined in `k8s_apiserver_settings` can be overriden by defining a variable called `k8s_apiserver_settings_user`. You can alse add additional settings by using this variable. E.g. to override `audit-log-maxage` and `audit-log-maxbackup` default values and add `watch-cache` add the following settings to `group_vars/k8s.yml`:
 
 ```
 k8s_apiserver_settings_user:
@@ -92,6 +121,8 @@ k8s_apiserver_settings_user:
   "audit-log-maxbackup": "4"
   "watch-cache": "false"
 ```
+
+The same is true for the `kube-controller-manager` by changing `k8s_controller_manager_settings` and `k8s_controller_manager_settings_user` variables.
 
 Example Playbook
 ----------------
