@@ -108,6 +108,12 @@
     state: started
   tags:
     - k8s-controller
+
+- name: Combine k8s_scheduler_settings and k8s_scheduler_settings_user (if defined)
+  set_fact:
+    k8s_scheduler_settings: "{{k8s_scheduler_settings | combine(k8s_scheduler_settings_user|default({})) }}"
+  tags:
+    - k8s-controller
  
 - name: Create systemd unit file for kube-scheduler
   template:

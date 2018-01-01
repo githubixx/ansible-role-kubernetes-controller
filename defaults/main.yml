@@ -80,7 +80,8 @@ k8s_controller_manager_settings:
   "service-account-private-key-file": "{{k8s_controller_manager_conf_dir}}/cert-k8s-apiserver-key.pem"
 
 # kube-scheduler settings
-k8s_scheduler_leader_elect: "true"
+k8s_scheduler_settings:
+  "leader-elect": "true"
 
 # The port the control plane componentes should connect to etcd cluster
 etcd_client_port: "2379"

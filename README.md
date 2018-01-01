@@ -6,15 +6,15 @@ This role is used in [Kubernetes the not so hard way with Ansible (at scaleway) 
 Versions
 --------
 
-I tag every release and try to stay with [semantic versioning](http://semver.org). If you want to use the role I recommend to checkout the latest tag. The master branch is basically development while the tags mark stable releases. But in general I try to keep master in good shape too. A tag `r1.0.0_v1.8.0` means this is release 1.0.0 of this role and it's meant to be used with Kubernetes version 1.8.0. If the role itself changes `rX.Y.Z` will increase. If the Kubernetes version changes `vX.Y.Z` will increase. This allows to tag bugfixes and new major versions of the role while it's still developed for a specific Kubernetes release.
+I tag every release and try to stay with [semantic versioning](http://semver.org) (well kind of...). If you want to use the role I recommend to checkout the latest tag. The master branch is basically development while the tags mark stable releases. But in general I try to keep master in good shape too. A tag `r1.0.0_v1.8.0` means this is release 1.0.0 of this role and it's meant to be used with Kubernetes version 1.8.0 (but will work with any 1.8.x release of course). If the role itself changes `rX.Y.Z` will increase. If the Kubernetes version changes `vX.Y.Z` will increase. This allows to tag bugfixes and new major versions of the role while it's still developed for a specific Kubernetes release. That's especially useful for Kubernetes major releases with breaking changes.
 
 Requirements
 ------------
 
 This role requires that you already created some certificates for Kubernetes API server (see [Kubernetes the not so hard way with Ansible (at Scaleway) - Part 4 - Certificate authority (CA)](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-at-scaleway-part-4/)). The role copies the certificates from `k8s_ca_conf_directory` to the destination host. You should also setup PeerVPN (see [Kubernetes the not so hard way with Ansible (at Scaleway) - Part 3 - Peervpn](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-at-scaleway-part-3/) and of course a etcd cluster (see [Kubernetes the not so hard way with Ansible (at Scaleway) - Part 5 - etcd cluster](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-at-scaleway-part-5/)
 
-Role Variables
---------------
+Role (default) variables
+------------------------
 
 ```
 # The directory to store the K8s certificates and other configuration
@@ -97,7 +97,8 @@ k8s_controller_manager_settings:
   "service-account-private-key-file": "{{k8s_controller_manager_conf_dir}}/cert-k8s-apiserver-key.pem"
 
 # kube-scheduler settings
-k8s_scheduler_leader_elect: "{{k8s_controller_manager_leader_elect}}"
+k8s_scheduler_settings:
+  "leader-elect": "true"
 
 # The port the control plane componentes should connect to etcd cluster
 etcd_client_port: "2379"
@@ -122,7 +123,7 @@ k8s_apiserver_settings_user:
   "watch-cache": "false"
 ```
 
-The same is true for the `kube-controller-manager` by changing `k8s_controller_manager_settings` and `k8s_controller_manager_settings_user` variables.
+The same is true for the `kube-controller-manager` by adding entries to `k8s_controller_manager_settings_user` variable. For `kube-scheduler` add entries to `k8s_scheduler_settings_user` variable to override/add settings in `k8s_scheduler_settings' dictionary.
 
 Example Playbook
 ----------------
