@@ -28,12 +28,16 @@ k8s_release: "1.8.4"
 # normally "tap0" or "peervpn0".
 k8s_interface: "tap0"
 
-# The directory from where to copy the K8s certificates (needs to be
-# accessable from the host you run Ansible on)
-k8s_ca_conf_directory: "/etc/k8s/certs"
+# The directory from where to copy the K8s certificates. By default this
+# will expand to user's LOCAL $HOME (the user that run's "ansible-playbook ..."
+# plus "/k8s/certs". That means if the user's $HOME directory is e.g.
+# "/home/da_user" then "k8s_ca_conf_directory" will have a value of
+# "/home/da_user/k8s/certs".
+k8s_ca_conf_directory: "{{ '~/k8s/certs' | expanduser }}"
 # Directory where kubeconfig for Kubernetes worker nodes and kube-proxy
-# is stored among other configuration files.
-k8s_config_directory: "/etc/k8s/configs"
+# is stored among other configuration files. Same variable expansion
+# rule applies as with "k8s_ca_conf_directory"
+k8s_config_directory: "{{ '~/k8s/configs' | expanduser }}"
 
 # K8s control plane binaries to download
 k8s_controller_binaries:
