@@ -127,7 +127,7 @@ k8s_apiserver_settings_user:
   "watch-cache": "false"
 ```
 
-The same is true for the `kube-controller-manager` by adding entries to `k8s_controller_manager_settings_user` variable. For `kube-scheduler` add entries to `k8s_scheduler_settings_user` variable to override/add settings in `k8s_scheduler_settings' dictionary.
+The same is true for the `kube-controller-manager` by adding entries to `k8s_controller_manager_settings_user` variable. For `kube-scheduler` add entries to `k8s_scheduler_settings_user` variable to override/add settings in `k8s_scheduler_settings` dictionary.
 
 Example Playbook
 ----------------
