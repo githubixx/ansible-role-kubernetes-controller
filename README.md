@@ -100,7 +100,8 @@ k8s_controller_manager_settings:
   "cluster-signing-cert-file": "{{k8s_controller_manager_conf_dir}}/ca-k8s-apiserver.pem"
   "service-account-private-key-file": "{{k8s_controller_manager_conf_dir}}/cert-k8s-apiserver-key.pem"
 
-# kube-scheduler settings
+# kube-scheduler settings (can be overriden or additional added by defining
+# "k8s_scheduler_settings_user" - see text below)
 k8s_scheduler_settings:
   "leader-elect": "true"
 
