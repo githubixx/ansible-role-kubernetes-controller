@@ -1,21 +1,16 @@
+#jinja2: trim_blocks:False
+{%- set x=k8s_controller_manager_settings.__setitem__('address',hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address) -%}
+{%- set x=k8s_controller_manager_settings.__setitem__('master','http://' + hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address + ':8080') -%}
+
 [Unit]
 Description=Kubernetes Controller Manager
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
 
 [Service]
 ExecStart={{k8s_bin_dir}}/kube-controller-manager \
-  --address={{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}} \
-  --cluster-cidr={{k8s_controller_manager_cluster_cidr}} \
-  --cluster-name={{k8s_controller_manager_cluser_name}} \
-  --cluster-signing-cert-file={{k8s_controller_manager_conf_dir}}/ca-k8s-apiserver.pem \
-  --cluster-signing-key-file={{k8s_controller_manager_conf_dir}}/cert-k8s-apiserver-key.pem \
-  --leader-elect={{k8s_controller_manager_leader_elect}} \
-  --master=http://{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}:8080 \
-  --root-ca-file={{k8s_controller_manager_conf_dir}}/ca-k8s-apiserver.pem \
-  --cluster-signing-cert-file={{k8s_controller_manager_conf_dir}}/ca-k8s-apiserver.pem \
-  --service-account-private-key-file={{k8s_controller_manager_conf_dir}}/cert-k8s-apiserver-key.pem \
-  --service-cluster-ip-range={{k8s_controller_manager_service_cluster_ip_range}} \
-  --v=2
+{%- for setting in k8s_controller_manager_settings|sort %}
+  --{{setting}}={{k8s_controller_manager_settings[setting]}} {% if not loop.last %}\{% endif %}
+{%- endfor %}
 Restart=on-failure
 RestartSec=5
 

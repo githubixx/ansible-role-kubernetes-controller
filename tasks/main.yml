@@ -57,6 +57,12 @@
   tags:
     - k8s-controller
 
+- name: Combine k8s_apiserver_settings and k8s_apiserver_settings_user (if defined)
+  set_fact:
+    k8s_apiserver_settings: "{{k8s_apiserver_settings | combine(k8s_apiserver_settings_user|default({})) }}"
+  tags:
+    - k8s-controller
+
 - name: Create systemd unit file for kube-apiserver
   template:
     src: etc/systemd/system/kube-apiserver.service.j2
@@ -64,16 +70,22 @@
     owner: root
     group: root
     mode: 0644
-  notify:
-    - reload systemd
   tags:
     - k8s-controller
+  notify:
+    - reload systemd
 
 - name: Enable and start kube-apiserver
   service:
     name: kube-apiserver
     enabled: yes
     state: started
+  tags:
+    - k8s-controller
+
+- name: Combine k8s_controller_manager_settings and k8s_controller_manager_settings_user (if defined)
+  set_fact:
+    k8s_controller_manager_settings: "{{k8s_controller_manager_settings | combine(k8s_controller_manager_settings_user|default({})) }}"
   tags:
     - k8s-controller
 
@@ -94,6 +106,12 @@
     name: kube-controller-manager
     enabled: yes
     state: started
+  tags:
+    - k8s-controller
+
+- name: Combine k8s_scheduler_settings and k8s_scheduler_settings_user (if defined)
+  set_fact:
+    k8s_scheduler_settings: "{{k8s_scheduler_settings | combine(k8s_scheduler_settings_user|default({})) }}"
   tags:
     - k8s-controller
  

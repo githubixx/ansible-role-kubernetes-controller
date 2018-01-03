@@ -1,8 +1,14 @@
-{% macro cluster_hosts() %}
+#jinja2: trim_blocks:False
+{%- macro cluster_hosts() -%}
 {%- for host in groups['k8s_controller'] -%}
 https://{{hostvars[host]['ansible_' + k8s_interface].ipv4.address}}:{{etcd_client_port}}{% if not loop.last %},{% endif %}
 {%- endfor -%}
-{% endmacro %}
+{%- endmacro -%}
+
+{%- set x=k8s_apiserver_settings.__setitem__('etcd-servers',cluster_hosts()) -%}
+{%- set x=k8s_apiserver_settings.__setitem__('advertise-address',hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address) -%}
+{%- set x=k8s_apiserver_settings.__setitem__('bind-address',hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address) -%}
+{%- set x=k8s_apiserver_settings.__setitem__('insecure-bind-address',hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address) -%}
 
 [Unit]
 Description=Kubernetes API Server
@@ -10,38 +16,9 @@ Documentation=https://github.com/GoogleCloudPlatform/kubernetes
 
 [Service]
 ExecStart={{k8s_bin_dir}}/kube-apiserver \
-  --admission-control={{k8s_apiserver_admission_control}} \
-  --advertise-address={{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}} \
-  --allow-privileged={{k8s_apiserver_allow_privileged}} \
-  --apiserver-count={{k8s_apiserver_apiserver_count}} \
-  --audit-log-maxage={{k8s_apiserver_audit_log_maxage}} \
-  --audit-log-maxbackup={{k8s_apiserver_audit_log_maxbackup}} \
-  --audit-log-maxsize={{k8s_apiserver_audit_log_maxsize}} \
-  --audit-log-path={{k8s_apiserver_audit_log_path}} \
-  --authorization-mode={{k8s_apiserver_authorization_mode}} \
-  --bind-address={{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}} \
-  --client-ca-file={{k8s_conf_dir}}/ca-k8s-apiserver.pem \
-  --enable-swagger-ui={{k8s_apiserver_enable_swagger_ui}} \
-  --etcd-cafile={{k8s_conf_dir}}/ca-etcd.pem \
-  --etcd-certfile={{k8s_conf_dir}}/cert-etcd.pem \
-  --etcd-keyfile={{k8s_conf_dir}}/cert-etcd-key.pem \
-  --etcd-servers={{cluster_hosts()}} \
-  --event-ttl={{k8s_apiserver_event_ttl}} \
-  --experimental-encryption-provider-config={{k8s_conf_dir}}/encryption-config.yaml \
-  --insecure-bind-address={{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}} \
-  --kubelet-certificate-authority={{k8s_conf_dir}}/ca-k8s-apiserver.pem \
-  --kubelet-client-certificate={{k8s_conf_dir}}/cert-k8s-apiserver.pem \
-  --kubelet-client-key={{k8s_conf_dir}}/cert-k8s-apiserver-key.pem \
-  --kubelet-https={{k8s_apiserver_kubelet_https}} \
-  --kubelet-preferred-address-types={{k8s_apiserver_kubelet_preferred_address_types}} \
-  --runtime-config={{k8s_apiserver_runtime_config}} \
-  --service-account-key-file={{k8s_conf_dir}}/cert-k8s-apiserver-key.pem \
-  --service-cluster-ip-range={{k8s_apiserver_service_cluster_ip_range}} \
-  --service-node-port-range={{k8s_apiserver_service_node_port_range}} \
-  --tls-ca-file={{k8s_conf_dir}}/ca-k8s-apiserver.pem \
-  --tls-cert-file={{k8s_conf_dir}}/cert-k8s-apiserver.pem \
-  --tls-private-key-file={{k8s_conf_dir}}/cert-k8s-apiserver-key.pem \
-  --v=2
+{%- for setting in k8s_apiserver_settings|sort %}
+  --{{setting}}={{k8s_apiserver_settings[setting]}} {% if not loop.last %}\{% endif %}
+{%- endfor %}
 Restart=on-failure
 RestartSec=5
 
