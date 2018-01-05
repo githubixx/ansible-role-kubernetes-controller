@@ -93,6 +93,8 @@ k8s_controller_manager_conf_dir: "{{k8s_conf_dir}}"
 # kube-controller-manager settings (can be overriden or additional added by defining
 # "k8s_controller_manager_settings_user" - see text below)
 k8s_controller_manager_settings:
+  "address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
+  "master": "{{'http://' + hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address + ':8080'}}"
   "cluster-cidr": "10.200.0.0/16"
   "cluster-name": "kubernetes"
   "leader-elect": "true"
