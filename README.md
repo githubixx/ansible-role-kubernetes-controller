@@ -108,6 +108,8 @@ k8s_controller_manager_settings:
 # kube-scheduler settings (can be overriden or additional added by defining
 # "k8s_scheduler_settings_user" - see text below)
 k8s_scheduler_settings:
+  "address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
+  "master": "{{'http://' + hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address + ':8080'}}"
   "leader-elect": "true"
 
 # The port the control plane componentes should connect to etcd cluster

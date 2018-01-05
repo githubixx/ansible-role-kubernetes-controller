@@ -1,8 +1,4 @@
 #jinja2: trim_blocks:False
-
-{%- set x=k8s_scheduler_settings.__setitem__('address',hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address) -%}
-{%- set x=k8s_scheduler_settings.__setitem__('master','http://' + hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address + ':8080') -%}
-
 [Unit]
 Description=Kubernetes Scheduler
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
