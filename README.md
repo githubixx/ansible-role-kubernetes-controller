@@ -13,6 +13,37 @@ Requirements
 
 This role requires that you already created some certificates for Kubernetes API server (see [Kubernetes the not so hard way with Ansible (at Scaleway) - Part 4 - Certificate authority (CA)](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-at-scaleway-part-4/)). The role copies the certificates from `k8s_ca_conf_directory` to the destination host. You should also setup PeerVPN (see [Kubernetes the not so hard way with Ansible (at Scaleway) - Part 3 - Peervpn](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-at-scaleway-part-3/) and of course a etcd cluster (see [Kubernetes the not so hard way with Ansible (at Scaleway) - Part 5 - etcd cluster](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-at-scaleway-part-5/)
 
+Changelog
+---------
+
+**r3.0.0_v1.9.1**
+
+- move advertise-address,bind-address,insecure-bind-address out of kube-apiserver.service.j2 template
+- move address,master settings out of kube-controller-manager.service.j2 template / fix variable bug in `k8s_apiserver_settings`
+- move address,master settings out of kube-scheduler.service.j2 template
+- fix: use `k8s_etcd` hosts group instead of `k8s_controller` group to generate etcd server list
+- we need to wait for kube-apiserver port 8080 to become ready before running kubectl tasks
+
+**r2.0.2_v1.9.1**
+
+- update to Kubernetes v1.9.1
+
+**r2.0.1_v1.9.0**
+
+- removed duplicate key cluster-signing-cert-file from `k8s_controller_manager_settings` dictionary
+
+**r2.0.0_v1.9.0**
+
+- introduce flexible parameter settings for API server via `k8s_apiserver_settings/k8s_apiserver_settings_user`
+- introduce flexible parameter settings for controller manager via `k8s_controller_manager_settings/k8s_controller_manager_settings_user`
+- introduce flexible parameter settings for kube-scheduler via `k8s_scheduler_settings/k8s_scheduler_settings_user`
+- change defaults for `k8s_ca_conf_directory` and `k8s_config_directory` variables
+- update to Kubernetes v1.9.0
+
+
+No changelog for releases < r2.0.0_v1.9.0 (see commit history if needed)
+
+
 Role (default) variables
 ------------------------
 
