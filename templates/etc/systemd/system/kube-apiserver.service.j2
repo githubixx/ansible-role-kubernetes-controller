@@ -6,9 +6,6 @@ https://{{hostvars[host]['ansible_' + k8s_interface].ipv4.address}}:{{etcd_clien
 {%- endmacro -%}
 
 {%- set x=k8s_apiserver_settings.__setitem__('etcd-servers',cluster_hosts()) -%}
-{%- set x=k8s_apiserver_settings.__setitem__('advertise-address',hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address) -%}
-{%- set x=k8s_apiserver_settings.__setitem__('bind-address',hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address) -%}
-{%- set x=k8s_apiserver_settings.__setitem__('insecure-bind-address',hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address) -%}
 
 [Unit]
 Description=Kubernetes API Server

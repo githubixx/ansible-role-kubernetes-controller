@@ -56,6 +56,9 @@ k8s_certificates:
 # kube-apiserver settings (can be overriden or additional added by defining
 # "k8s_apiserver_settings_user" - see text below)
 k8s_apiserver_settings:
+  "advertise-address": "hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address"
+  "bind-address": "hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address"
+  "insecure-bind-address": "hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address"
   "admission-control": "Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
   "allow-privileged": "true"
   "apiserver-count": "3"
