@@ -56,6 +56,9 @@ k8s_certificates:
 # kube-apiserver settings (can be overriden or additional added by defining
 # "k8s_apiserver_settings_user" - see text below)
 k8s_apiserver_settings:
+  "advertise-address": "hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address"
+  "bind-address": "hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address"
+  "insecure-bind-address": "hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address"
   "admission-control": "Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
   "allow-privileged": "true"
   "apiserver-count": "3"
@@ -90,6 +93,8 @@ k8s_controller_manager_conf_dir: "{{k8s_conf_dir}}"
 # kube-controller-manager settings (can be overriden or additional added by defining
 # "k8s_controller_manager_settings_user" - see text below)
 k8s_controller_manager_settings:
+  "address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
+  "master": "{{'http://' + hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address + ':8080'}}"
   "cluster-cidr": "10.200.0.0/16"
   "cluster-name": "kubernetes"
   "leader-elect": "true"
@@ -103,6 +108,8 @@ k8s_controller_manager_settings:
 # kube-scheduler settings (can be overriden or additional added by defining
 # "k8s_scheduler_settings_user" - see text below)
 k8s_scheduler_settings:
+  "address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
+  "master": "{{'http://' + hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address + ':8080'}}"
   "leader-elect": "true"
 
 # The port the control plane componentes should connect to etcd cluster
