@@ -16,6 +16,10 @@ This role requires that you already created some certificates for Kubernetes API
 Changelog
 ---------
 
+**r3.0.0_v1.9.3**
+
+- update `k8s_release` to `1.9.3`
+
 **r3.0.0_v1.9.1**
 
 - move advertise-address,bind-address,insecure-bind-address out of kube-apiserver.service.j2 template
