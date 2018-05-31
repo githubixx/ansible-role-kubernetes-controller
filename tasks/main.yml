@@ -165,7 +165,7 @@
   run_once: true
   delegate_to: "{{groups.k8s_controller|first}}"
 
-- name: Wait 300 seconds for kube-apiserver port 8080 to become open on the host
+- name: Wait for kube-apiserver to listen on port 8080 on the host
   wait_for:
     port: 8080
     delay: 5
