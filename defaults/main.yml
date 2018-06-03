@@ -28,12 +28,14 @@ k8s_controller_binaries:
   - kube-scheduler
   - kubectl
 
-# K8s API daemon certificates
+# K8s kube-(apiserver|controller-manager|scheduler) certificates
 k8s_certificates:
   - ca-k8s-apiserver.pem
   - ca-k8s-apiserver-key.pem
   - cert-k8s-apiserver.pem
   - cert-k8s-apiserver-key.pem
+  - cert-k8s-controller-manager.pem
+  - cert-k8s-controller-manager-key.pem
 
 k8s_apiserver_secure_port: "6443"
 
