@@ -16,6 +16,12 @@ This role requires that you already created some certificates for Kubernetes API
 Changelog
 ---------
 
+**r4.0.0_v1.10.3**
+
+- update `k8s_release` to `1.10.3`
+- removed deprecated kube-apiserver parameter `insecure-bind-address` (see: [#59018](https://github.com/kubernetes/kubernetes/pull/59018))
+- added variable `k8s_apiserver_secure_port: 6443`
+
 **r3.0.0_v1.9.8**
 
 - update `k8s_release` to `1.9.8`
