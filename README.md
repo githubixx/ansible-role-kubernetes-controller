@@ -21,6 +21,7 @@ Changelog
 - update `k8s_release` to `1.10.3`
 - removed deprecated kube-apiserver parameter `insecure-bind-address` (see: [#59018](https://github.com/kubernetes/kubernetes/pull/59018))
 - added variable `k8s_apiserver_secure_port: 6443`
+- added parameter `secure-port` to `k8s_apiserver_settings` parameter list
 
 **r3.0.0_v1.9.8**
 
@@ -98,12 +99,14 @@ k8s_certificates:
   - cert-k8s-apiserver.pem
   - cert-k8s-apiserver-key.pem
 
+k8s_apiserver_secure_port: "6443"
+
 # kube-apiserver settings (can be overriden or additional added by defining
 # "k8s_apiserver_settings_user" - see text below)
 k8s_apiserver_settings:
   "advertise-address": "hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address"
   "bind-address": "hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address"
-  "insecure-bind-address": "hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address"
+  "secure-port": "{{k8s_apiserver_secure_port}}"
   "admission-control": "Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
   "allow-privileged": "true"
   "apiserver-count": "3"
