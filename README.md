@@ -22,6 +22,7 @@ Changelog
 - removed deprecated kube-apiserver parameter `insecure-bind-address` (see: [#59018](https://github.com/kubernetes/kubernetes/pull/59018))
 - added variable `k8s_apiserver_secure_port: 6443`
 - added parameter `secure-port` to `k8s_apiserver_settings` parameter list
+- added kube-scheduler/kube-controller-manager certificate files to k8s_certificates list
 
 **r3.0.0_v1.9.8**
 
@@ -98,6 +99,10 @@ k8s_certificates:
   - ca-k8s-apiserver-key.pem
   - cert-k8s-apiserver.pem
   - cert-k8s-apiserver-key.pem
+  - cert-k8s-controller-manager.pem
+  - cert-k8s-controller-manager-key.pem
+  - cert-k8s-scheduler.pem
+  - cert-k8s-scheduler-key.pem
 
 k8s_apiserver_secure_port: "6443"
 
