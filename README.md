@@ -26,6 +26,7 @@ Changelog
 - added variable `k8s_controller_manager_conf_dir` / added kubeconfig for kube-controller-manager
 - added variable `k8s_scheduler_conf_dir` / added kubeconfig for kube-scheduler
 - added kubeconfig for `admin` user (located by default in `k8s_conf_dir`)
+- new `service-account-key-file` value for kube-apiserver
 
 **r3.0.0_v1.9.8**
 
@@ -136,7 +137,7 @@ k8s_apiserver_settings:
   "kubelet-certificate-authority": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
   "kubelet-client-certificate": "{{k8s_conf_dir}}/cert-k8s-apiserver.pem"
   "kubelet-client-key": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"
-  "service-account-key-file": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"
+  "service-account-key-file": "{{k8s_conf_dir}}/cert-k8s-controller-manager-sa.pem"
   "tls-ca-file": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
   "tls-cert-file": "{{k8s_conf_dir}}/cert-k8s-apiserver.pem"
   "tls-private-key-file": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"

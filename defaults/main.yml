@@ -70,7 +70,7 @@ k8s_apiserver_settings:
   "kubelet-certificate-authority": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
   "kubelet-client-certificate": "{{k8s_conf_dir}}/cert-k8s-apiserver.pem"
   "kubelet-client-key": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"
-  "service-account-key-file": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"
+  "service-account-key-file": "{{k8s_conf_dir}}/cert-k8s-controller-manager-sa.pem"
   "tls-cert-file": "{{k8s_conf_dir}}/cert-k8s-apiserver.pem"
   "tls-private-key-file": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"
 
