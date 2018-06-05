@@ -75,7 +75,7 @@ k8s_apiserver_settings:
   "tls-private-key-file": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"
 
 # The directory to store controller manager configuration.
-k8s_controller_manager_conf_dir: "{{k8s_conf_dir}}"
+k8s_controller_manager_conf_dir: "/var/lib/kube-controller-manager"
 # K8s controller manager settings (can be overriden or additional added by defining
 # "k8s_controller_manager_settings_user")
 k8s_controller_manager_settings:
@@ -90,6 +90,8 @@ k8s_controller_manager_settings:
   "root-ca-file": "{{k8s_controller_manager_conf_dir}}/ca-k8s-apiserver.pem"
   "service-account-private-key-file": "{{k8s_controller_manager_conf_dir}}/cert-k8s-apiserver-key.pem"
 
+# The directory to store scheduler configuration.
+k8s_scheduler_conf_dir: "/var/lib/kube-scheduler"
 # kube-scheduler settings
 k8s_scheduler_settings:
   "address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"

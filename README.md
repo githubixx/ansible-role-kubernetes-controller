@@ -22,7 +22,10 @@ Changelog
 - removed deprecated kube-apiserver parameter `insecure-bind-address` (see: [#59018](https://github.com/kubernetes/kubernetes/pull/59018))
 - added variable `k8s_apiserver_secure_port: 6443`
 - added parameter `secure-port` to `k8s_apiserver_settings` parameter list
-- added kube-controller-manager-ca certificate files to `k8s_certificates` list
+- added `kube-controller-manager-ca` certificate files to `k8s_certificates` list
+- added variable `k8s_controller_manager_conf_dir` / added kubeconfig for kube-controller-manager
+- added variable `k8s_scheduler_conf_dir` / added kubeconfig for kube-scheduler
+- added kubeconfig for `admin` user (located by default in `k8s_conf_dir`)
 
 **r3.0.0_v1.9.8**
 
@@ -69,7 +72,7 @@ k8s_conf_dir: "/var/lib/kubernetes"
 # The directory to store the K8s binaries
 k8s_bin_dir: "/usr/local/bin"
 # K8s release
-k8s_release: "1.9.8"
+k8s_release: "1.10.3"
 # The interface on which the K8s services should listen on. As all cluster
 # communication should use the PeerVPN interface the interface name is
 # normally "tap0" or "peervpn0".
@@ -139,7 +142,7 @@ k8s_apiserver_settings:
   "tls-private-key-file": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"
 
 # The directory to store controller manager configuration.
-k8s_controller_manager_conf_dir: "{{k8s_conf_dir}}"
+k8s_controller_manager_conf_dir: "/var/lib/kube-controller-manager"
 
 # kube-controller-manager settings (can be overriden or additional added by defining
 # "k8s_controller_manager_settings_user" - see text below)
@@ -156,6 +159,8 @@ k8s_controller_manager_settings:
   "cluster-signing-cert-file": "{{k8s_controller_manager_conf_dir}}/ca-k8s-apiserver.pem"
   "service-account-private-key-file": "{{k8s_controller_manager_conf_dir}}/cert-k8s-apiserver-key.pem"
 
+# The directory to store scheduler configuration.
+k8s_scheduler_conf_dir: "/var/lib/kube-scheduler"
 # kube-scheduler settings (can be overriden or additional added by defining
 # "k8s_scheduler_settings_user" - see text below)
 k8s_scheduler_settings:

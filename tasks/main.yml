@@ -1,5 +1,5 @@
 ---
-- name: Create Kubernetes config directory
+- name: Create Kubernetes/kube-apiserver config directory
   file:
     path: "{{k8s_conf_dir}}"
     state: directory
@@ -8,6 +8,56 @@
     group: root
   tags:
     - k8s-controller
+
+- name: Create kube-controller-manager config directory
+  file:
+    path: "{{k8s_controller_manager_conf_dir}}"
+    state: directory
+    mode: 0700
+    owner: root
+    group: root
+  tags:
+    - k8s-controller
+
+- name: Create kube-controller-manager kubeconfig
+  template:
+    src: "{{k8s_config_directory}}/kube-controller-manager.kubeconfig"
+    dest: "{{k8s_controller_manager_conf_dir}}/kube-controller-manager.kubeconfig"
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - k8s-worker
+
+- name: Create scheduler config directory
+  file:
+    path: "{{k8s_scheduler_conf_dir}}"
+    state: directory
+    mode: 0700
+    owner: root
+    group: root
+  tags:
+    - k8s-controller
+
+- name: Create kube-scheduler kubeconfig
+  template:
+    src: "{{k8s_config_directory}}/kube-scheduler.kubeconfig"
+    dest: "{{k8s_scheduler_conf_dir}}/kube-scheduler.kubeconfig"
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - k8s-worker
+
+- name: Create kubeconfig for admin user
+  template:
+    src: "{{k8s_config_directory}}/admin.kubeconfig"
+    dest: "{{k8s_scheduler_conf_dir}}/admin.kubeconfig"
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - k8s-worker
 
 - name: Copy etcd certificates
   copy:
