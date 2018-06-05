@@ -27,6 +27,7 @@ Changelog
 - added variable `k8s_scheduler_conf_dir` / added kubeconfig for kube-scheduler
 - added kubeconfig for `admin` user (located by default in `k8s_conf_dir`)
 - new `service-account-key-file` value for kube-apiserver
+- changes in `k8s_controller_manager_settings`: removed `master` parameter, added `kubeconfig`, new value for `service-account-private-key-file`, new parameter `use-service-account-credentials`
 
 **r3.0.0_v1.9.8**
 
@@ -149,16 +150,16 @@ k8s_controller_manager_conf_dir: "/var/lib/kube-controller-manager"
 # "k8s_controller_manager_settings_user" - see text below)
 k8s_controller_manager_settings:
   "address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
-  "master": "{{'http://' + hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address + ':8080'}}"
   "cluster-cidr": "10.200.0.0/16"
   "cluster-name": "kubernetes"
+  "kubeconfig": "{{k8s_controller_manager_conf_dir}}/kube-controller-manager.kubeconfig"
   "leader-elect": "true"
   "service-cluster-ip-range": "10.32.0.0/16"
-  "cluster-signing-cert-file": "{{k8s_controller_manager_conf_dir}}/ca-k8s-apiserver.pem"
-  "cluster-signing-key-file": "{{k8s_controller_manager_conf_dir}}/cert-k8s-apiserver-key.pem"
-  "root-ca-file": "{{k8s_controller_manager_conf_dir}}/ca-k8s-apiserver.pem"
-  "cluster-signing-cert-file": "{{k8s_controller_manager_conf_dir}}/ca-k8s-apiserver.pem"
-  "service-account-private-key-file": "{{k8s_controller_manager_conf_dir}}/cert-k8s-apiserver-key.pem"
+  "cluster-signing-cert-file": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
+  "cluster-signing-key-file": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"
+  "root-ca-file": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
+  "service-account-private-key-file": "{{k8s_conf_dir}}/cert-k8s-controller-manager-sa-key.pem"
+  "use-service-account-credentials": "true"
 
 # The directory to store scheduler configuration.
 k8s_scheduler_conf_dir: "/var/lib/kube-scheduler"
