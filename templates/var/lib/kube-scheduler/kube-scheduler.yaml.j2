@@ -1,0 +1,9 @@
+#jinja2: trim_blocks:False
+apiVersion: componentconfig/v1alpha1
+kind: KubeSchedulerConfiguration
+clientConnection:
+  kubeconfig: "{{k8s_scheduler_conf_dir}}/kube-scheduler.kubeconfig"
+healthzBindAddress: {{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}:10251
+leaderElection:
+  leaderElect: true
+metricsBindAddress: {{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}:10251

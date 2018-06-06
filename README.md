@@ -24,8 +24,8 @@ Changelog
 - added parameter `secure-port` to `k8s_apiserver_settings` parameter list
 - added `kube-controller-manager-ca` certificate files to `k8s_certificates` list
 - added variable `k8s_controller_manager_conf_dir` / added kubeconfig for kube-controller-manager
-- added variable `k8s_scheduler_conf_dir` / added kubeconfig for kube-scheduler
-- added kubeconfig for `admin` user (located by default in `k8s_conf_dir`)
+- added variable `k8s_scheduler_conf_dir` / added kubeconfig for kube-scheduler / settings for kube-scheduler now in ` templates/var/lib/kube-scheduler/kube-scheduler.yaml.j2`
+- added kubeconfig for `admin` user (located by default in `k8s_conf_dir`). This `admin.kubeconfig` will be needed for `kubectl`
 - new `service-account-key-file` value for kube-apiserver
 - changes in `k8s_controller_manager_settings`: removed `master` parameter, added `kubeconfig`, new value for `service-account-private-key-file`, new parameter `use-service-account-credentials`
 
@@ -163,12 +163,11 @@ k8s_controller_manager_settings:
 
 # The directory to store scheduler configuration.
 k8s_scheduler_conf_dir: "/var/lib/kube-scheduler"
-# kube-scheduler settings (can be overriden or additional added by defining
-# "k8s_scheduler_settings_user" - see text below)
+
+# kube-scheduler settings (only --config left,
+# see https://github.com/kubernetes/kubernetes/pull/62515, remaining parameter deprecated)
 k8s_scheduler_settings:
-  "address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
-  "master": "{{'http://' + hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address + ':8080'}}"
-  "leader-elect": "true"
+  "config": "{{k8s_scheduler_conf_dir}}/kube-scheduler.yaml"
 
 # The port the control plane componentes should connect to etcd cluster
 etcd_client_port: "2379"

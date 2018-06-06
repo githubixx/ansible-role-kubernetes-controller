@@ -93,11 +93,10 @@ k8s_controller_manager_settings:
 
 # The directory to store scheduler configuration.
 k8s_scheduler_conf_dir: "/var/lib/kube-scheduler"
-# kube-scheduler settings
+# kube-scheduler settings (only --config left,
+# see https://github.com/kubernetes/kubernetes/pull/62515)
 k8s_scheduler_settings:
-  "address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
-  "master": "{{'http://' + hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address + ':8080'}}"
-  "leader-elect": "true"
+  "config": "{{k8s_scheduler_conf_dir}}/kube-scheduler.yaml"
 
 # The port the control plane componentes should connect to etcd cluster
 etcd_client_port: "2379"
