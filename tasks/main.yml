@@ -62,7 +62,7 @@
 - name: Create kubeconfig for admin user
   template:
     src: "{{k8s_config_directory}}/admin.kubeconfig"
-    dest: "{{k8s_scheduler_conf_dir}}/admin.kubeconfig"
+    dest: "{{k8s_conf_dir}}/admin.kubeconfig"
     owner: root
     group: root
     mode: 0644
@@ -234,7 +234,7 @@
   delegate_to: "{{groups.k8s_controller|first}}"
 
 - name: Apply kube-apiserver-to-kubelet ClusterRole
-  shell: "kubectl apply --kubeconfig {{k8s_config_directory}}/admin.kubeconfig -f /tmp/kube-apiserver-to-kubelet_cluster_role.yaml"
+  shell: "kubectl apply --kubeconfig {{k8s_conf_dir}}/admin.kubeconfig -f /tmp/kube-apiserver-to-kubelet_cluster_role.yaml"
   register: kube_apiserver_to_kubelet_cluster_role
   run_once: true
   delegate_to: "{{groups.k8s_controller|first}}"
@@ -242,7 +242,7 @@
     - k8s-controller
 
 - name: Apply kube-apiserver-to-kubelet ClusterRoleBinding
-  shell: "kubectl apply --kubeconfig {{k8s_config_directory}}/admin.kubeconfig -f /tmp/kube-apiserver-to-kubelet_cluster_role_binding.yaml"
+  shell: "kubectl apply --kubeconfig {{k8s_conf_dir}}/admin.kubeconfig -f /tmp/kube-apiserver-to-kubelet_cluster_role_binding.yaml"
   register: kube_apiserver_to_kubelet_cluster_role_binding
   run_once: true
   delegate_to: "{{groups.k8s_controller|first}}"
