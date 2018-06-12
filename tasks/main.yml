@@ -8,6 +8,7 @@
     group: root
   tags:
     - k8s-controller
+    - k8s-controller-base
 
 - name: Create kube-controller-manager config directory
   file:
@@ -18,6 +19,7 @@
     group: root
   tags:
     - k8s-controller
+    - k8s-controller-base
 
 - name: Create kube-controller-manager kubeconfig
   template:
@@ -28,6 +30,7 @@
     mode: 0644
   tags:
     - k8s-worker
+    - k8s-controller-base
 
 - name: Create scheduler config directory
   file:
@@ -38,6 +41,7 @@
     group: root
   tags:
     - k8s-controller
+    - k8s-controller-base
 
 - name: Create kube-scheduler kubeconfig
   template:
@@ -47,7 +51,8 @@
     group: root
     mode: 0644
   tags:
-    - k8s-worker
+    - k8s-controller
+    - k8s-controller-base
 
 - name: Create kube-scheduler.yaml
   template:
@@ -57,7 +62,8 @@
     group: root
     mode: 0644
   tags:
-    - k8s-worker
+    - k8s-controller
+    - k8s-controller-base
 
 - name: Create kubeconfig for admin user
   template:
@@ -67,7 +73,8 @@
     group: root
     mode: 0644
   tags:
-    - k8s-worker
+    - k8s-controller
+    - k8s-controller-base
 
 - name: Copy etcd certificates
   copy:
@@ -80,6 +87,7 @@
     - "{{etcd_certificates}}"
   tags:
     - k8s-controller
+    - k8s-controller-base
 
 - name: Copy Kubernetes certificates
   copy:
@@ -92,6 +100,7 @@
     - "{{k8s_certificates}}"
   tags:
     - k8s-controller
+    - k8s-controller-base
 
 - name: Downloading official Kubernetes binaries
   get_url:
@@ -116,6 +125,7 @@
     group: root
   tags:
     - k8s-controller
+    - k8s-controller-base
 
 - name: Combine k8s_apiserver_settings and k8s_apiserver_settings_user (if defined)
   set_fact:
