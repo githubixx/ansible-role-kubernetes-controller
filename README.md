@@ -16,6 +16,19 @@ This role requires that you already created some certificates for Kubernetes API
 Changelog
 ---------
 
+**r4.0.0_v1.10.4**
+
+- update `k8s_release` to `1.10.4`
+- removed deprecated kube-apiserver parameter `insecure-bind-address` (see: [#59018](https://github.com/kubernetes/kubernetes/pull/59018))
+- added variable `k8s_apiserver_secure_port: 6443`
+- added parameter `secure-port` to `k8s_apiserver_settings` parameter list
+- added `kube-controller-manager-ca` certificate files to `k8s_certificates` list
+- added variable `k8s_controller_manager_conf_dir` / added kubeconfig for kube-controller-manager
+- added variable `k8s_scheduler_conf_dir` / added kubeconfig for kube-scheduler / settings for kube-scheduler now in ` templates/var/lib/kube-scheduler/kube-scheduler.yaml.j2`
+- added kubeconfig for `admin` user (located by default in `k8s_conf_dir`). This `admin.kubeconfig` will be needed for `kubectl`
+- new `service-account-key-file` value for kube-apiserver
+- changes in `k8s_controller_manager_settings`: removed `master` parameter, added `kubeconfig`, new value for `service-account-private-key-file`, new parameter `use-service-account-credentials`
+
 **r3.0.0_v1.9.8**
 
 - update `k8s_release` to `1.9.8`
@@ -61,7 +74,7 @@ k8s_conf_dir: "/var/lib/kubernetes"
 # The directory to store the K8s binaries
 k8s_bin_dir: "/usr/local/bin"
 # K8s release
-k8s_release: "1.9.8"
+k8s_release: "1.10.4"
 # The interface on which the K8s services should listen on. As all cluster
 # communication should use the PeerVPN interface the interface name is
 # normally "tap0" or "peervpn0".
@@ -91,14 +104,18 @@ k8s_certificates:
   - ca-k8s-apiserver-key.pem
   - cert-k8s-apiserver.pem
   - cert-k8s-apiserver-key.pem
+  - cert-k8s-controller-manager-sa.pem
+  - cert-k8s-controller-manager-sa-key.pem
+
+k8s_apiserver_secure_port: "6443"
 
 # kube-apiserver settings (can be overriden or additional added by defining
 # "k8s_apiserver_settings_user" - see text below)
 k8s_apiserver_settings:
   "advertise-address": "hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address"
   "bind-address": "hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address"
-  "insecure-bind-address": "hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address"
-  "admission-control": "Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
+  "secure-port": "{{k8s_apiserver_secure_port}}"
+  "enable-admission-plugins": "Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
   "allow-privileged": "true"
   "apiserver-count": "3"
   "authorization-mode": "Node,RBAC"
@@ -121,35 +138,36 @@ k8s_apiserver_settings:
   "kubelet-certificate-authority": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
   "kubelet-client-certificate": "{{k8s_conf_dir}}/cert-k8s-apiserver.pem"
   "kubelet-client-key": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"
-  "service-account-key-file": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"
+  "service-account-key-file": "{{k8s_conf_dir}}/cert-k8s-controller-manager-sa.pem"
   "tls-ca-file": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
   "tls-cert-file": "{{k8s_conf_dir}}/cert-k8s-apiserver.pem"
   "tls-private-key-file": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"
 
 # The directory to store controller manager configuration.
-k8s_controller_manager_conf_dir: "{{k8s_conf_dir}}"
+k8s_controller_manager_conf_dir: "/var/lib/kube-controller-manager"
 
 # kube-controller-manager settings (can be overriden or additional added by defining
 # "k8s_controller_manager_settings_user" - see text below)
 k8s_controller_manager_settings:
   "address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
-  "master": "{{'http://' + hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address + ':8080'}}"
   "cluster-cidr": "10.200.0.0/16"
   "cluster-name": "kubernetes"
+  "kubeconfig": "{{k8s_controller_manager_conf_dir}}/kube-controller-manager.kubeconfig"
   "leader-elect": "true"
   "service-cluster-ip-range": "10.32.0.0/16"
-  "cluster-signing-cert-file": "{{k8s_controller_manager_conf_dir}}/ca-k8s-apiserver.pem"
-  "cluster-signing-key-file": "{{k8s_controller_manager_conf_dir}}/cert-k8s-apiserver-key.pem"
-  "root-ca-file": "{{k8s_controller_manager_conf_dir}}/ca-k8s-apiserver.pem"
-  "cluster-signing-cert-file": "{{k8s_controller_manager_conf_dir}}/ca-k8s-apiserver.pem"
-  "service-account-private-key-file": "{{k8s_controller_manager_conf_dir}}/cert-k8s-apiserver-key.pem"
+  "cluster-signing-cert-file": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
+  "cluster-signing-key-file": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"
+  "root-ca-file": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
+  "service-account-private-key-file": "{{k8s_conf_dir}}/cert-k8s-controller-manager-sa-key.pem"
+  "use-service-account-credentials": "true"
 
-# kube-scheduler settings (can be overriden or additional added by defining
-# "k8s_scheduler_settings_user" - see text below)
+# The directory to store scheduler configuration.
+k8s_scheduler_conf_dir: "/var/lib/kube-scheduler"
+
+# kube-scheduler settings (only --config left,
+# see https://github.com/kubernetes/kubernetes/pull/62515, remaining parameter deprecated)
 k8s_scheduler_settings:
-  "address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
-  "master": "{{'http://' + hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address + ':8080'}}"
-  "leader-elect": "true"
+  "config": "{{k8s_scheduler_conf_dir}}/kube-scheduler.yaml"
 
 # The port the control plane componentes should connect to etcd cluster
 etcd_client_port: "2379"

@@ -1,5 +1,5 @@
 ---
-- name: Create Kubernetes config directory
+- name: Create Kubernetes/kube-apiserver config directory
   file:
     path: "{{k8s_conf_dir}}"
     state: directory
@@ -8,6 +8,73 @@
     group: root
   tags:
     - k8s-controller
+    - k8s-controller-base
+
+- name: Create kube-controller-manager config directory
+  file:
+    path: "{{k8s_controller_manager_conf_dir}}"
+    state: directory
+    mode: 0700
+    owner: root
+    group: root
+  tags:
+    - k8s-controller
+    - k8s-controller-base
+
+- name: Create kube-controller-manager kubeconfig
+  template:
+    src: "{{k8s_config_directory}}/kube-controller-manager.kubeconfig"
+    dest: "{{k8s_controller_manager_conf_dir}}/kube-controller-manager.kubeconfig"
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - k8s-worker
+    - k8s-controller-base
+
+- name: Create scheduler config directory
+  file:
+    path: "{{k8s_scheduler_conf_dir}}"
+    state: directory
+    mode: 0700
+    owner: root
+    group: root
+  tags:
+    - k8s-controller
+    - k8s-controller-base
+
+- name: Create kube-scheduler kubeconfig
+  template:
+    src: "{{k8s_config_directory}}/kube-scheduler.kubeconfig"
+    dest: "{{k8s_scheduler_conf_dir}}/kube-scheduler.kubeconfig"
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - k8s-controller
+    - k8s-controller-base
+
+- name: Create kube-scheduler.yaml
+  template:
+    src: "templates/var/lib/kube-scheduler/kube-scheduler.yaml.j2"
+    dest: "{{k8s_scheduler_conf_dir}}/kube-scheduler.yaml"
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - k8s-controller
+    - k8s-controller-base
+
+- name: Create kubeconfig for admin user
+  template:
+    src: "{{k8s_config_directory}}/admin.kubeconfig"
+    dest: "{{k8s_conf_dir}}/admin.kubeconfig"
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - k8s-controller
+    - k8s-controller-base
 
 - name: Copy etcd certificates
   copy:
@@ -20,6 +87,7 @@
     - "{{etcd_certificates}}"
   tags:
     - k8s-controller
+    - k8s-controller-base
 
 - name: Copy Kubernetes certificates
   copy:
@@ -32,6 +100,7 @@
     - "{{k8s_certificates}}"
   tags:
     - k8s-controller
+    - k8s-controller-base
 
 - name: Downloading official Kubernetes binaries
   get_url:
@@ -56,6 +125,7 @@
     group: root
   tags:
     - k8s-controller
+    - k8s-controller-base
 
 - name: Combine k8s_apiserver_settings and k8s_apiserver_settings_user (if defined)
   set_fact:
@@ -174,7 +244,7 @@
   delegate_to: "{{groups.k8s_controller|first}}"
 
 - name: Apply kube-apiserver-to-kubelet ClusterRole
-  shell: "kubectl --server={{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}:8080 apply -f /tmp/kube-apiserver-to-kubelet_cluster_role.yaml"
+  shell: "kubectl apply --kubeconfig {{k8s_conf_dir}}/admin.kubeconfig -f /tmp/kube-apiserver-to-kubelet_cluster_role.yaml"
   register: kube_apiserver_to_kubelet_cluster_role
   run_once: true
   delegate_to: "{{groups.k8s_controller|first}}"
@@ -182,7 +252,7 @@
     - k8s-controller
 
 - name: Apply kube-apiserver-to-kubelet ClusterRoleBinding
-  shell: "kubectl --server={{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}:8080 apply -f /tmp/kube-apiserver-to-kubelet_cluster_role_binding.yaml"
+  shell: "kubectl apply --kubeconfig {{k8s_conf_dir}}/admin.kubeconfig -f /tmp/kube-apiserver-to-kubelet_cluster_role_binding.yaml"
   register: kube_apiserver_to_kubelet_cluster_role_binding
   run_once: true
   delegate_to: "{{groups.k8s_controller|first}}"
