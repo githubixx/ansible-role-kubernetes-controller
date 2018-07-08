@@ -16,6 +16,10 @@ This role requires that you already created some certificates for Kubernetes API
 Changelog
 ---------
 
+**r4.0.1_v1.10.4**
+
+- wait for kube-apiserver on port 8080 no longer needed (fixes [#11](https://github.com/githubixx/ansible-role-kubernetes-controller/issues/11))
+
 **r4.0.0_v1.10.4**
 
 - update `k8s_release` to `1.10.4`
