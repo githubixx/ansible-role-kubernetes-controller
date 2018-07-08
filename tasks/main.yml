@@ -235,14 +235,6 @@
   run_once: true
   delegate_to: "{{groups.k8s_controller|first}}"
 
-- name: Wait for kube-apiserver to listen on port 8080 on the host
-  wait_for:
-    port: 8080
-    delay: 5
-    host: "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
-  run_once: true
-  delegate_to: "{{groups.k8s_controller|first}}"
-
 - name: Apply kube-apiserver-to-kubelet ClusterRole
   shell: "kubectl apply --kubeconfig {{k8s_conf_dir}}/admin.kubeconfig -f /tmp/kube-apiserver-to-kubelet_cluster_role.yaml"
   register: kube_apiserver_to_kubelet_cluster_role
