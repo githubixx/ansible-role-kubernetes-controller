@@ -16,6 +16,10 @@ This role requires that you already created some certificates for Kubernetes API
 Changelog
 ---------
 
+**r5.0.0_v1.11.3**
+
+- update `k8s_release` to `1.11.3`
+
 **r4.0.4_v1.10.8**
 
 - update `k8s_release` to `1.10.8`
