@@ -27,10 +27,10 @@ k8s_conf_dir: "/var/lib/kubernetes"
 # The directory to store the K8s binaries
 k8s_bin_dir: "/usr/local/bin"
 # K8s release
-k8s_release: "1.10.8"
+k8s_release: "1.12.3"
 # The interface on which the K8s services should listen on. As all cluster
-# communication should use the PeerVPN interface the interface name is
-# normally "tap0" or "peervpn0".
+# communication should use a VPN interface the interface name is
+# normally "wg0" (WireGuard),"peervpn0" (PeerVPN) or "tap0".
 k8s_interface: "tap0"
 
 # The directory from where to copy the K8s certificates. By default this
@@ -51,7 +51,7 @@ k8s_controller_binaries:
   - kube-scheduler
   - kubectl
 
-# K8s API daemon certificates
+# K8s kube-(apiserver|controller-manager-sa) certificates
 k8s_certificates:
   - ca-k8s-apiserver.pem
   - ca-k8s-apiserver-key.pem
@@ -62,11 +62,11 @@ k8s_certificates:
 
 k8s_apiserver_secure_port: "6443"
 
-# kube-apiserver settings (can be overriden or additional added by defining
-# "k8s_apiserver_settings_user" - see text below)
+# K8s API daemon settings (can be overriden or additional added by defining
+# "k8s_apiserver_settings_user")
 k8s_apiserver_settings:
-  "advertise-address": "hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address"
-  "bind-address": "hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address"
+  "advertise-address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
+  "bind-address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
   "secure-port": "{{k8s_apiserver_secure_port}}"
   "enable-admission-plugins": "Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
   "allow-privileged": "true"
@@ -79,7 +79,9 @@ k8s_apiserver_settings:
   "enable-swagger-ui": "true"
   "event-ttl": "1h"
   "kubelet-https": "true"
-  "kubelet-preferred-address-types": "InternalIP,Hostname,ExternalIP"
+  "kubelet-preferred-address-types": "InternalIP,Hostname,ExternalIP" # "--kubelet-preferred-address-types" defaults to:
+                                                                      # "Hostname,InternalDNS,InternalIP,ExternalDNS,ExternalIP"
+                                                                      # Needs to be changed to make "kubectl logs" and "kubectl exec" work.
   "runtime-config": "api/all"
   "service-cluster-ip-range": "10.32.0.0/16"
   "service-node-port-range": "30000-32767"
@@ -92,15 +94,13 @@ k8s_apiserver_settings:
   "kubelet-client-certificate": "{{k8s_conf_dir}}/cert-k8s-apiserver.pem"
   "kubelet-client-key": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"
   "service-account-key-file": "{{k8s_conf_dir}}/cert-k8s-controller-manager-sa.pem"
-  "tls-ca-file": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
   "tls-cert-file": "{{k8s_conf_dir}}/cert-k8s-apiserver.pem"
   "tls-private-key-file": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"
 
 # The directory to store controller manager configuration.
 k8s_controller_manager_conf_dir: "/var/lib/kube-controller-manager"
-
-# kube-controller-manager settings (can be overriden or additional added by defining
-# "k8s_controller_manager_settings_user" - see text below)
+# K8s controller manager settings (can be overriden or additional added by defining
+# "k8s_controller_manager_settings_user")
 k8s_controller_manager_settings:
   "address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
   "cluster-cidr": "10.200.0.0/16"
@@ -116,9 +116,8 @@ k8s_controller_manager_settings:
 
 # The directory to store scheduler configuration.
 k8s_scheduler_conf_dir: "/var/lib/kube-scheduler"
-
 # kube-scheduler settings (only --config left,
-# see https://github.com/kubernetes/kubernetes/pull/62515, remaining parameter deprecated)
+# see https://github.com/kubernetes/kubernetes/pull/62515)
 k8s_scheduler_settings:
   "config": "{{k8s_scheduler_conf_dir}}/kube-scheduler.yaml"
 

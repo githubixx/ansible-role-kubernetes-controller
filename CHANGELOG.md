@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+**r5.0.1_v1.12.3**
+
+- update `k8s_release` to `1.12.3`
+
 **r5.0.0_v1.11.3**
 
 - update `k8s_release` to `1.11.3`
