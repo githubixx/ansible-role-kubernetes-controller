@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+**r5.0.1_v1.12.3**
+
+- update `k8s_release` to `1.12.3`
+- kube-apiserver: added `Priority` admission plugin
+- kube-scheduler: deprecated group version changed from `componentconfig/v1alpha1` to `kubescheduler.config.k8s.io/v1alpha1`
+- kube-controller-manager: replace deprecated `--address` setting with `--bind-address`
+
 **r5.0.0_v1.11.3**
 
 - update `k8s_release` to `1.11.3`
