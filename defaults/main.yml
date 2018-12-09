@@ -79,7 +79,7 @@ k8s_controller_manager_conf_dir: "/var/lib/kube-controller-manager"
 # K8s controller manager settings (can be overriden or additional added by defining
 # "k8s_controller_manager_settings_user")
 k8s_controller_manager_settings:
-  "address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
+  "bind-address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
   "cluster-cidr": "10.200.0.0/16"
   "cluster-name": "kubernetes"
   "kubeconfig": "{{k8s_controller_manager_conf_dir}}/kube-controller-manager.kubeconfig"
