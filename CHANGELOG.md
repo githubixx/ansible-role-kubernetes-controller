@@ -3,6 +3,7 @@ Changelog
 
 **6.0.0+1.13.2**
 
+- update `k8s_release` to `1.13.2`
 - use correct semantic versioning as described in https://semver.org. Needed for Ansible Galaxy importer as it now insists on using semantic versioning.
 - make Ansible linter happy
 
