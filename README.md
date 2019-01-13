@@ -89,7 +89,7 @@ k8s_apiserver_settings:
   "etcd-cafile": "{{k8s_conf_dir}}/ca-etcd.pem"
   "etcd-certfile": "{{k8s_conf_dir}}/cert-etcd.pem"
   "etcd-keyfile": "{{k8s_conf_dir}}/cert-etcd-key.pem"
-  "experimental-encryption-provider-config": "{{k8s_conf_dir}}/encryption-config.yaml"
+  "encryption-provider-config": "{{k8s_conf_dir}}/encryption-config.yaml"
   "kubelet-certificate-authority": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
   "kubelet-client-certificate": "{{k8s_conf_dir}}/cert-k8s-apiserver.pem"
   "kubelet-client-key": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"

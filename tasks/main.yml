@@ -1,7 +1,7 @@
 ---
 - name: Create Kubernetes/kube-apiserver config directory
   file:
-    path: "{{k8s_conf_dir}}"
+    path: "{{ k8s_conf_dir }}"
     state: directory
     mode: 0700
     owner: root
@@ -12,7 +12,7 @@
 
 - name: Create kube-controller-manager config directory
   file:
-    path: "{{k8s_controller_manager_conf_dir}}"
+    path: "{{ k8s_controller_manager_conf_dir }}"
     state: directory
     mode: 0700
     owner: root
@@ -23,8 +23,8 @@
 
 - name: Create kube-controller-manager kubeconfig
   template:
-    src: "{{k8s_config_directory}}/kube-controller-manager.kubeconfig"
-    dest: "{{k8s_controller_manager_conf_dir}}/kube-controller-manager.kubeconfig"
+    src: "{{ k8s_config_directory }}/kube-controller-manager.kubeconfig"
+    dest: "{{ k8s_controller_manager_conf_dir }}/kube-controller-manager.kubeconfig"
     owner: root
     group: root
     mode: 0644
@@ -34,7 +34,7 @@
 
 - name: Create scheduler config directory
   file:
-    path: "{{k8s_scheduler_conf_dir}}"
+    path: "{{ k8s_scheduler_conf_dir }}"
     state: directory
     mode: 0700
     owner: root
@@ -45,8 +45,8 @@
 
 - name: Create kube-scheduler kubeconfig
   template:
-    src: "{{k8s_config_directory}}/kube-scheduler.kubeconfig"
-    dest: "{{k8s_scheduler_conf_dir}}/kube-scheduler.kubeconfig"
+    src: "{{ k8s_config_directory }}/kube-scheduler.kubeconfig"
+    dest: "{{ k8s_scheduler_conf_dir }}/kube-scheduler.kubeconfig"
     owner: root
     group: root
     mode: 0644
@@ -57,7 +57,7 @@
 - name: Create kube-scheduler.yaml
   template:
     src: "templates/var/lib/kube-scheduler/kube-scheduler.yaml.j2"
-    dest: "{{k8s_scheduler_conf_dir}}/kube-scheduler.yaml"
+    dest: "{{ k8s_scheduler_conf_dir }}/kube-scheduler.yaml"
     owner: root
     group: root
     mode: 0644
@@ -67,8 +67,8 @@
 
 - name: Create kubeconfig for admin user
   template:
-    src: "{{k8s_config_directory}}/admin.kubeconfig"
-    dest: "{{k8s_conf_dir}}/admin.kubeconfig"
+    src: "{{ k8s_config_directory }}/admin.kubeconfig"
+    dest: "{{ k8s_conf_dir }}/admin.kubeconfig"
     owner: root
     group: root
     mode: 0644
@@ -78,37 +78,37 @@
 
 - name: Copy etcd certificates
   copy:
-    src: "{{k8s_ca_conf_directory}}/{{item}}"
-    dest: "{{k8s_conf_dir}}/{{item}}"
+    src: "{{ k8s_ca_conf_directory }}/{{ item }}"
+    dest: "{{ k8s_conf_dir }}/{{ item }}"
     mode: 0640
     owner: root
     group: root
   with_items:
-    - "{{etcd_certificates}}"
+    - "{{ etcd_certificates }}"
   tags:
     - k8s-controller
     - k8s-controller-base
 
 - name: Copy Kubernetes certificates
   copy:
-    src: "{{k8s_ca_conf_directory}}/{{item}}"
-    dest: "{{k8s_conf_dir}}/{{item}}"
+    src: "{{ k8s_ca_conf_directory }}/{{ item }}"
+    dest: "{{ k8s_conf_dir }}/{{ item }}"
     mode: 0640
     owner: root
     group: root
   with_items:
-    - "{{k8s_certificates}}"
+    - "{{ k8s_certificates }}"
   tags:
     - k8s-controller
     - k8s-controller-base
 
 - name: Downloading official Kubernetes binaries
   get_url:
-    url: https://storage.googleapis.com/kubernetes-release/release/v{{k8s_release}}/bin/linux/amd64/{{item}}
-    dest: "{{k8s_bin_dir}}"
+    url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_release }}/bin/linux/amd64/{{ item }}"
+    dest: "{{ k8s_bin_dir }}"
     mode: 0755
   with_items:
-    - "{{k8s_controller_binaries}}"
+    - "{{ k8s_controller_binaries }}"
   notify:
     - restart kube-apiserver
     - restart kube-controller-manager
@@ -118,8 +118,8 @@
 
 - name: Copy encryption provider config file
   copy:
-    src: "{{k8s_config_directory}}/encryption-config.yaml"
-    dest: "{{k8s_conf_dir}}/encryption-config.yaml"
+    src: "{{ k8s_config_directory }}/encryption-config.yaml"
+    dest: "{{ k8s_conf_dir }}/encryption-config.yaml"
     mode: 0644
     owner: root
     group: root
@@ -129,7 +129,7 @@
 
 - name: Combine k8s_apiserver_settings and k8s_apiserver_settings_user (if defined)
   set_fact:
-    k8s_apiserver_settings: "{{k8s_apiserver_settings | combine(k8s_apiserver_settings_user|default({})) }}"
+    k8s_apiserver_settings: "{{ k8s_apiserver_settings | combine(k8s_apiserver_settings_user|default({})) }}"
   tags:
     - k8s-controller
 
@@ -155,7 +155,7 @@
 
 - name: Combine k8s_controller_manager_settings and k8s_controller_manager_settings_user (if defined)
   set_fact:
-    k8s_controller_manager_settings: "{{k8s_controller_manager_settings | combine(k8s_controller_manager_settings_user|default({})) }}"
+    k8s_controller_manager_settings: "{{ k8s_controller_manager_settings | combine(k8s_controller_manager_settings_user|default({})) }}"
   tags:
     - k8s-controller
 
@@ -181,10 +181,10 @@
 
 - name: Combine k8s_scheduler_settings and k8s_scheduler_settings_user (if defined)
   set_fact:
-    k8s_scheduler_settings: "{{k8s_scheduler_settings | combine(k8s_scheduler_settings_user|default({})) }}"
+    k8s_scheduler_settings: "{{ k8s_scheduler_settings | combine(k8s_scheduler_settings_user|default({})) }}"
   tags:
     - k8s-controller
- 
+
 - name: Create systemd unit file for kube-scheduler
   template:
     src: etc/systemd/system/kube-scheduler.service.j2
@@ -213,7 +213,7 @@
     dest: "/tmp/kube-apiserver-to-kubelet_cluster_role.yaml"
     mode: 0600
   run_once: true
-  delegate_to: "{{groups.k8s_controller|first}}"
+  delegate_to: "{{ groups.k8s_controller|first }}"
   tags:
     - k8s-controller
 
@@ -223,7 +223,7 @@
     dest: "/tmp/kube-apiserver-to-kubelet_cluster_role_binding.yaml"
     mode: 0600
   run_once: true
-  delegate_to: "{{groups.k8s_controller|first}}"
+  delegate_to: "{{ groups.k8s_controller|first }}"
   tags:
     - k8s-controller
 
@@ -231,34 +231,34 @@
   wait_for:
     port: 6443
     delay: 5
-    host: "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
+    host: "{{ hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address }}"
   run_once: true
-  delegate_to: "{{groups.k8s_controller|first}}"
+  delegate_to: "{{ groups.k8s_controller|first }}"
 
 - name: Apply kube-apiserver-to-kubelet ClusterRole
-  shell: "kubectl apply --kubeconfig {{k8s_conf_dir}}/admin.kubeconfig -f /tmp/kube-apiserver-to-kubelet_cluster_role.yaml"
+  shell: "kubectl apply --kubeconfig {{ k8s_conf_dir }}/admin.kubeconfig -f /tmp/kube-apiserver-to-kubelet_cluster_role.yaml"
   register: kube_apiserver_to_kubelet_cluster_role
   run_once: true
-  delegate_to: "{{groups.k8s_controller|first}}"
+  delegate_to: "{{ groups.k8s_controller|first }}"
   tags:
     - k8s-controller
 
 - name: Apply kube-apiserver-to-kubelet ClusterRoleBinding
-  shell: "kubectl apply --kubeconfig {{k8s_conf_dir}}/admin.kubeconfig -f /tmp/kube-apiserver-to-kubelet_cluster_role_binding.yaml"
+  shell: "kubectl apply --kubeconfig {{ k8s_conf_dir }}/admin.kubeconfig -f /tmp/kube-apiserver-to-kubelet_cluster_role_binding.yaml"
   register: kube_apiserver_to_kubelet_cluster_role_binding
   run_once: true
-  delegate_to: "{{groups.k8s_controller|first}}"
+  delegate_to: "{{ groups.k8s_controller|first }}"
   tags:
     - k8s-controller
 
 - name: Remove temporary files
   file:
-    path: "{{item}}"
+    path: "{{ item }}"
     state: absent
   with_items:
     - "/tmp/kube-apiserver-to-kubelet_cluster_role.yaml"
     - "/tmp/kube-apiserver-to-kubelet_cluster_role_binding.yaml"
   run_once: true
-  delegate_to: "{{groups.k8s_controller|first}}"
+  delegate_to: "{{ groups.k8s_controller|first }}"
   tags:
     - k8s-controller
