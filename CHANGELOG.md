@@ -1,11 +1,17 @@
 Changelog
 ---------
 
+**7.0.0+1.13.5**
+
+- update `k8s_release` to `1.13.5`
+- introduce `bind-address` flag and bind on VPN IP by default
+- introduce `port` flag for kube-controller-manager and set value to 0 to disable unsecure port
+
 **6.0.0+1.13.2**
 
 - update `k8s_release` to `1.13.2`
-- kube-apiserver: --experimental-encryption-provider-config flag is deprecated and replaced in favor of --encryption-provider-config
-- kube-apiserver: the configuration file referenced by --encryption-provider-config now uses kind: EncryptionConfiguration and apiVersion: apiserver.config.k8s.io/v1. Support for kind: EncryptionConfig and apiVersion: v1 is deprecated and will be removed in a future release. See https://github.com/githubixx/ansible-kubernetes-playbooks/tree/master/kubeencryptionconfig and https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-certificate-authority/ (search for kubeencryptionconfig.yml). To avoid deprecation warnings it makes sense to create a new `encryption-config.yaml` before running this role to update `kube-apiserver`.
+- kube-apiserver: `--experimental-encryption-provider-config` flag is deprecated and replaced in favor of `--encryption-provider-config`
+- kube-apiserver: the configuration file referenced by `--encryption-provider-config` now uses `kind: EncryptionConfiguration` and `apiVersion: apiserver.config.k8s.io/v1`. Support for `kind: EncryptionConfig` and `apiVersion: v1` is deprecated and will be removed in a future release. See https://github.com/githubixx/ansible-kubernetes-playbooks/tree/master/kubeencryptionconfig and https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-certificate-authority/ (search for `kubeencryptionconfig.yml`). To avoid deprecation warnings it makes sense to create a new `encryption-config.yaml` before running this role to update `kube-apiserver`.
 - use correct semantic versioning as described in https://semver.org. Needed for Ansible Galaxy importer as it now insists on using semantic versioning.
 - make Ansible linter happy
 

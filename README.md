@@ -27,7 +27,7 @@ k8s_conf_dir: "/var/lib/kubernetes"
 # The directory to store the K8s binaries
 k8s_bin_dir: "/usr/local/bin"
 # K8s release
-k8s_release: "1.13.2"
+k8s_release: "1.13.5"
 # The interface on which the K8s services should listen on. As all cluster
 # communication should use a VPN interface the interface name is
 # normally "wg0" (WireGuard),"peervpn0" (PeerVPN) or "tap0".
@@ -68,7 +68,7 @@ k8s_apiserver_settings:
   "advertise-address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
   "bind-address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
   "secure-port": "{{k8s_apiserver_secure_port}}"
-  "enable-admission-plugins": "Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
+  "enable-admission-plugins": "Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota,Priority"
   "allow-privileged": "true"
   "apiserver-count": "3"
   "authorization-mode": "Node,RBAC"
@@ -102,7 +102,8 @@ k8s_controller_manager_conf_dir: "/var/lib/kube-controller-manager"
 # K8s controller manager settings (can be overriden or additional added by defining
 # "k8s_controller_manager_settings_user")
 k8s_controller_manager_settings:
-  "address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
+  "bind-address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
+  "port": "0"
   "cluster-cidr": "10.200.0.0/16"
   "cluster-name": "kubernetes"
   "kubeconfig": "{{k8s_controller_manager_conf_dir}}/kube-controller-manager.kubeconfig"
@@ -119,6 +120,7 @@ k8s_scheduler_conf_dir: "/var/lib/kube-scheduler"
 # kube-scheduler settings (only --config left,
 # see https://github.com/kubernetes/kubernetes/pull/62515)
 k8s_scheduler_settings:
+  "bind-address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
   "config": "{{k8s_scheduler_conf_dir}}/kube-scheduler.yaml"
 
 # The port the control plane componentes should connect to etcd cluster
