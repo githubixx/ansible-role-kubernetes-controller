@@ -1,9 +1,10 @@
 Changelog
 ---------
 
-**6.0.1+1.13.5**
+**6.1.0+1.13.5**
 
 - update `k8s_release` to `1.13.5`
+- introduce `bind-address` flag and bind on VPN IP by default
 
 **6.0.0+1.13.2**
 
