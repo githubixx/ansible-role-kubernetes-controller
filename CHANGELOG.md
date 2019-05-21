@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+**8.0.0+1.14.2**
+
+- update `k8s_release` to `1.14.2`
+- add all admissions plugins to `enable-admission-plugins` option that are enabled by default in K8s 1.14
+- remove `Initializers` addmission plugin (no longer available in 1.14)
+
 **7.0.0+1.13.5**
 
 - update `k8s_release` to `1.13.5`
