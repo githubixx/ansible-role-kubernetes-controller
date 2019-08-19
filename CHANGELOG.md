@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+**8.0.1+1.14.6**
+
+- update `k8s_release` to `1.14.6`
+
 **8.0.0+1.14.2**
 
 - update `k8s_release` to `1.14.2`
