@@ -1,9 +1,9 @@
 Changelog
 ---------
 
-**9.0.0+1.15.5**
+**9.0.0+1.15.6**
 
-- update `k8s_release` to `1.15.5`
+- update `k8s_release` to `1.15.6`
 
 **9.0.0+1.15.3**
 
