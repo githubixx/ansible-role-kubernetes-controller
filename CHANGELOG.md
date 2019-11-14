@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+**10.0.0+1.16.3**
+
+- update `k8s_release` to `1.16.3`
+- remove deprecated `enable-swagger-ui` option from `kube-apiserver`
+
 **9.0.0+1.15.6**
 
 - update `k8s_release` to `1.15.6`
