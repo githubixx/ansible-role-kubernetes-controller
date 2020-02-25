@@ -49,7 +49,7 @@
     dest: "{{ k8s_scheduler_conf_dir }}/kube-scheduler.kubeconfig"
     owner: root
     group: root
-    mode: 0644
+    mode: 0440
   tags:
     - k8s-controller
     - k8s-controller-base
@@ -60,7 +60,7 @@
     dest: "{{ k8s_scheduler_conf_dir }}/kube-scheduler.yaml"
     owner: root
     group: root
-    mode: 0644
+    mode: 0440
   tags:
     - k8s-controller
     - k8s-controller-base
@@ -71,7 +71,7 @@
     dest: "{{ k8s_conf_dir }}/admin.kubeconfig"
     owner: root
     group: root
-    mode: 0644
+    mode: 0440
   tags:
     - k8s-controller
     - k8s-controller-base
@@ -80,7 +80,7 @@
   copy:
     src: "{{ k8s_ca_conf_directory }}/{{ item }}"
     dest: "{{ k8s_conf_dir }}/{{ item }}"
-    mode: 0640
+    mode: 0440
     owner: root
     group: root
   with_items:
@@ -93,7 +93,7 @@
   copy:
     src: "{{ k8s_ca_conf_directory }}/{{ item }}"
     dest: "{{ k8s_conf_dir }}/{{ item }}"
-    mode: 0640
+    mode: 0440
     owner: root
     group: root
   with_items:
@@ -120,7 +120,7 @@
   copy:
     src: "{{ k8s_config_directory }}/encryption-config.yaml"
     dest: "{{ k8s_conf_dir }}/encryption-config.yaml"
-    mode: 0644
+    mode: 0440
     owner: root
     group: root
   tags:

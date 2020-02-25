@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+**10.1.0+1.16.3**
+
+- strengthen file permissions for certificate files and other config files
+
 **10.0.0+1.16.3**
 
 - update `k8s_release` to `1.16.3`
