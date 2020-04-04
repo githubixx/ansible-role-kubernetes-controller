@@ -1,6 +1,31 @@
 Changelog
 ---------
 
+**Remove old tags**
+
+- The following tags are removed as they're not compatible with Ansible Galaxy and I guess nobody uses them anymore:
+
+```
+r2.0.0_v1.9.0
+r2.0.1_v1.9.0
+r2.0.2_v1.9.1
+r3.0.0_v1.9.1
+r3.0.0_v1.9.3
+r3.0.0_v1.9.8
+r4.0.1_v1.10.4
+r4.0.2_v1.10.4
+r4.0.3_v1.10.4
+r4.0.4_v1.10.8
+r5.0.1_v1.12.3
+v1.0.0_r1.5.1
+v1.0.0_v1.8.0
+v1.0.0_v1.8.2
+v1.1.0_v1.8.4
+v1.1.1_v1.8.4
+v1.1.2_v1.8.4
+v1.2.0_v1.8.4
+```
+
 **10.1.0+1.16.3**
 
 - strengthen file permissions for certificate files and other config files
