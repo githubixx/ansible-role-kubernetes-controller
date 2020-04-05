@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+**10.1.1+1.16.8**
+
+- update `k8s_release` to `1.16.8`
+
 **Remove old tags**
 
 - The following tags are removed as they're not compatible with Ansible Galaxy and I guess nobody uses them anymore:
