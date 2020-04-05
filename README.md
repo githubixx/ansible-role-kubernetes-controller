@@ -81,7 +81,7 @@ k8s_apiserver_settings:
   "kubelet-preferred-address-types": "InternalIP,Hostname,ExternalIP" # "--kubelet-preferred-address-types" defaults to:
                                                                       # "Hostname,InternalDNS,InternalIP,ExternalDNS,ExternalIP"
                                                                       # Needs to be changed to make "kubectl logs" and "kubectl exec" work.
-  "runtime-config": "api/all"
+  "runtime-config": "api/all=true"
   "service-cluster-ip-range": "10.32.0.0/16"
   "service-node-port-range": "30000-32767"
   "client-ca-file": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
