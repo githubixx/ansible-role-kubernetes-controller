@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+**11.0.0+1.17.4**
+
+- update `k8s_release` to `1.17.4`
+- `rbac.authorization.k8s.io/v1beta1` changed to `rbac.authorization.k8s.io/v1`
+- update `runtime-config` (needs boolean expression now)
+
 **10.1.1+1.16.8**
 
 - update `k8s_release` to `1.16.8`
