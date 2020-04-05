@@ -27,7 +27,7 @@ k8s_conf_dir: "/var/lib/kubernetes"
 # The directory to store the K8s binaries
 k8s_bin_dir: "/usr/local/bin"
 # K8s release
-k8s_release: "1.16.8"
+k8s_release: "1.17.4"
 # The interface on which the K8s services should listen on. As all cluster
 # communication should use a VPN interface the interface name is
 # normally "wg0" (WireGuard),"peervpn0" (PeerVPN) or "tap0".
@@ -81,7 +81,7 @@ k8s_apiserver_settings:
   "kubelet-preferred-address-types": "InternalIP,Hostname,ExternalIP" # "--kubelet-preferred-address-types" defaults to:
                                                                       # "Hostname,InternalDNS,InternalIP,ExternalDNS,ExternalIP"
                                                                       # Needs to be changed to make "kubectl logs" and "kubectl exec" work.
-  "runtime-config": "api/all"
+  "runtime-config": "api/all=true"
   "service-cluster-ip-range": "10.32.0.0/16"
   "service-node-port-range": "30000-32767"
   "client-ca-file": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
