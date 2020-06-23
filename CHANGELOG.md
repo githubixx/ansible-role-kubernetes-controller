@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+**12.0.0+1.18.4**
+
+- update `k8s_release` to `1.18.4`
+- renamed `cert-etcd.pem/cert-etcd-key.pem` to `cert-k8s-apiserver-etcd.pem/cert-k8s-apiserver-etcd-key.pem`
+- `kubescheduler.config.k8s.io/v1alpha1` changed to `kubescheduler.config.k8s.io/v1alpha2` in `kube-scheduler.yaml.j2` (see: https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG/CHANGELOG-1.18.md#kube-scheduler-1)
+
 **11.0.0+1.17.4**
 
 - update `k8s_release` to `1.17.4`
