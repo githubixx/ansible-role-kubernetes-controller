@@ -37,14 +37,12 @@ k8s_certificates:
   - cert-k8s-controller-manager-sa.pem
   - cert-k8s-controller-manager-sa-key.pem
 
-k8s_apiserver_secure_port: "6443"
-
 # K8s API daemon settings (can be overriden or additional added by defining
 # "k8s_apiserver_settings_user")
 k8s_apiserver_settings:
   "advertise-address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
   "bind-address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
-  "secure-port": "{{k8s_apiserver_secure_port}}"
+  "secure-port": "6443"
   "enable-admission-plugins": "NodeRestriction,NamespaceLifecycle,LimitRanger,ServiceAccount,TaintNodesByCondition,Priority,DefaultTolerationSeconds,DefaultStorageClass,PersistentVolumeClaimResize,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota"
   "allow-privileged": "true"
   "apiserver-count": "3"
