@@ -6,7 +6,7 @@ This role is used in [Kubernetes the not so hard way with Ansible - Control plan
 Versions
 --------
 
-I tag every release and try to stay with [semantic versioning](http://semver.org). If you want to use the role I recommend to checkout the latest tag. The master branch is basically development while the tags mark stable releases. But in general I try to keep master in good shape too. A tag `12.0.0+1.18.4` means this is release `12.0.0` of this role and it's meant to be used with Kubernetes version `1.18.4` (but should work with any K8s 1.18.x release of course). If the role itself changes `X.Y.Z` before `+` will increase. If the Kubernetes version changes `X.Y.Z` after `+` will increase too. This allows to tag bugfixes and new major versions of the role while it's still developed for a specific Kubernetes release. That's especially useful for Kubernetes major releases with breaking changes.
+I tag every release and try to stay with [semantic versioning](http://semver.org). If you want to use the role I recommend to checkout the latest tag. The master branch is basically development while the tags mark stable releases. But in general I try to keep master in good shape too. A tag `12.0.0+1.18.5` means this is release `12.0.0` of this role and it's meant to be used with Kubernetes version `1.18.5` (but should work with any K8s 1.18.x release of course). If the role itself changes `X.Y.Z` before `+` will increase. If the Kubernetes version changes `X.Y.Z` after `+` will increase too. This allows to tag bugfixes and new major versions of the role while it's still developed for a specific Kubernetes release. That's especially useful for Kubernetes major releases with breaking changes.
 
 Requirements
 ------------
@@ -27,7 +27,7 @@ k8s_conf_dir: "/var/lib/kubernetes"
 # The directory to store the K8s binaries
 k8s_bin_dir: "/usr/local/bin"
 # K8s release
-k8s_release: "1.18.4"
+k8s_release: "1.18.5"
 # The interface on which the K8s services should listen on. As all cluster
 # communication should use a VPN interface the interface name is
 # normally "wg0" (WireGuard),"peervpn0" (PeerVPN) or "tap0".
@@ -102,7 +102,7 @@ k8s_controller_manager_conf_dir: "/var/lib/kube-controller-manager"
 # "k8s_controller_manager_settings_user")
 k8s_controller_manager_settings:
   "bind-address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
-  "port": "0"
+  "secure-port": "10257"
   "cluster-cidr": "10.200.0.0/16"
   "cluster-name": "kubernetes"
   "kubeconfig": "{{k8s_controller_manager_conf_dir}}/kube-controller-manager.kubeconfig"
