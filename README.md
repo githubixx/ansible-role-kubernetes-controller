@@ -84,8 +84,8 @@ k8s_apiserver_settings:
   "service-node-port-range": "30000-32767"
   "client-ca-file": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
   "etcd-cafile": "{{k8s_conf_dir}}/ca-etcd.pem"
-  "etcd-certfile": "{{k8s_conf_dir}}/cert-etcd.pem"
-  "etcd-keyfile": "{{k8s_conf_dir}}/cert-etcd-key.pem"
+  "etcd-certfile": "{{k8s_conf_dir}}/cert-k8s-apiserver-etcd.pem"
+  "etcd-keyfile": "{{k8s_conf_dir}}/cert-k8s-apiserver-etcd-key.pem"
   "encryption-provider-config": "{{k8s_conf_dir}}/encryption-config.yaml"
   "kubelet-certificate-authority": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
   "kubelet-client-certificate": "{{k8s_conf_dir}}/cert-k8s-apiserver.pem"
@@ -130,8 +130,8 @@ etcd_interface: "tap0"
 etcd_certificates:
   - ca-etcd.pem
   - ca-etcd-key.pem
-  - cert-etcd.pem
-  - cert-etcd-key.pem
+  - cert-k8s-apiserver-etcd.pem
+  - cert-k8s-apiserver-etcd-key.pem
 ```
 
 The kube-apiserver settings defined in `k8s_apiserver_settings` can be overriden by defining a variable called `k8s_apiserver_settings_user`. You can also add additional settings by using this variable. E.g. to override `audit-log-maxage` and `audit-log-maxbackup` default values and add `watch-cache` add the following settings to `group_vars/k8s.yml`:
