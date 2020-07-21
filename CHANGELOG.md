@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+**12.0.1+1.18.5**
+
+- added Ubuntu 20.04 (Focal Fossa) as supported platform
+
 **12.0.0+1.18.5**
 
 - update `k8s_release` to `1.18.5`
