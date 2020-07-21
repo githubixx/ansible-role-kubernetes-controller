@@ -4,7 +4,7 @@ k8s_conf_dir: "/var/lib/kubernetes"
 # The directory to store the K8s binaries
 k8s_bin_dir: "/usr/local/bin"
 # K8s release
-k8s_release: "1.17.4"
+k8s_release: "1.18.5"
 # The interface on which the K8s services should listen on. As all cluster
 # communication should use a VPN interface the interface name is
 # normally "wg0" (WireGuard),"peervpn0" (PeerVPN) or "tap0".
@@ -37,14 +37,12 @@ k8s_certificates:
   - cert-k8s-controller-manager-sa.pem
   - cert-k8s-controller-manager-sa-key.pem
 
-k8s_apiserver_secure_port: "6443"
-
 # K8s API daemon settings (can be overriden or additional added by defining
 # "k8s_apiserver_settings_user")
 k8s_apiserver_settings:
   "advertise-address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
   "bind-address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
-  "secure-port": "{{k8s_apiserver_secure_port}}"
+  "secure-port": "6443"
   "enable-admission-plugins": "NodeRestriction,NamespaceLifecycle,LimitRanger,ServiceAccount,TaintNodesByCondition,Priority,DefaultTolerationSeconds,DefaultStorageClass,PersistentVolumeClaimResize,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota"
   "allow-privileged": "true"
   "apiserver-count": "3"
@@ -63,8 +61,8 @@ k8s_apiserver_settings:
   "service-node-port-range": "30000-32767"
   "client-ca-file": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
   "etcd-cafile": "{{k8s_conf_dir}}/ca-etcd.pem"
-  "etcd-certfile": "{{k8s_conf_dir}}/cert-etcd.pem"
-  "etcd-keyfile": "{{k8s_conf_dir}}/cert-etcd-key.pem"
+  "etcd-certfile": "{{k8s_conf_dir}}/cert-k8s-apiserver-etcd.pem"
+  "etcd-keyfile": "{{k8s_conf_dir}}/cert-k8s-apiserver-etcd-key.pem"
   "encryption-provider-config": "{{k8s_conf_dir}}/encryption-config.yaml"
   "kubelet-certificate-authority": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
   "kubelet-client-certificate": "{{k8s_conf_dir}}/cert-k8s-apiserver.pem"
@@ -79,13 +77,13 @@ k8s_controller_manager_conf_dir: "/var/lib/kube-controller-manager"
 # "k8s_controller_manager_settings_user")
 k8s_controller_manager_settings:
   "bind-address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
-  "port": "0"
+  "secure-port": "10257"
   "cluster-cidr": "10.200.0.0/16"
   "cluster-name": "kubernetes"
   "kubeconfig": "{{k8s_controller_manager_conf_dir}}/kube-controller-manager.kubeconfig"
   "leader-elect": "true"
   "service-cluster-ip-range": "10.32.0.0/16"
-  "cluster-signing-cert-file": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
+  "cluster-signing-cert-file": "{{k8s_conf_dir}}/cert-k8s-apiserver.pem"
   "cluster-signing-key-file": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"
   "root-ca-file": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
   "service-account-private-key-file": "{{k8s_conf_dir}}/cert-k8s-controller-manager-sa-key.pem"
@@ -109,5 +107,5 @@ etcd_interface: "tap0"
 etcd_certificates:
   - ca-etcd.pem
   - ca-etcd-key.pem
-  - cert-etcd.pem
-  - cert-etcd-key.pem
+  - cert-k8s-apiserver-etcd.pem
+  - cert-k8s-apiserver-etcd-key.pem
