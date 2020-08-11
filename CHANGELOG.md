@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+**12.1.0+1.18.6**
+
+- update `k8s_release` to `1.18.6`
+- added `"allocate-node-cidrs": "true"" to `k8s_controller_manager_settings` otherwise `cluster-cidr` setting won't be used by `kube-controller-manager`
+- creating ClusterRole's and ClusterRoleBindings is now delegated to `127.0.0.1` (localhost) instead of picking the first Kubernetes controller node for that task
+
 **12.0.1+1.18.5**
 
 - added Ubuntu 20.04 (Focal Fossa) as supported platform
