@@ -92,8 +92,7 @@ k8s_controller_manager_settings:
 
 # The directory to store scheduler configuration.
 k8s_scheduler_conf_dir: "/var/lib/kube-scheduler"
-# kube-scheduler settings (only --config left,
-# see https://github.com/kubernetes/kubernetes/pull/62515)
+# kube-scheduler settings
 k8s_scheduler_settings:
   "bind-address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
   "config": "{{k8s_scheduler_conf_dir}}/kube-scheduler.yaml"
