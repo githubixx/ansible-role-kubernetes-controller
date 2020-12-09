@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+**13.0.0+1.19.4**
+
+- update 'k8s_release' to `1.19.4`
+- `KubeSchedulerConfiguration` graduates to Beta (see https://kubernetes.io/docs/reference/scheduling/config). Upgrade `kubescheduler.config.k8s.io/v1alpha2` to `kubescheduler.config.k8s.io/v1beta1`
+
 **12.2.0+1.18.12**
 
 - update `k8s_release` to `1.18.12`
