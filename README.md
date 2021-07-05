@@ -29,7 +29,7 @@ k8s_conf_dir: "/var/lib/kubernetes"
 k8s_bin_dir: "/usr/local/bin"
 
 # K8s release
-k8s_release: "1.19.12"
+k8s_release: "1.20.8"
 
 # The interface on which the K8s services should listen on. As all cluster
 # communication should use a VPN interface the interface name is
@@ -95,6 +95,8 @@ k8s_apiserver_settings:
   "kubelet-client-certificate": "{{k8s_conf_dir}}/cert-k8s-apiserver.pem"
   "kubelet-client-key": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"
   "service-account-key-file": "{{k8s_conf_dir}}/cert-k8s-controller-manager-sa.pem"
+  "service-account-signing-key-file": "{{k8s_conf_dir}}/cert-k8s-controller-manager-sa-key.pem"
+  "service-account-issuer": "https://{{ groups.k8s_controller|first }}:6443"
   "tls-cert-file": "{{k8s_conf_dir}}/cert-k8s-apiserver.pem"
   "tls-private-key-file": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"
 
