@@ -4,6 +4,7 @@ Changelog
 **15.0.0+1.21.4**
 
 - update `k8s_release` to `1.21.4`
+- remove Ubuntu 16.04 support
 
 **14.1.0+1.20.10**
 
