@@ -6,7 +6,7 @@ k8s_conf_dir: "/var/lib/kubernetes"
 k8s_bin_dir: "/usr/local/bin"
 
 # K8s release
-k8s_release: "1.21.4"
+k8s_release: "1.21.8"
 
 # The interface on which the K8s services should listen on. As all cluster
 # communication should use a VPN interface the interface name is
@@ -41,7 +41,7 @@ k8s_certificates:
   - cert-k8s-controller-manager-sa.pem
   - cert-k8s-controller-manager-sa-key.pem
 
-# K8s API daemon settings (can be overriden or additional added by defining
+# K8s API daemon settings (can be overridden or additional added by defining
 # "k8s_apiserver_settings_user")
 k8s_apiserver_settings:
   "advertise-address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
@@ -80,7 +80,7 @@ k8s_apiserver_settings:
 # The directory to store controller manager configuration.
 k8s_controller_manager_conf_dir: "/var/lib/kube-controller-manager"
 
-# K8s controller manager settings (can be overriden or additional added by defining
+# K8s controller manager settings (can be overridden or additional added by defining
 # "k8s_controller_manager_settings_user")
 k8s_controller_manager_settings:
   "bind-address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
@@ -105,13 +105,13 @@ k8s_scheduler_settings:
   "bind-address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
   "config": "{{k8s_scheduler_conf_dir}}/kube-scheduler.yaml"
 
-# The port the control plane componentes should connect to etcd cluster
+# The port the control plane components should connect to etcd cluster
 etcd_client_port: "2379"
 
 # The interface the etcd cluster is listening on
 etcd_interface: "tap0"
 
-# The etcd certificates needed for the control plane componentes to be able
+# The etcd certificates needed for the control plane components to be able
 # to connect to the etcd cluster.
 etcd_certificates:
   - ca-etcd.pem

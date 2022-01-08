@@ -1,7 +1,7 @@
 ansible-role-kubernetes-controller
 ==================================
 
-This role is used in [Kubernetes the not so hard way with Ansible - Control plane](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-control-plane/). It installes the Kubernetes API server, scheduler and controller manager. For more information about this role please have a look at [Kubernetes the not so hard way with Ansible - Control plane](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-control-plane/).
+This role is used in [Kubernetes the not so hard way with Ansible - Control plane](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-control-plane/). It installs the Kubernetes API server, scheduler and controller manager. For more information about this role please have a look at [Kubernetes the not so hard way with Ansible - Control plane](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-control-plane/).
 
 Versions
 --------
@@ -21,7 +21,7 @@ see [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-controll
 Role (default) variables
 ------------------------
 
-```
+```yaml
 # The directory to store the K8s certificates and other configuration
 k8s_conf_dir: "/var/lib/kubernetes"
 
@@ -29,7 +29,7 @@ k8s_conf_dir: "/var/lib/kubernetes"
 k8s_bin_dir: "/usr/local/bin"
 
 # K8s release
-k8s_release: "1.21.4"
+k8s_release: "1.21.8"
 
 # The interface on which the K8s services should listen on. As all cluster
 # communication should use a VPN interface the interface name is
@@ -64,7 +64,7 @@ k8s_certificates:
   - cert-k8s-controller-manager-sa.pem
   - cert-k8s-controller-manager-sa-key.pem
 
-# K8s API daemon settings (can be overriden or additional added by defining
+# K8s API daemon settings (can be overridden or additional added by defining
 # "k8s_apiserver_settings_user")
 k8s_apiserver_settings:
   "advertise-address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
@@ -103,7 +103,7 @@ k8s_apiserver_settings:
 # The directory to store controller manager configuration.
 k8s_controller_manager_conf_dir: "/var/lib/kube-controller-manager"
 
-# K8s controller manager settings (can be overriden or additional added by defining
+# K8s controller manager settings (can be overridden or additional added by defining
 # "k8s_controller_manager_settings_user")
 k8s_controller_manager_settings:
   "bind-address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
@@ -128,13 +128,13 @@ k8s_scheduler_settings:
   "bind-address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
   "config": "{{k8s_scheduler_conf_dir}}/kube-scheduler.yaml"
 
-# The port the control plane componentes should connect to etcd cluster
+# The port the control plane components should connect to etcd cluster
 etcd_client_port: "2379"
 
 # The interface the etcd cluster is listening on
 etcd_interface: "tap0"
 
-# The etcd certificates needed for the control plane componentes to be able
+# The etcd certificates needed for the control plane components to be able
 # to connect to the etcd cluster.
 etcd_certificates:
   - ca-etcd.pem
@@ -143,9 +143,9 @@ etcd_certificates:
   - cert-k8s-apiserver-etcd-key.pem
 ```
 
-The kube-apiserver settings defined in `k8s_apiserver_settings` can be overriden by defining a variable called `k8s_apiserver_settings_user`. You can also add additional settings by using this variable. E.g. to override `audit-log-maxage` and `audit-log-maxbackup` default values and add `watch-cache` add the following settings to `group_vars/k8s.yml`:
+The kube-apiserver settings defined in `k8s_apiserver_settings` can be overridden by defining a variable called `k8s_apiserver_settings_user`. You can also add additional settings by using this variable. E.g. to override `audit-log-maxage` and `audit-log-maxbackup` default values and add `watch-cache` add the following settings to `group_vars/k8s.yml`:
 
-```
+```yaml
 k8s_apiserver_settings_user:
   "audit-log-maxage": "40"
   "audit-log-maxbackup": "4"
@@ -157,7 +157,7 @@ The same is true for the `kube-controller-manager` by adding entries to `k8s_con
 Example Playbook
 ----------------
 
-```
+```yaml
 - hosts: k8s_controller
   roles:
     - githubixx.kubernetes-controller
