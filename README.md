@@ -79,7 +79,6 @@ k8s_apiserver_settings:
   "audit-log-maxsize": "100"
   "audit-log-path": "/var/log/audit.log"
   "event-ttl": "1h"
-  "kubelet-https": "true"
   "kubelet-preferred-address-types": "InternalIP,Hostname,ExternalIP" # "--kubelet-preferred-address-types" defaults to:
                                                                       # "Hostname,InternalDNS,InternalIP,ExternalDNS,ExternalIP"
                                                                       # Needs to be changed to make "kubectl logs" and "kubectl exec" work.
