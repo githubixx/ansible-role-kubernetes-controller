@@ -1,5 +1,11 @@
 # Changelog
 
+## 16.0.0+1.22.5
+
+- update `k8s_release` to `1.22.5`
+- add parameter `authentication-kubeconfig`, `authorization-kubeconfig` and `requestheader-client-ca-file` to `k8s_controller_manager_settings` (see [K8s Deprecations 1.22](https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG/CHANGELOG-1.22.md#deprecation)
+- removed `kubelet-https: "true"` from `k8s_apiserver_settings` as no longer supported by `kube-apiserver`
+
 ## 15.0.1+1.21.8
 
 - update `k8s_release` to `1.21.8`
