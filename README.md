@@ -29,7 +29,7 @@ k8s_conf_dir: "/var/lib/kubernetes"
 k8s_bin_dir: "/usr/local/bin"
 
 # K8s release
-k8s_release: "1.21.8"
+k8s_release: "1.22.5"
 
 # The interface on which the K8s services should listen on. As all cluster
 # communication should use a VPN interface the interface name is
@@ -79,7 +79,6 @@ k8s_apiserver_settings:
   "audit-log-maxsize": "100"
   "audit-log-path": "/var/log/audit.log"
   "event-ttl": "1h"
-  "kubelet-https": "true"
   "kubelet-preferred-address-types": "InternalIP,Hostname,ExternalIP" # "--kubelet-preferred-address-types" defaults to:
                                                                       # "Hostname,InternalDNS,InternalIP,ExternalDNS,ExternalIP"
                                                                       # Needs to be changed to make "kubectl logs" and "kubectl exec" work.
@@ -111,12 +110,15 @@ k8s_controller_manager_settings:
   "cluster-cidr": "10.200.0.0/16"
   "allocate-node-cidrs": "true"
   "cluster-name": "kubernetes"
+  "authentication-kubeconfig": "{{k8s_controller_manager_conf_dir}}/kube-controller-manager.kubeconfig"
+  "authorization-kubeconfig": "{{k8s_controller_manager_conf_dir}}/kube-controller-manager.kubeconfig"
   "kubeconfig": "{{k8s_controller_manager_conf_dir}}/kube-controller-manager.kubeconfig"
   "leader-elect": "true"
   "service-cluster-ip-range": "10.32.0.0/16"
-  "cluster-signing-cert-file": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
+  "cluster-signing-cert-file": "{{k8s_conf_dir}}/cert-k8s-apiserver.pem"
   "cluster-signing-key-file": "{{k8s_conf_dir}}/cert-k8s-apiserver-key.pem"
   "root-ca-file": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
+  "requestheader-client-ca-file": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
   "service-account-private-key-file": "{{k8s_conf_dir}}/cert-k8s-controller-manager-sa-key.pem"
   "use-service-account-credentials": "true"
 
