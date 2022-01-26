@@ -3,6 +3,7 @@
 ## 16.1.0+1.22.6
 
 - update `k8s_release` to `1.22.6`
+- use `kubescheduler.config.k8s.io/v1beta2` in `templates/var/lib/kube-scheduler/kube-scheduler.yaml.j2` (`v1beta1` will be removed in Kubernetes v1.23 - see [Remove scheduler policy config and cc v1beta1](https://github.com/kubernetes/enhancements/issues/2901)
 
 ## 16.0.0+1.22.5
 
