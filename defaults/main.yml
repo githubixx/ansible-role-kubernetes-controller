@@ -107,7 +107,7 @@ k8s_scheduler_settings:
   "bind-address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
   "config": "{{k8s_scheduler_conf_dir}}/kube-scheduler.yaml"
   "authentication-kubeconfig": "{{k8s_scheduler_conf_dir}}/kube-scheduler.kubeconfig"
-  "authorization-kubeconfig": "{{k8s_scheduler_conf_dir}}/kube-scheduler.kubeconfig
+  "authorization-kubeconfig": "{{k8s_scheduler_conf_dir}}/kube-scheduler.kubeconfig"
   "requestheader-client-ca-file": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
 
 # The port the control plane components should connect to etcd cluster
