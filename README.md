@@ -11,7 +11,7 @@ I tag every release and try to stay with [semantic versioning](http://semver.org
 Requirements
 ------------
 
-This role requires that you already created some certificates for Kubernetes API server (see [Kubernetes the not so hard way with Ansible - Certificate authority (CA)](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-certificate-authority/)). The role copies the certificates from `k8s_ca_conf_directory` to the destination host. You should also setup a fully meshed VPN with e.g. WireGuard (see [Kubernetes the not so hard way with Ansible - WireGuard](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-wireguard/) and of course an etcd cluster (see [Kubernetes the not so hard way with Ansible - etcd cluster](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-etcd/)
+This role requires that you already created some certificates for Kubernetes API server (see [Kubernetes the not so hard way with Ansible - Certificate authority (CA)](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-certificate-authority/)). The role copies the certificates from `k8s_ca_conf_directory` to the destination host. You should also setup a fully meshed VPN with e.g. WireGuard (see [Kubernetes the not so hard way with Ansible - WireGuard](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-wireguard/)) and of course an etcd cluster (see [Kubernetes the not so hard way with Ansible - etcd cluster](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-etcd/))
 
 Changelog
 ---------
@@ -79,9 +79,9 @@ k8s_apiserver_settings:
   "audit-log-maxsize": "100"
   "audit-log-path": "/var/log/audit.log"
   "event-ttl": "1h"
-  "kubelet-preferred-address-types": "InternalIP,Hostname,ExternalIP" # "--kubelet-preferred-address-types" defaults to:
-                                                                      # "Hostname,InternalDNS,InternalIP,ExternalDNS,ExternalIP"
-                                                                      # Needs to be changed to make "kubectl logs" and "kubectl exec" work.
+  "kubelet-preferred-address-types": "InternalIP,Hostname,ExternalIP"  # "--kubelet-preferred-address-types" defaults to:
+                                                                       # "Hostname,InternalDNS,InternalIP,ExternalDNS,ExternalIP"
+                                                                       # Needs to be changed to make "kubectl logs" and "kubectl exec" work.
   "runtime-config": "api/all=true"
   "service-cluster-ip-range": "10.32.0.0/16"
   "service-node-port-range": "30000-32767"
