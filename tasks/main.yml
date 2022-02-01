@@ -148,7 +148,7 @@
 - name: Enable and start kube-apiserver
   service:
     name: kube-apiserver
-    enabled: yes
+    enabled: true
     state: started
   tags:
     - k8s-controller
@@ -174,7 +174,7 @@
 - name: Enable and start kube-controller-manager
   service:
     name: kube-controller-manager
-    enabled: yes
+    enabled: true
     state: started
   tags:
     - k8s-controller
@@ -200,7 +200,7 @@
 - name: Enable and start kube-scheduler
   service:
     name: kube-scheduler
-    enabled: yes
+    enabled: true
     state: started
   tags:
     - k8s-controller

@@ -6,12 +6,12 @@ This role is used in [Kubernetes the not so hard way with Ansible - Control plan
 Versions
 --------
 
-I tag every release and try to stay with [semantic versioning](http://semver.org). If you want to use the role I recommend to checkout the latest tag. The master branch is basically development while the tags mark stable releases. But in general I try to keep master in good shape too. A tag `15.0.0+1.21.4` means this is release `15.0.0` of this role and it's meant to be used with Kubernetes version `1.21.4` (but should work with any K8s 1.21.x release of course). If the role itself changes `X.Y.Z` before `+` will increase. If the Kubernetes version changes `X.Y.Z` after `+` will increase too. This allows to tag bugfixes and new major versions of the role while it's still developed for a specific Kubernetes release. That's especially useful for Kubernetes major releases with breaking changes.
+I tag every release and try to stay with [semantic versioning](http://semver.org). If you want to use the role I recommend to checkout the latest tag. The master branch is basically development while the tags mark stable releases. But in general I try to keep master in good shape too. A tag `17.0.0+1.23.3` means this is release `17.0.0` of this role and it's meant to be used with Kubernetes version `1.23.3` (but should work with any K8s 1.23.x release of course). If the role itself changes `X.Y.Z` before `+` will increase. If the Kubernetes version changes `X.Y.Z` after `+` will increase too. This allows to tag bugfixes and new major versions of the role while it's still developed for a specific Kubernetes release. That's especially useful for Kubernetes major releases with breaking changes.
 
 Requirements
 ------------
 
-This role requires that you already created some certificates for Kubernetes API server (see [Kubernetes the not so hard way with Ansible - Certificate authority (CA)](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-certificate-authority/)). The role copies the certificates from `k8s_ca_conf_directory` to the destination host. You should also setup a fully meshed VPN with e.g. WireGuard (see [Kubernetes the not so hard way with Ansible - WireGuard](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-wireguard/) and of course an etcd cluster (see [Kubernetes the not so hard way with Ansible - etcd cluster](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-etcd/)
+This role requires that you already created some certificates for Kubernetes API server (see [Kubernetes the not so hard way with Ansible - Certificate authority (CA)](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-certificate-authority/)). The role copies the certificates from `k8s_ca_conf_directory` to the destination host. You should also setup a fully meshed VPN with e.g. WireGuard (see [Kubernetes the not so hard way with Ansible - WireGuard](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-wireguard/)) and of course an etcd cluster (see [Kubernetes the not so hard way with Ansible - etcd cluster](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-etcd/))
 
 Changelog
 ---------
@@ -29,7 +29,7 @@ k8s_conf_dir: "/var/lib/kubernetes"
 k8s_bin_dir: "/usr/local/bin"
 
 # K8s release
-k8s_release: "1.22.6"
+k8s_release: "1.23.3"
 
 # The interface on which the K8s services should listen on. As all cluster
 # communication should use a VPN interface the interface name is
@@ -79,9 +79,9 @@ k8s_apiserver_settings:
   "audit-log-maxsize": "100"
   "audit-log-path": "/var/log/audit.log"
   "event-ttl": "1h"
-  "kubelet-preferred-address-types": "InternalIP,Hostname,ExternalIP" # "--kubelet-preferred-address-types" defaults to:
-                                                                      # "Hostname,InternalDNS,InternalIP,ExternalDNS,ExternalIP"
-                                                                      # Needs to be changed to make "kubectl logs" and "kubectl exec" work.
+  "kubelet-preferred-address-types": "InternalIP,Hostname,ExternalIP"  # "--kubelet-preferred-address-types" defaults to:
+                                                                       # "Hostname,InternalDNS,InternalIP,ExternalDNS,ExternalIP"
+                                                                       # Needs to be changed to make "kubectl logs" and "kubectl exec" work.
   "runtime-config": "api/all=true"
   "service-cluster-ip-range": "10.32.0.0/16"
   "service-node-port-range": "30000-32767"
@@ -129,6 +129,9 @@ k8s_scheduler_conf_dir: "/var/lib/kube-scheduler"
 k8s_scheduler_settings:
   "bind-address": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
   "config": "{{k8s_scheduler_conf_dir}}/kube-scheduler.yaml"
+  "authentication-kubeconfig": "{{k8s_scheduler_conf_dir}}/kube-scheduler.kubeconfig"
+  "authorization-kubeconfig": "{{k8s_scheduler_conf_dir}}/kube-scheduler.kubeconfig
+  "requestheader-client-ca-file": "{{k8s_conf_dir}}/ca-k8s-apiserver.pem"
 
 # The port the control plane components should connect to etcd cluster
 etcd_client_port: "2379"

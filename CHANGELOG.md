@@ -1,5 +1,12 @@
 # Changelog
 
+## 17.0.0+1.23.3
+
+- update `k8s_release` to `1.23.3`
+- add parameter `authentication-kubeconfig`, `authorization-kubeconfig` and `requestheader-client-ca-file` to `k8s_scheduler_settings` (see [K8s Deprecations 1.23](https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG/CHANGELOG-1.23.md#deprecation))
+- remove `healthzBindAddress` and `metricsBindAddress` from `kube-scheduler.yaml.j2` (deprecated)
+- this role now requires Ansible >= 2.9
+
 ## 16.1.0+1.22.6
 
 - update `k8s_release` to `1.22.6`
