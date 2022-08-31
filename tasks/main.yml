@@ -110,9 +110,9 @@
   with_items:
     - "{{ k8s_controller_binaries }}"
   notify:
-    - restart kube-apiserver
-    - restart kube-controller-manager
-    - restart kube-scheduler
+    - Restart kube-apiserver
+    - Restart kube-controller-manager
+    - Restart kube-scheduler
   tags:
     - k8s-controller
 
@@ -143,7 +143,7 @@
   tags:
     - k8s-controller
   notify:
-    - reload systemd
+    - Reload systemd
 
 - name: Enable and start kube-apiserver
   ansible.builtin.service:
@@ -167,7 +167,7 @@
     group: root
     mode: 0644
   notify:
-    - reload systemd
+    - Reload systemd
   tags:
     - k8s-controller
 
@@ -193,7 +193,7 @@
     group: root
     mode: 0644
   notify:
-    - reload systemd
+    - Reload systemd
   tags:
     - k8s-controller
 
