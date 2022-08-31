@@ -1,19 +1,19 @@
 ---
-- name: reload systemd
-  systemd:
+- name: Reload systemd
+  ansible.builtin.systemd:
     daemon_reload: true
 
-- name: restart kube-apiserver
-  service:
+- name: Restart kube-apiserver
+  ansible.builtin.service:
     name: kube-apiserver
     state: restarted
 
-- name: restart kube-controller-manager
-  service:
+- name: Restart kube-controller-manager
+  ansible.builtin.service:
     name: kube-controller-manager
     state: restarted
 
-- name: restart kube-scheduler
-  service:
+- name: Restart kube-scheduler
+  ansible.builtin.service:
     name: kube-scheduler
     state: restarted
