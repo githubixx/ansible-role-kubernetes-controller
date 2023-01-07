@@ -110,6 +110,12 @@ k8s_scheduler_settings:
   "authorization-kubeconfig": "{{ k8s_scheduler_conf_dir }}/kube-scheduler.kubeconfig"
   "requestheader-client-ca-file": "{{ k8s_conf_dir }}/ca-k8s-apiserver.pem"
 
+# By default all tasks that needs to communicate with the Kubernetes
+# cluster are executed on local host (127.0.0.1). But if that one
+# doesn't have direct connection to the K8s cluster or should be executed
+# elsewhere this variable can be changed accordingly.
+k8s_controller_delegate_to: 127.0.0.1
+
 # The port the control plane components should connect to etcd cluster
 etcd_client_port: "2379"
 

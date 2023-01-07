@@ -213,7 +213,7 @@
     dest: "/tmp/kube-apiserver-to-kubelet_cluster_role.yaml"
     mode: 0600
   run_once: true
-  delegate_to: 127.0.0.1
+  delegate_to: "{{ k8s_controller_delegate_to }}"
   tags:
     - k8s-controller
 
@@ -223,7 +223,7 @@
     dest: "/tmp/kube-apiserver-to-kubelet_cluster_role_binding.yaml"
     mode: 0600
   run_once: true
-  delegate_to: 127.0.0.1
+  delegate_to: "{{ k8s_controller_delegate_to }}"
   tags:
     - k8s-controller
 
@@ -239,7 +239,7 @@
   ansible.builtin.shell: "kubectl apply --kubeconfig {{ k8s_config_directory }}/admin.kubeconfig -f /tmp/kube-apiserver-to-kubelet_cluster_role.yaml"
   register: kube_apiserver_to_kubelet_cluster_role
   run_once: true
-  delegate_to: 127.0.0.1
+  delegate_to: "{{ k8s_controller_delegate_to }}"
   changed_when: false
   tags:
     - k8s-controller
@@ -248,7 +248,7 @@
   ansible.builtin.shell: "kubectl apply --kubeconfig {{ k8s_config_directory }}/admin.kubeconfig -f /tmp/kube-apiserver-to-kubelet_cluster_role_binding.yaml"
   register: kube_apiserver_to_kubelet_cluster_role_binding
   run_once: true
-  delegate_to: 127.0.0.1
+  delegate_to: "{{ k8s_controller_delegate_to }}"
   changed_when: false
   tags:
     - k8s-controller
@@ -261,6 +261,6 @@
     - "/tmp/kube-apiserver-to-kubelet_cluster_role.yaml"
     - "/tmp/kube-apiserver-to-kubelet_cluster_role_binding.yaml"
   run_once: true
-  delegate_to: 127.0.0.1
+  delegate_to: "{{ k8s_controller_delegate_to }}"
   tags:
     - k8s-controller
