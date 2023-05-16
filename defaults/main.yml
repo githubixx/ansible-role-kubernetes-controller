@@ -49,7 +49,6 @@ k8s_apiserver_settings:
   "secure-port": "6443"
   "enable-admission-plugins": "NodeRestriction,NamespaceLifecycle,LimitRanger,ServiceAccount,TaintNodesByCondition,Priority,DefaultTolerationSeconds,DefaultStorageClass,PersistentVolumeClaimResize,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota"
   "allow-privileged": "true"
-  "apiserver-count": "3"
   "authorization-mode": "Node,RBAC"
   "audit-log-maxage": "30"
   "audit-log-maxbackup": "3"
