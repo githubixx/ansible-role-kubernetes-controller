@@ -1,5 +1,9 @@
 # Changelog
 
+## 19.2.0+1.25.9
+
+- update `k8s_release` to `1.25.9`
+
 ## 19.1.0+1.25.5
 
 - Introduce `k8s_controller_delegate_to` variable. By default it's set to `127.0.0.1` and reflects the same value as before.
