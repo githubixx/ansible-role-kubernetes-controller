@@ -29,7 +29,7 @@ k8s_conf_dir: "/var/lib/kubernetes"
 k8s_bin_dir: "/usr/local/bin"
 
 # K8s release
-k8s_release: "1.25.5"
+k8s_release: "1.25.9"
 
 # The interface on which the K8s services should listen on. As all cluster
 # communication should use a VPN interface the interface name is
@@ -72,7 +72,6 @@ k8s_apiserver_settings:
   "secure-port": "6443"
   "enable-admission-plugins": "NodeRestriction,NamespaceLifecycle,LimitRanger,ServiceAccount,TaintNodesByCondition,Priority,DefaultTolerationSeconds,DefaultStorageClass,PersistentVolumeClaimResize,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota"
   "allow-privileged": "true"
-  "apiserver-count": "3"
   "authorization-mode": "Node,RBAC"
   "audit-log-maxage": "30"
   "audit-log-maxbackup": "3"
