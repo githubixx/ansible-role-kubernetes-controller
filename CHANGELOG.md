@@ -3,6 +3,9 @@
 ## 19.2.0+1.25.9
 
 - update `k8s_release` to `1.25.9`
+- `kube-apiserver`: remove `--apiserver-count` flag. It has been deprecated and will be removed in a future K8s release.
+- `templates/var/lib/kube-scheduler/kube-scheduler.yaml.j2`: `KubeSchedulerConfiguration v1beta2` is deprecated in Kubernetes v1.25, will be removed in v1.26
+
 
 ## 19.1.0+1.25.5
 
