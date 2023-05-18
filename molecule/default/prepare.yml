@@ -1,0 +1,125 @@
+---
+# Copyright (C) 2023 Robert Wimmer
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Update cache
+  hosts: k8s
+  remote_user: vagrant
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Update APT package cache
+      apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+- name: Harden hosts
+  hosts: all
+  remote_user: vagrant
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Setup harden-linux role
+      include_role:
+        name: githubixx.harden-linux
+
+- name: Setup Wireguard VPN
+  hosts: vpn
+  remote_user: vagrant
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Setup wireguard role
+      include_role:
+        name: githubixx.ansible_role_wireguard
+
+- name: Setup Kubernetes certificates
+  hosts: k8s_assets
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Install cfssl
+      include_role:
+        name: githubixx.cfssl
+
+    - name: Generate etcd and K8s TLS certificates
+      include_role:
+        name: githubixx.kubernetes-ca
+
+    - name: Copy certificate files from assets to local host
+      ansible.posix.synchronize:
+        mode: pull
+        src: "{{ k8s_config_directory }}"
+        dest: "/tmp"
+
+- name: Setup etcd
+  hosts: k8s_etcd
+  remote_user: vagrant
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Include etcd role
+      include_role:
+        name: githubixx.etcd
+
+- name: Setup Kubernetes authentication files
+  hosts: k8s_assets
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Install kubectl
+      ansible.builtin.include_role:
+        name: githubixx.kubectl
+
+    - name: Generate kubelet kubeconfig
+      ansible.builtin.include_tasks:
+        file: "tasks/kubelets.yml"
+
+    - name: Generate kube-proxy kubeconfig
+      ansible.builtin.include_tasks:
+        file: "tasks/kube-proxy.yml"
+
+    - name: Generate kube-controller-manager kubeconfig
+      ansible.builtin.include_tasks:
+        file: "tasks/kube-controller-manager.yml"
+
+    - name: Generate kube-scheduler kubeconfig
+      ansible.builtin.include_tasks:
+        file: "tasks/kube-scheduler.yml"
+
+    - name: Generate kube-admin-user kubeconfig
+      ansible.builtin.include_tasks:
+        file: "tasks/kube-admin-user.yml"
+
+    - name: Generate kubeencryption configuration
+      ansible.builtin.include_tasks:
+        file: "tasks/kubeencryptionconfig.yml"
+
+    - name: Copy configuration files from assets to local host
+      ansible.posix.synchronize:
+        mode: pull
+        src: "{{ k8s_config_directory }}"
+        dest: "/tmp"
+
+- name: Setup Kubernetes tooling
+  hosts: k8s_assets
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Generate configuration for kubectl
+      ansible.builtin.include_tasks:
+        file: "tasks/kubectlconfig.yml"
+
+    - name: Install support packages
+      ansible.builtin.package:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - conntrack
+          - python3-pip
+
+    - name: Install kubernetes Python package
+      ansible.builtin.pip:
+        name: kubernetes
+        state: present

@@ -1,0 +1,11 @@
+---
+# Copyright (C) 2023 Robert Wimmer
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+roles:
+  - githubixx.ansible_role_wireguard
+  - githubixx.harden-linux
+  - githubixx.cfssl
+  - githubixx.kubernetes-ca
+  - githubixx.etcd
+  - githubixx.kubectl
