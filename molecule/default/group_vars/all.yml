@@ -1,0 +1,151 @@
+---
+# Copyright (C) 2023 Robert Wimmer
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+harden_linux_ntp: "systemd-timesyncd"
+
+# Password for user "root" and "k8s" is "k8s" in both cases
+harden_linux_root_password: "$6$rounds=656000$mysecretsalt$MAWG.0rF8bob584404vPcgVWbGe9c32KsdGI/.d6F7XFJhlR4PCzKSL4GlPaEWzFMjNSagmupelRqPmhbVhR8."
+harden_linux_deploy_user: "k8s"
+harden_linux_deploy_user_password: "$6$rounds=656000$mysecretsalt$MAWG.0rF8bob584404vPcgVWbGe9c32KsdGI/.d6F7XFJhlR4PCzKSL4GlPaEWzFMjNSagmupelRqPmhbVhR8."
+harden_linux_deploy_user_home: "/home/k8s"
+
+harden_linux_sysctl_settings_user:
+  "net.ipv4.ip_forward": 1
+  "net.ipv6.conf.default.forwarding": 1
+  "net.ipv6.conf.all.forwarding": 1
+
+harden_linux_sshd_settings_user:
+  "^Port ": "Port 22"
+  "^PasswordAuthentication": "PasswordAuthentication yes"
+  "^PermitRootLogin": "PermitRootLogin yes"
+
+harden_linux_ufw_rules:
+  - rule: "allow"
+    to_port: "22"
+    protocol: "tcp"
+  - rule: "allow"
+    to_port: "51820"
+    protocol: "udp"
+  - rule: "allow"
+    to_port: "80"
+    protocol: "tcp"
+  - rule: "allow"
+    to_port: "443"
+    protocol: "tcp"
+  - rule: "allow"
+    to_port: "25"
+    protocol: "tcp"
+
+harden_linux_ufw_allow_networks:
+  - "10.0.0.0/8"
+  - "172.16.0.0/12"
+  - "192.168.0.0/16"
+
+harden_linux_ufw_logging: 'on'
+
+harden_linux_ufw_defaults_user:
+  "^DEFAULT_FORWARD_POLICY": 'DEFAULT_FORWARD_POLICY="ACCEPT"'
+
+harden_linux_sshguard_whitelist:
+  - "127.0.0.0/8"
+  - "::1/128"
+  - "10.0.0.0/8"
+
+etcd_ca_conf_directory: "/tmp/k8s"
+etcd_conf_dir: "/etc/etcd"
+etcd_interface: "{{ k8s_interface }}"
+etcd_settings_user:
+  "heartbeat-interval": "250"
+  "election-timeout": "2500"
+etcd_cert_hosts:
+  - localhost
+  - 127.0.0.1
+  - 10.32.0.1
+  - kubernetes
+  - kubernetes.default
+  - kubernetes.default.svc
+  - kubernetes.default.svc.cluster
+  - kubernetes.svc.cluster.local
+  - 192.168.10.5
+  - 192.168.10.10
+  - 192.168.10.20
+  - 192.168.10.30
+  - 192.168.10.100
+  - 192.168.10.110
+  - 192.168.10.120
+  - 192.168.10.130
+  - 10.10.10.5
+  - 10.10.10.10
+  - 10.10.10.20
+  - 10.10.10.30
+  - 10.10.10.100
+  - 10.10.10.110
+  - 10.10.10.120
+  - 10.10.10.130
+  - test-controller1
+  - test-controller2
+  - test-controller3
+  - test-worker1
+  - test-worker2
+  - test-worker3
+
+k8s_ca_conf_directory: "/tmp/k8s"
+k8s_ca_conf_directory_perm: "0775"
+k8s_ca_file_perm: "0666"
+k8s_ca_certificate_owner: "{{ k8s_config_owner }}"
+k8s_ca_certificate_group: "{{ k8s_config_group }}"
+
+k8s_interface: "wg0"
+k8s_controller_delegate_to: "test-assets"
+
+k8s_config_cluster_name: "k8s"
+k8s_config_directory: "/tmp/k8s"
+k8s_config_directory_perm: "0777"
+k8s_config_file_perm: "0666"
+k8s_config_owner: "root"
+k8s_config_group: "root"
+
+k8s_encryption_config_directory: "{{k8s_config_directory}}"
+k8s_encryption_config_key: "Y29uZmlndXJhdGlvbjIyCg=="
+k8s_encryption_config_owner: "{{ k8s_config_owner }}"
+k8s_encryption_config_group: "{{ k8s_config_owner }}"
+k8s_encryption_config_directory_perm: "{{ k8s_config_directory_perm }}"
+k8s_encryption_config_file_perm: "{{ k8s_config_file_perm }}"
+
+k8s_conf_dir: "/var/lib/kubernetes"
+
+k8s_worker_kubelet_conf_dir: "/var/lib/kubelet"
+
+k8s_apiserver_secure_port: "6443"
+
+k8s_apiserver_settings_user:
+  "enable-aggregator-routing": "true"
+
+k8s_worker_kubelet_settings:
+  "config": "{{k8s_worker_kubelet_conf_dir}}/kubelet-config.yaml"
+  "node-ip": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
+  "container-runtime-endpoint": "unix:///run/containerd/containerd.sock"
+  "kubeconfig": "{{k8s_worker_kubelet_conf_dir}}/kubeconfig"
+  "seccomp-default": ""
+
+containerd_flavor: "k8s"
+containerd_tmp_directory: "/tmp"
+containerd_runc_binary_directory: "/usr/local/sbin"
+containerd_crictl_config_file: "crictl.yaml"
+containerd_crictl_config_directory: "/etc"
+containerd_cni_binary_directory: "/opt/cni/bin"
+
+cilium_etcd_enabled: "false"
+cilium_delegate_to: "test-assets"
+cilium_helm_show_commands: true
+cilium_etcd_interface: "{{ k8s_interface }}"
+
+ca_etcd_csr_cn: "etcd"
+ca_k8s_apiserver_csr_cn: "kubernetes"
+etcd_server_csr_cn: "etcd"
+etcd_peer_csr_cn: "etcd"
+etcd_client_csr_cn_prefix: "etcd"
+k8s_apiserver_csr_cn: "kubernetes"
+k8s_admin_csr_cn: "admin"
+k8s_controller_manager_sa_csr_cn: "service-accounts"

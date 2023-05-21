@@ -1,0 +1,16 @@
+---
+# Copyright (C) 2023 Robert Wimmer
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Taint Kubernetes control plane nodes
+  kubernetes.core.k8s_taint:
+    state: present
+    name: "{{ k8s_controller_node }}"
+    taints:
+      - effect: NoExecute
+        key: "node-role.kubernetes.io/control-plane"
+      - effect: NoSchedule
+        key: "node-role.kubernetes.io/control-plane"
+  loop: "{{ groups['k8s_controller'] }}"
+  loop_control:
+    loop_var: k8s_controller_node

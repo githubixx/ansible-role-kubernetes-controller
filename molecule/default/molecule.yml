@@ -1,0 +1,118 @@
+---
+# Copyright (C) 2023 Robert Wimmer
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+role_name_check: 2
+
+dependency:
+  name: galaxy
+
+driver:
+  name: vagrant
+  provider:
+    name: libvirt
+    type: libvirt
+
+platforms:
+  - name: test-assets
+    box: generic/ubuntu2004
+    memory: 1024
+    cpus: 2
+    groups:
+      - vpn
+      - k8s_assets
+      - k8s
+    interfaces:
+      - auto_config: true
+        network_name: private_network
+        type: static
+        ip: 192.168.10.5
+  - name: test-controller1
+    box: generic/ubuntu2004
+    memory: 2048
+    cpus: 2
+    groups:
+      - vpn
+      - k8s_controller
+      - k8s_worker
+      - k8s_etcd
+      - k8s
+    interfaces:
+      - auto_config: true
+        network_name: private_network
+        type: static
+        ip: 192.168.10.10
+  - name: test-controller2
+    box: generic/ubuntu2004
+    memory: 2048
+    cpus: 2
+    groups:
+      - vpn
+      - k8s_controller
+      - k8s_worker
+      - k8s_etcd
+      - k8s
+    interfaces:
+      - auto_config: true
+        network_name: private_network
+        type: static
+        ip: 192.168.10.20
+  - name: test-controller3
+    box: generic/ubuntu2004
+    memory: 2048
+    cpus: 2
+    groups:
+      - vpn
+      - k8s_controller
+      - k8s_worker
+      - k8s_etcd
+      - k8s
+    interfaces:
+      - auto_config: true
+        network_name: private_network
+        type: static
+        ip: 192.168.10.30
+  - name: test-worker1
+    box: generic/ubuntu2004
+    memory: 2048
+    cpus: 2
+    groups:
+      - vpn
+      - k8s_worker
+      - k8s
+    interfaces:
+      - auto_config: true
+        network_name: private_network
+        type: static
+        ip: 192.168.10.100
+  - name: test-worker2
+    box: generic/ubuntu2004
+    memory: 2048
+    cpus: 2
+    groups:
+      - vpn
+      - k8s_worker
+      - k8s
+    interfaces:
+      - auto_config: true
+        network_name: private_network
+        type: static
+        ip: 192.168.10.110
+
+provisioner:
+  name: ansible
+  connection_options:
+    ansible_ssh_user: vagrant
+    ansible_become: true
+  log: true
+  lint: yamllint . && flake8
+
+scenario:
+  name: default
+  test_sequence:
+    - prepare
+    - converge
+
+verifier:
+  name: ansible
+  enabled: true

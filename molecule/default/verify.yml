@@ -1,0 +1,30 @@
+---   
+# Copyright (C) 2023 Robert Wimmer
+# SPDX-License-Identifier: GPL-3.0-or-later 
+
+- name: Verify setup
+  hosts: test-assets
+  tasks:
+    - name: Fetch namespaces information
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: namespace
+      register: k8s__namespaces_info
+
+    - name: Print namespaces
+      ansible.builtin.debug:
+        var: "{{ k8s__namespaces_info | community.general.json_query(query) }}"
+      vars:
+        query: "length(resources)"
+      when: ansible_verbosity > 1
+
+    - name: Register namespaces count
+      ansible.builtin.set_fact:
+        k8s__namespaces_count: "{{ k8s__namespaces_info | community.general.json_query(query) }}"
+      vars:
+        query: "length(resources)"
+
+    - name: There should be four namespaces
+      ansible.builtin.assert:
+        that:
+          - k8s__namespaces_count|int == 4

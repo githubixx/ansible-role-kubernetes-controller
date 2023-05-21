@@ -1,0 +1,21 @@
+---
+# Copyright (C) 2023 Robert Wimmer
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Setup Kubernetes controller
+  hosts: k8s_controller
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Include kubernetes-controller role
+      ansible.builtin.include_role:
+        name: githubixx.kubernetes-controller
+
+# - name: Taint Kubernetes control plane nodes
+#   hosts: k8s_assets
+#   become: true
+#   gather_facts: true
+#   tasks:
+#     - name: Control plane nodes should only run critical pods
+#       ansible.builtin.include_tasks:
+#         file: tasks/taint_controller_nodes.yml

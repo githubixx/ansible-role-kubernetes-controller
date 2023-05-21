@@ -1,0 +1,8 @@
+---
+# Copyright (C) 2023 Robert Wimmer
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+wireguard_address: "10.10.10.100/24"
+wireguard_port: 51820
+wireguard_persistent_keepalive: "30"
+wireguard_endpoint: "192.168.10.100"
