@@ -10,6 +10,8 @@ https://{{hostvars[host]['ansible_' + k8s_interface].ipv4.address}}:{{etcd_clien
 [Unit]
 Description=Kubernetes API Server
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+Wants=network-online.target
+After=network-online.target
 
 [Service]
 ExecStart={{k8s_bin_dir}}/kube-apiserver \
