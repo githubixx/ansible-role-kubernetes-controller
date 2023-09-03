@@ -3,6 +3,9 @@
 ## 20.0.1+1.26.8
 
 - update `k8s_release` to `1.26.8`
+- `kube-apiserver` needs to have network-online.target ready
+- `kube-controller-manager` needs to have network-online.target ready
+- `kube-scheduler` needs to have network-online.target ready
 
 ## 20.0.0+1.26.4
 
