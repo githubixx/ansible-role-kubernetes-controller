@@ -7,9 +7,9 @@
   become: true
   gather_facts: true
   tasks:
-    - name: Include kubernetes-controller role
+    - name: Include kubernetes_controller role
       ansible.builtin.include_role:
-        name: githubixx.kubernetes-controller
+        name: githubixx.kubernetes_controller
 
 # - name: Taint Kubernetes control plane nodes
 #   hosts: k8s_assets

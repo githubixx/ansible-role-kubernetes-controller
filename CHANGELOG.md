@@ -1,5 +1,11 @@
 # Changelog
 
+## 21.0.0+1.27.5
+
+- **BREAKING**: `meta/main.yml`: change role_name from `kubernetes-controller` to `kubernetes_controller`. This is a requirement since quite some time for Ansible Galaxy. But the requirement was introduced after this role already existed for quite some time. So please update the name of the role in your playbook accordingly!
+- update `k8s_release` to `1.27.5`
+- `meta/main.yml`: remove Ubuntu 18.04 as supported OS (reached EOL)
+
 ## 20.0.1+1.26.8
 
 - update `k8s_release` to `1.26.8`
