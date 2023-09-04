@@ -170,7 +170,7 @@ Example Playbook
 ```yaml
 - hosts: k8s_controller
   roles:
-    - githubixx.kubernetes-controller
+    - githubixx.kubernetes_controller
 ```
 
 License
