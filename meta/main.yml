@@ -9,7 +9,7 @@ galaxy_info:
   platforms:
     - name: Ubuntu
       versions:
-        - focal
+        - "focal"
   galaxy_tags:
     - kubernetes
     - scheduler
