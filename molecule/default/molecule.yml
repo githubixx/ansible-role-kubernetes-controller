@@ -15,8 +15,8 @@ driver:
 
 platforms:
   - name: test-assets
-    box: generic/ubuntu2004
-    memory: 1024
+    box: generic/ubuntu2204
+    memory: 2048
     cpus: 2
     groups:
       - vpn
@@ -28,7 +28,7 @@ platforms:
         type: static
         ip: 192.168.10.5
   - name: test-controller1
-    box: generic/ubuntu2004
+    box: generic/ubuntu2204
     memory: 2048
     cpus: 2
     groups:
@@ -43,7 +43,7 @@ platforms:
         type: static
         ip: 192.168.10.10
   - name: test-controller2
-    box: generic/ubuntu2004
+    box: generic/ubuntu2204
     memory: 2048
     cpus: 2
     groups:
@@ -73,7 +73,7 @@ platforms:
         type: static
         ip: 192.168.10.30
   - name: test-worker1
-    box: generic/ubuntu2004
+    box: generic/ubuntu2204
     memory: 2048
     cpus: 2
     groups:

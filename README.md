@@ -13,6 +13,12 @@ Requirements
 
 This role requires that you already created some certificates for Kubernetes API server (see [Kubernetes the not so hard way with Ansible - Certificate authority (CA)](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-certificate-authority/)). The role copies the certificates from `k8s_ca_conf_directory` to the destination host. You should also setup a fully meshed VPN with e.g. WireGuard (see [Kubernetes the not so hard way with Ansible - WireGuard](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-wireguard/)) and of course an etcd cluster (see [Kubernetes the not so hard way with Ansible - etcd cluster](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-etcd/))
 
+Supported OS
+------------
+
+- Ubuntu 20.04 (Focal Fossa)
+- Ubuntu 22.04 (Jammy Jellyfish)
+
 Changelog
 ---------
 
@@ -171,6 +177,29 @@ Example Playbook
 - hosts: k8s_controller
   roles:
     - githubixx.kubernetes_controller
+```
+
+Testing
+-------
+
+This role has a small test setup that is created using [Molecule](https://github.com/ansible-community/molecule), libvirt (vagrant-libvirt) and QEMU/KVM. Please see my blog post [Testing Ansible roles with Molecule, libvirt (vagrant-libvirt) and QEMU/KVM](https://www.tauceti.blog/posts/testing-ansible-roles-with-molecule-libvirt-vagrant-qemu-kvm/) how to setup. The test configuration is [here](https://github.com/githubixx/ansible-role-kubernetes-controller/tree/master/molecule/default).
+
+Afterwards Molecule can be executed:
+
+```bash
+molecule converge
+```
+
+This will setup a few virtual machines (VM) with supported Ubuntu OS and installs an Kubernetes cluster but without the worker nodes (so no nodes with `kube-proxy` and `kubelet` installed). A small verification step is also included:
+
+```bash
+molecule verify
+```
+
+To clean up run
+
+```bash
+molecule destroy
 ```
 
 License
