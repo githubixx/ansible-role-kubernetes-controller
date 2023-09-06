@@ -1,5 +1,9 @@
 # Changelog
 
+## 21.1.1+1.27.5
+
+- `molecule/default/molecule.yml`: use Ubuntu 20.04 instead of 22.04 for `test-assets` for now because of certificate problems with Python urllib module
+
 ## 21.1.0+1.27.5
 
 - add support for Ubuntu 22.04
