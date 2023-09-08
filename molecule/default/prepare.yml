@@ -44,7 +44,7 @@
 
     - name: Generate etcd and K8s TLS certificates
       include_role:
-        name: githubixx.kubernetes-ca
+        name: githubixx.kubernetes_ca
 
     - name: Copy certificate files from assets to local host
       ansible.posix.synchronize:
