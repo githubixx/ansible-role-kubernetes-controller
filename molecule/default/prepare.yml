@@ -19,9 +19,9 @@
   become: true
   gather_facts: true
   tasks:
-    - name: Setup harden-linux role
+    - name: Setup harden_linux role
       include_role:
-        name: githubixx.harden-linux
+        name: githubixx.harden_linux
 
 - name: Setup Wireguard VPN
   hosts: vpn

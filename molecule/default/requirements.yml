@@ -4,7 +4,7 @@
 
 roles:
   - githubixx.ansible_role_wireguard
-  - githubixx.harden-linux
+  - githubixx.harden_linux
   - githubixx.cfssl
   - githubixx.kubernetes_ca
   - githubixx.etcd
