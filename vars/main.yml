@@ -1,1 +1,29 @@
 ---
+# Kubernetes control plane binaries to download.
+k8s_ctl_binaries:
+  - kube-apiserver
+  - kube-controller-manager
+  - kube-scheduler
+  - kubectl
+
+# Kubernetes certificates for:
+# kube-(apiserver|controller-manager|controller-manager-sa|scheduler)
+k8s_ctl_certificates:
+  - ca-k8s-apiserver.pem
+  - ca-k8s-apiserver-key.pem
+  - cert-k8s-apiserver.pem
+  - cert-k8s-apiserver-key.pem
+  - cert-k8s-controller-manager-sa.pem
+  - cert-k8s-controller-manager-sa-key.pem
+  - cert-k8s-scheduler.pem
+  - cert-k8s-scheduler-key.pem
+  - cert-k8s-controller-manager.pem
+  - cert-k8s-controller-manager-key.pem
+
+# The "etcd" certificates needed for the control plane components to be able
+# to connect to the "etcd" cluster.
+k8s_ctl_etcd_certificates:
+  - ca-etcd.pem
+  - ca-etcd-key.pem
+  - cert-k8s-apiserver-etcd.pem
+  - cert-k8s-apiserver-etcd-key.pem

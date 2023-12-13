@@ -1,6 +1,6 @@
----   
+---
 # Copyright (C) 2023 Robert Wimmer
-# SPDX-License-Identifier: GPL-3.0-or-later 
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Verify setup
   hosts: test-assets
@@ -9,6 +9,7 @@
       kubernetes.core.k8s_info:
         api_version: v1
         kind: namespace
+        kubeconfig: "{{ k8s_admin_conf_dir }}/admin.kubeconfig"
       register: k8s__namespaces_info
 
     - name: Print namespaces

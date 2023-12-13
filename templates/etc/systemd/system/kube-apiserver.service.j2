@@ -1,7 +1,7 @@
 #jinja2: trim_blocks:False
 {%- macro cluster_hosts() -%}
 {%- for host in groups['k8s_etcd'] -%}
-https://{{hostvars[host]['ansible_' + k8s_interface].ipv4.address}}:{{etcd_client_port}}{% if not loop.last %},{% endif %}
+https://{{ hostvars[host]['ansible_' + k8s_ctl_etcd_interface].ipv4.address }}:{{ k8s_ctl_etcd_client_port }}{% if not loop.last %},{% endif %}
 {%- endfor -%}
 {%- endmacro -%}
 
@@ -14,12 +14,13 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
-ExecStart={{k8s_bin_dir}}/kube-apiserver \
+ExecStart={{ k8s_ctl_bin_dir }}/kube-apiserver \
 {%- for setting in k8s_apiserver_settings|sort %}
-  --{{setting}}={{k8s_apiserver_settings[setting]}} {% if not loop.last %}\{% endif %}
+  --{{ setting }}={{ k8s_apiserver_settings[setting] }} {% if not loop.last %}\{% endif %}
 {%- endfor %}
-Restart=on-failure
-RestartSec=5
+{%- for setting in k8s_ctl_service_options %}
+{{ setting }}
+{%- endfor %}
 
 [Install]
 WantedBy=multi-user.target

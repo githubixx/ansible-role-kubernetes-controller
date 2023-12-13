@@ -2,8 +2,6 @@
 # Copyright (C) 2023 Robert Wimmer
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-role_name_check: 2
-
 dependency:
   name: galaxy
 
@@ -33,6 +31,7 @@ platforms:
     cpus: 2
     groups:
       - vpn
+      - ubuntu22
       - k8s_controller
       - k8s_worker
       - k8s_etcd
@@ -48,6 +47,7 @@ platforms:
     cpus: 2
     groups:
       - vpn
+      - ubuntu22
       - k8s_controller
       - k8s_worker
       - k8s_etcd
@@ -63,6 +63,7 @@ platforms:
     cpus: 2
     groups:
       - vpn
+      - ubuntu20
       - k8s_controller
       - k8s_worker
       - k8s_etcd
@@ -78,6 +79,7 @@ platforms:
     cpus: 2
     groups:
       - vpn
+      - ubuntu22
       - k8s_worker
       - k8s
     interfaces:
@@ -91,6 +93,7 @@ platforms:
     cpus: 2
     groups:
       - vpn
+      - ubuntu20
       - k8s_worker
       - k8s
     interfaces:

@@ -1,0 +1,102 @@
+---
+- name: Register checksum of kube-controller-manager original kubeconfig
+  ansible.builtin.stat:
+    path: "{{ k8s_controller_manager_conf_dir }}/kubeconfig"
+  register: k8s_ctl__controller_manager_kubeconfig_orig_stat
+
+- name: Generate kubeconfig for kube-controller-manager (set-cluster)
+  ansible.builtin.shell: >
+    set -o errexit; \
+    kubectl config set-cluster {{ k8s_config_cluster_name }} \
+      --certificate-authority={{ k8s_ctl_pki_dir }}/ca-k8s-apiserver.pem \
+      --embed-certs=true \
+      --server=https://{{ k8s_ctl_api_endpoint_host }}:{{ k8s_ctl_api_endpoint_port }} \
+      --kubeconfig={{ k8s_controller_manager_conf_dir }}/kubeconfig
+  args:
+    executable: /bin/bash
+  register: k8s_ctl__set_cluster_out
+  changed_when: false
+  failed_when: k8s_ctl__set_cluster_out.rc != 0
+
+- name: Generate kubeconfig for kube-controller-manager (set-cluster) - DEBUG OUTPUT
+  ansible.builtin.debug:
+    msg: "COMMAND:{{ k8s_ctl__set_cluster_out.cmd }} | OUTPUT: {{ k8s_ctl__set_cluster_out.stdout }}"
+    verbosity: 2
+
+- name: Generate kubeconfig for kube-controller-manager (set-credentials)
+  ansible.builtin.shell: >
+    set -o errexit; \
+    kubectl config set-credentials system:kube-controller-manager \
+      --client-certificate={{ k8s_ctl_pki_dir }}/cert-k8s-controller-manager.pem \
+      --client-key={{ k8s_ctl_pki_dir }}/cert-k8s-controller-manager-key.pem \
+      --embed-certs=true \
+      --kubeconfig={{ k8s_controller_manager_conf_dir }}/kubeconfig
+  args:
+    executable: /bin/bash
+  register: k8s_ctl__set_credentials_out
+  changed_when: false
+  failed_when: k8s_ctl__set_credentials_out.rc != 0
+
+- name: Generate kubeconfig for kube-controller-manager (set-credentials) - DEBUG OUTPUT
+  ansible.builtin.debug:
+    msg: "COMMAND:{{ k8s_ctl__set_credentials_out.cmd }} | OUTPUT: {{ k8s_ctl__set_credentials_out.stdout }}"
+    verbosity: 2
+
+- name: Generate kubeconfig for kube-controller-manager (set-context)
+  ansible.builtin.shell: >
+    set -o errexit; \
+    kubectl config set-context default \
+      --cluster={{ k8s_config_cluster_name }} \
+      --user=system:kube-controller-manager \
+      --kubeconfig={{ k8s_controller_manager_conf_dir }}/kubeconfig
+  args:
+    executable: /bin/bash
+  register: k8s_ctl__set_context_out
+  changed_when: false
+  failed_when: k8s_ctl__set_context_out.rc != 0
+
+- name: Generate kubeconfig for kube-controller-manager (set-context) - DEBUG OUTPUT
+  ansible.builtin.debug:
+    msg: "COMMAND:{{ k8s_ctl__set_context_out.cmd }} | OUTPUT: {{ k8s_ctl__set_context_out.stdout }}"
+    verbosity: 2
+
+- name: Generate kubeconfig for kube-controller-manager (use-context)
+  ansible.builtin.shell: >
+    set -o errexit; \
+    kubectl config use-context default \
+      --kubeconfig={{ k8s_controller_manager_conf_dir }}/kubeconfig
+  args:
+    executable: /bin/bash
+  register: k8s_ctl__use_context_out
+  changed_when: false
+  failed_when: k8s_ctl__use_context_out.rc != 0
+
+- name: Generate kubeconfig for kube-controller-manager (use-context) - DEBUG OUTPUT
+  ansible.builtin.debug:
+    msg: "COMMAND:{{ k8s_ctl__use_context_out.cmd }} | OUTPUT: {{ k8s_ctl__use_context_out.stdout }}"
+    verbosity: 2
+
+- name: Set file permissions
+  ansible.builtin.file:
+    path: "{{ k8s_controller_manager_conf_dir }}/kubeconfig"
+    owner: "root"
+    group: "{{ k8s_run_as_group }}"
+    mode: "0640"
+    modification_time: "preserve"
+    access_time: "preserve"
+
+- name: Register checksum of kube-controller-manager current kubeconfig
+  ansible.builtin.stat:
+    path: "{{ k8s_controller_manager_conf_dir }}/kubeconfig"
+  register: k8s_ctl__controller_manager_kubeconfig_current_stat
+
+- name: Check if kubeconfig file changed
+  when:
+    - k8s_ctl__controller_manager_kubeconfig_orig_stat.stat.checksum is defined
+    - k8s_ctl__controller_manager_kubeconfig_orig_stat.stat.checksum != k8s_ctl__controller_manager_kubeconfig_current_stat.stat.checksum
+  ansible.builtin.debug:
+    msg: "kubeconfig file changed"
+  changed_when:
+    - k8s_ctl__controller_manager_kubeconfig_orig_stat.stat.checksum != k8s_ctl__controller_manager_kubeconfig_current_stat.stat.checksum
+  notify:
+    - Restart kube-controller-manager

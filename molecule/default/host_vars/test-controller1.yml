@@ -6,3 +6,6 @@ wireguard_address: "10.10.10.10/24"
 wireguard_port: 51820
 wireguard_persistent_keepalive: "30"
 wireguard_endpoint: "192.168.10.10"
+
+k8s_ctl_api_endpoint_host: "127.0.0.1"
+k8s_ctl_api_endpoint_port: "16443"

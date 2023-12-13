@@ -2,24 +2,33 @@
 # Copyright (C) 2023 Robert Wimmer
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+# Use "systemd-timesyncd" for time services. It's available by default.
 harden_linux_ntp: "systemd-timesyncd"
 
-# Password for user "root" and "k8s" is "k8s" in both cases
-harden_linux_root_password: "$6$rounds=656000$mysecretsalt$MAWG.0rF8bob584404vPcgVWbGe9c32KsdGI/.d6F7XFJhlR4PCzKSL4GlPaEWzFMjNSagmupelRqPmhbVhR8."
-harden_linux_deploy_user: "k8s"
-harden_linux_deploy_user_password: "$6$rounds=656000$mysecretsalt$MAWG.0rF8bob584404vPcgVWbGe9c32KsdGI/.d6F7XFJhlR4PCzKSL4GlPaEWzFMjNSagmupelRqPmhbVhR8."
-harden_linux_deploy_user_home: "/home/k8s"
+# Password for user "root" and "vagrant" is "vagrant" in both cases. As
+# "vagrant" user is available in every Vagrant Ubuntu Box just use it.
+harden_linux_root_password: "$6$rounds=656000$mysecretsalt$fpyQ9hMON6iKKuM0Rz10WZKNJR4OkQTVfBmd4SPrJPsU9XmgQGRtogcUnFB5FLRIitswuQFr6Tr8Mos9l7Ojm0"
+harden_linux_deploy_user: "vagrant"
+harden_linux_deploy_user_password: "$6$rounds=656000$mysecretsalt$fpyQ9hMON6iKKuM0Rz10WZKNJR4OkQTVfBmd4SPrJPsU9XmgQGRtogcUnFB5FLRIitswuQFr6Tr8Mos9l7Ojm0"
+harden_linux_deploy_user_home: "/home/vagrant"
+harden_linux_deploy_user_uid: "1000"
+harden_linux_deploy_user_shell: "/bin/bash"
 
+# Enable IP forwarding for IPv4 and IPv6
 harden_linux_sysctl_settings_user:
   "net.ipv4.ip_forward": 1
   "net.ipv6.conf.default.forwarding": 1
   "net.ipv6.conf.all.forwarding": 1
 
+# Let SSHd listen on port 22, allow password authentication and allow "root"
+# login. The last two settings are not recommended for production use but for
+# this test deployment it's okay as it makes debugging easier and faster.
 harden_linux_sshd_settings_user:
   "^Port ": "Port 22"
   "^PasswordAuthentication": "PasswordAuthentication yes"
   "^PermitRootLogin": "PermitRootLogin yes"
 
+# Open a few ports for ssh, Wireguard, HTTP, HTTPS and SMTP.
 harden_linux_ufw_rules:
   - rule: "allow"
     to_port: "22"
@@ -37,115 +46,124 @@ harden_linux_ufw_rules:
     to_port: "25"
     protocol: "tcp"
 
+# Allow all traffic from the following networks.
 harden_linux_ufw_allow_networks:
   - "10.0.0.0/8"
   - "172.16.0.0/12"
   - "192.168.0.0/16"
 
+# Enable logging for UFW.
 harden_linux_ufw_logging: 'on'
 
+# Set the default forward policy to "ACCEPT".
 harden_linux_ufw_defaults_user:
   "^DEFAULT_FORWARD_POLICY": 'DEFAULT_FORWARD_POLICY="ACCEPT"'
 
+# Don't block SSH logins from the following networks even login attempts fail
+# for a few times.
 harden_linux_sshguard_whitelist:
   - "127.0.0.0/8"
   - "::1/128"
   - "10.0.0.0/8"
+  - "172.16.0.0/12"
+  - "192.168.0.0/16"
 
-etcd_ca_conf_directory: "/tmp/k8s"
+# Directory where the etcd certificates are stored on the Ansible controller
+# host. Certificate files for etcd will be copied from this directory to
+# the etcd nodes.
+etcd_ca_conf_directory: "{{ k8s_ca_conf_directory }}"
+# Directory where the etcd certificates are stored on the etcd hosts.
 etcd_conf_dir: "/etc/etcd"
+# Interface where the etcd service is listening on.
 etcd_interface: "{{ k8s_interface }}"
+# A few additional settings for etcd.
 etcd_settings_user:
   "heartbeat-interval": "250"
   "election-timeout": "2500"
+# Host names and IP addresses in the etcd certificates.
 etcd_cert_hosts:
   - localhost
   - 127.0.0.1
-  - 10.32.0.1
-  - kubernetes
-  - kubernetes.default
-  - kubernetes.default.svc
-  - kubernetes.default.svc.cluster
-  - kubernetes.svc.cluster.local
-  - 192.168.10.5
   - 192.168.10.10
   - 192.168.10.20
   - 192.168.10.30
-  - 192.168.10.100
-  - 192.168.10.110
-  - 192.168.10.120
-  - 192.168.10.130
-  - 10.10.10.5
   - 10.10.10.10
   - 10.10.10.20
   - 10.10.10.30
-  - 10.10.10.100
-  - 10.10.10.110
-  - 10.10.10.120
-  - 10.10.10.130
   - test-controller1
   - test-controller2
   - test-controller3
-  - test-worker1
-  - test-worker2
-  - test-worker3
 
-k8s_ca_conf_directory: "/tmp/k8s"
-k8s_ca_conf_directory_perm: "0775"
-k8s_ca_file_perm: "0666"
-k8s_ca_certificate_owner: "{{ k8s_config_owner }}"
-k8s_ca_certificate_group: "{{ k8s_config_group }}"
+# Directory where the Kubernetes certificates are stored on the Ansible
+# controller host.
+k8s_ca_conf_directory: "/tmp/k8s-ca"
+# Permissions for the Kubernetes CA directory.
+k8s_ca_conf_directory_perm: "0700"
+# Permissions for the Kubernetes CA files.
+k8s_ca_file_perm: "0600"
+# Owner of the Kubernetes CA files.
+k8s_ca_certificate_owner: "vagrant"
+# Group of the Kubernetes CA files.
+k8s_ca_certificate_group: "vagrant"
 
+# Interface where the Kubernetes control plane services are listening on.
 k8s_interface: "wg0"
-k8s_controller_delegate_to: "test-assets"
+# Interface where the etcd daemons listening on.
+k8s_ctl_etcd_interface: "{{ etcd_interface }}"
 
+# Delegate tasks like creating the Kubernetes CA certificates to the following
+# host. This host also communicates with the "kube-apiserver" if required
+# for certain tasks.
+k8s_ctl_delegate_to: "test-assets"
+
+# Directory where the Kubernetes certificates are stored on the Ansible
+# controller host and where the Ansible can find them to be copied to the
+# Kubernetes control plane nodes.
+k8s_ctl_ca_conf_directory: "{{ k8s_ca_conf_directory }}"
+
+# The name of the Kubernetes cluster.
 k8s_config_cluster_name: "k8s"
-k8s_config_directory: "/tmp/k8s"
-k8s_config_directory_perm: "0777"
-k8s_config_file_perm: "0666"
-k8s_config_owner: "root"
-k8s_config_group: "root"
 
-k8s_encryption_config_directory: "{{k8s_config_directory}}"
+# Directory where "admin.kubeconfig" (the credentials file) for the "admin"
+# user is stored
+k8s_admin_conf_dir: "{{ '~/k8s/configs' | expanduser }}"
+# Permissions for the directory specified in "k8s_admin_conf_dir"
+k8s_admin_conf_dir_perm: "0700"
+# Owner of the directory specified in "k8s_admin_conf_dir" and for
+# "admin.kubeconfig" stored in this directory.
+k8s_admin_conf_owner: "root"
+# Group of the directory specified in "k8s_admin_conf_dir" and for
+# "admin.kubeconfig" stored in this directory.
+k8s_admin_conf_group: "root"
+
+# Run Kubernetes control plane services as the following user.
+k8s_run_as_user: "k8s"
+# Run Kubernetes control plane services as the following group.
+k8s_run_as_group: "k8s"
+
+# Key used for encrypting secrets (encryption at-rest) by the
+# "kube-apiserver".
 k8s_encryption_config_key: "Y29uZmlndXJhdGlvbjIyCg=="
-k8s_encryption_config_owner: "{{ k8s_config_owner }}"
-k8s_encryption_config_group: "{{ k8s_config_owner }}"
-k8s_encryption_config_directory_perm: "{{ k8s_config_directory_perm }}"
-k8s_encryption_config_file_perm: "{{ k8s_config_file_perm }}"
 
-k8s_conf_dir: "/var/lib/kubernetes"
-
-k8s_worker_kubelet_conf_dir: "/var/lib/kubelet"
-
-k8s_apiserver_secure_port: "6443"
-
+# Additional settings for the "kube-apiserver".
 k8s_apiserver_settings_user:
   "enable-aggregator-routing": "true"
 
-k8s_worker_kubelet_settings:
-  "config": "{{k8s_worker_kubelet_conf_dir}}/kubelet-config.yaml"
-  "node-ip": "{{hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address}}"
-  "container-runtime-endpoint": "unix:///run/containerd/containerd.sock"
-  "kubeconfig": "{{k8s_worker_kubelet_conf_dir}}/kubeconfig"
-  "seccomp-default": ""
+# Directory for the "runc" binaries
+runc_bin_directory: "/usr/local/sbin"
 
-containerd_flavor: "k8s"
-containerd_tmp_directory: "/tmp"
-containerd_runc_binary_directory: "/usr/local/sbin"
-containerd_crictl_config_file: "crictl.yaml"
-containerd_crictl_config_directory: "/etc"
-containerd_cni_binary_directory: "/opt/cni/bin"
-
-cilium_etcd_enabled: "false"
-cilium_delegate_to: "test-assets"
-cilium_helm_show_commands: true
-cilium_etcd_interface: "{{ k8s_interface }}"
-
+# Common name for "etcd" certificate authority certificates.
 ca_etcd_csr_cn: "etcd"
+
+# Common name for "kube-apiserver" certificate authority certificate.
 ca_k8s_apiserver_csr_cn: "kubernetes"
+
+# Common names for "etcd" server, peer and client certificates.
 etcd_server_csr_cn: "etcd"
 etcd_peer_csr_cn: "etcd"
 etcd_client_csr_cn_prefix: "etcd"
+
+# Common names for kube-apiserver, admin and kube-controller-manager certificates.
 k8s_apiserver_csr_cn: "kubernetes"
 k8s_admin_csr_cn: "admin"
 k8s_controller_manager_sa_csr_cn: "service-accounts"
