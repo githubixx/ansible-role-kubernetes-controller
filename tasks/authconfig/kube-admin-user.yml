@@ -1,0 +1,129 @@
+---
+- name: Create directory to store admin.kubeconfig file
+  ansible.builtin.file:
+    path: "{{ k8s_admin_conf_dir }}"
+    state: directory
+    mode: "{{ k8s_admin_conf_dir_perm }}"
+    owner: "{{ k8s_admin_conf_owner }}"
+    group: "{{ k8s_admin_conf_group }}"
+
+- name: Register checksum original admin.kubeconfig
+  ansible.builtin.stat:
+    path: "{{ k8s_admin_conf_dir }}/admin.kubeconfig"
+  register: k8s_ctl__admin_kubeconfig_orig_stat
+  run_once: true
+  delegate_to: "{{ k8s_ctl_delegate_to }}"
+
+- name: Generate a kubeconfig file for the admin user (set-cluster)
+  ansible.builtin.shell: >
+    set -o errexit; \
+    kubectl config set-cluster {{ k8s_config_cluster_name }} \
+      --certificate-authority={{ k8s_ctl_ca_conf_directory }}/ca-k8s-apiserver.pem \
+      --embed-certs=true \
+      --server=https://{{ k8s_admin_api_endpoint_host }}:{{ k8s_admin_api_endpoint_port }} \
+      --kubeconfig={{ k8s_admin_conf_dir }}/admin.kubeconfig
+  args:
+    executable: /bin/bash
+  register: k8s_ctl__set_cluster_out
+  changed_when: false
+  failed_when: k8s_ctl__set_cluster_out.rc != 0
+  run_once: true
+  delegate_to: "{{ k8s_ctl_delegate_to }}"
+
+- name: Generate kubeconfig for the admin user (set-cluster) - DEBUG OUTPUT
+  ansible.builtin.debug:
+    msg: "COMMAND:{{ k8s_ctl__set_cluster_out.cmd }} | OUTPUT: {{ k8s_ctl__set_cluster_out.stdout }}"
+    verbosity: 2
+  run_once: true
+  delegate_to: "{{ k8s_ctl_delegate_to }}"
+
+- name: Generate a kubeconfig file for the admin user (set-credentials)
+  ansible.builtin.shell: >
+    set -o errexit; \
+    kubectl config set-credentials admin \
+      --client-certificate={{ k8s_ctl_ca_conf_directory }}/cert-admin.pem \
+      --client-key={{ k8s_ctl_ca_conf_directory }}/cert-admin-key.pem \
+      --embed-certs=true \
+      --kubeconfig={{ k8s_admin_conf_dir }}/admin.kubeconfig
+  args:
+    executable: /bin/bash
+  register: k8s_ctl__set_credentials_out
+  changed_when: false
+  failed_when: k8s_ctl__set_credentials_out.rc != 0
+  run_once: true
+  delegate_to: "{{ k8s_ctl_delegate_to }}"
+
+- name: Generate kubeconfig for the admin user (set-credentials) - DEBUG OUTPUT
+  ansible.builtin.debug:
+    msg: "COMMAND:{{ k8s_ctl__set_credentials_out.cmd }} | OUTPUT: {{ k8s_ctl__set_credentials_out.stdout }}"
+    verbosity: 2
+  run_once: true
+  delegate_to: "{{ k8s_ctl_delegate_to }}"
+
+- name: Generate a kubeconfig file for the admin user (set-context)
+  ansible.builtin.shell: >
+    set -o errexit; \
+    kubectl config set-context default \
+      --cluster={{ k8s_config_cluster_name }} \
+      --user=admin \
+      --kubeconfig={{ k8s_admin_conf_dir }}/admin.kubeconfig
+  args:
+    executable: /bin/bash
+  register: k8s_ctl__set_context_out
+  changed_when: false
+  failed_when: k8s_ctl__set_context_out.rc != 0
+  run_once: true
+  delegate_to: "{{ k8s_ctl_delegate_to }}"
+
+- name: Generate kubeconfig for the admin user (set-context) - DEBUG OUTPUT
+  ansible.builtin.debug:
+    msg: "COMMAND:{{ k8s_ctl__set_context_out.cmd }} | OUTPUT: {{ k8s_ctl__set_context_out.stdout }}"
+    verbosity: 2
+  run_once: true
+  delegate_to: "{{ k8s_ctl_delegate_to }}"
+
+- name: Set use-context
+  ansible.builtin.shell: >
+    kubectl config use-context default \
+      --kubeconfig={{ k8s_admin_conf_dir }}/admin.kubeconfig
+  args:
+    executable: /bin/bash
+  register: k8s_ctl__use_context_out
+  changed_when: false
+  failed_when: k8s_ctl__use_context_out.rc != 0
+  run_once: true
+  delegate_to: "{{ k8s_ctl_delegate_to }}"
+
+- name: Generate kubeconfig for the admin user (use-context) - DEBUG OUTPUT
+  ansible.builtin.debug:
+    msg: "COMMAND:{{ k8s_ctl__use_context_out.cmd }} | OUTPUT: {{ k8s_ctl__use_context_out.stdout }}"
+    verbosity: 2
+
+- name: Set file permissions
+  ansible.builtin.file:
+    path: "{{ k8s_admin_conf_dir }}/admin.kubeconfig"
+    owner: "{{ k8s_admin_conf_owner }}"
+    group: "{{ k8s_admin_conf_owner }}"
+    mode: "0640"
+    modification_time: "preserve"
+    access_time: "preserve"
+  run_once: true
+  delegate_to: "{{ k8s_ctl_delegate_to }}"
+
+- name: Register checksum of current admin.kubeconfig
+  ansible.builtin.stat:
+    path: "{{ k8s_admin_conf_dir }}/admin.kubeconfig"
+  register: k8s_ctl__admin_kubeconfig_current_stat
+  run_once: true
+  delegate_to: "{{ k8s_ctl_delegate_to }}"
+
+- name: Check if admin.kubeconfig file changed
+  when:
+    - k8s_ctl__admin_kubeconfig_orig_stat.stat.checksum is defined
+    - k8s_ctl__admin_kubeconfig_orig_stat.stat.checksum != k8s_ctl__admin_kubeconfig_current_stat.stat.checksum
+  ansible.builtin.debug:
+    msg: "admin.kubeconfig file changed"
+  changed_when:
+    - k8s_ctl__admin_kubeconfig_orig_stat.stat.checksum != k8s_ctl__admin_kubeconfig_current_stat.stat.checksum
+  run_once: true
+  delegate_to: "{{ k8s_ctl_delegate_to }}"
