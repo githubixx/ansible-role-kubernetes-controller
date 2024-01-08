@@ -4,7 +4,7 @@ This role is used in [Kubernetes the not so hard way with Ansible - Control plan
 
 ## Versions
 
-I tag every release and try to stay with [semantic versioning](http://semver.org). If you want to use the role I recommend to checkout the latest tag. The master branch is basically development while the tags mark stable releases. But in general I try to keep master in good shape too. A tag `21.0.0+1.27.8` means this is release `21.0.0` of this role and it's meant to be used with Kubernetes version `1.27.8` (but should work with any K8s 1.27.x release of course). If the role itself changes `X.Y.Z` before `+` will increase. If the Kubernetes version changes `X.Y.Z` after `+` will increase too. This allows to tag bugfixes and new major versions of the role while it's still developed for a specific Kubernetes release. That's especially useful for Kubernetes major releases with breaking changes.
+I tag every release and try to stay with [semantic versioning](http://semver.org). If you want to use the role I recommend to checkout the latest tag. The master branch is basically development while the tags mark stable releases. But in general I try to keep master in good shape too. A tag `23.0.0+1.28.5` means this is release `23.0.0` of this role and it's meant to be used with Kubernetes version `1.28.5` (but should work with any K8s 1.27.x release of course). If the role itself changes `X.Y.Z` before `+` will increase. If the Kubernetes version changes `X.Y.Z` after `+` will increase too. This allows to tag bugfixes and new major versions of the role while it's still developed for a specific Kubernetes release. That's especially useful for Kubernetes major releases with breaking changes.
 
 ## Requirements
 
@@ -23,9 +23,19 @@ See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-con
 
 **Recent changes:**
 
-## 23.0.0+1.27.5
+## 23.0.0+1.28.5
+
+### GENERAL
+
+If you upgrade from a release < `22.0.0+1.27.8` please read the [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-controller/blob/master/CHANGELOG.md) carefully! Version `22.0.0+1.27.8` had quite a few breaking changes!
+
+### UPDATE
 
 - update `k8s_release` to `1.28.5`
+
+### BREAKING
+
+- Extend `enable-admission-plugins` in `k8s_apiserver_settings` by: `PodSecurity,Priority,StorageObjectInUseProtection,RuntimeClass,CertificateApproval,CertificateSigning,ClusterTrustBundleAttest,CertificateSubjectRestriction,DefaultIngressClass`. These are enabled by default if this flag is not specified (see [Admission Controllers Reference](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/) for more information).
 
 ## 22.0.0+1.27.8
 
@@ -121,7 +131,7 @@ er on the Ansible controller host. Previously it was needed to prepare these fil
 - Add tasks to install [ansible-role-cni](https://github.com/githubixx/ansible-role-cni) and [ansible-role-runc](https://github.com/githubixx/ansible-role-runc)
 - Use `kubernetes.core.k8s_info` module instead of calling `kubectl` binary
 
-21.1.3+1.27.5
+## 21.1.3+1.27.5
 
 - rename `githubixx.harden-linux` to `githubixx.harden_linux`
 
@@ -141,7 +151,7 @@ er on the Ansible controller host. Previously it was needed to prepare these fil
 roles:
   - name: githubixx.kubernetes_controller
     src: https://github.com/githubixx/ansible-role-kubernetes-controller.git
-    version: 22.0.0+1.27.8
+    version: 23.0.0+1.28.5
 ```
 
 ## Role (default) variables
