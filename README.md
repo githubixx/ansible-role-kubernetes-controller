@@ -21,7 +21,11 @@ This role requires that you already created some certificates for Kubernetes API
 
 See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-controller/blob/master/CHANGELOG.md)
 
-**Changes in the last two versions:**
+**Recent changes:**
+
+## 23.0.0+1.27.5
+
+- update `k8s_release` to `1.28.5`
 
 ## 22.0.0+1.27.8
 
@@ -167,7 +171,7 @@ k8s_ctl_pki_dir: "{{ k8s_ctl_conf_dir }}/pki"
 k8s_ctl_bin_dir: "/usr/local/bin"
 
 # The Kubernetes release.
-k8s_ctl_release: "1.27.8"
+k8s_ctl_release: "1.28.5"
 
 # The interface on which the Kubernetes services should listen on. As all cluster
 # communication should use a VPN interface the interface name is
@@ -341,7 +345,7 @@ k8s_apiserver_settings:
   "advertise-address": "{{ hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address }}"
   "bind-address": "{{ hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address }}"
   "secure-port": "6443"
-  "enable-admission-plugins": "NodeRestriction,NamespaceLifecycle,LimitRanger,ServiceAccount,TaintNodesByCondition,Priority,DefaultTolerationSeconds,DefaultStorageClass,PersistentVolumeClaimResize,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota"
+  "enable-admission-plugins": "NodeRestriction,NamespaceLifecycle,LimitRanger,ServiceAccount,TaintNodesByCondition,Priority,DefaultTolerationSeconds,DefaultStorageClass,PersistentVolumeClaimResize,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,PodSecurity,Priority,StorageObjectInUseProtection,RuntimeClass,CertificateApproval,CertificateSigning,ClusterTrustBundleAttest,CertificateSubjectRestriction,DefaultIngressClass"
   "allow-privileged": "true"
   "authorization-mode": "Node,RBAC"
   "audit-log-maxage": "30"

@@ -1,5 +1,15 @@
 # Changelog
 
+## 23.0.0+1.28.5
+
+### UPDATE
+
+- update `k8s_release` to `1.28.5`
+
+### BREAKING
+
+- Extend `enable-admission-plugins` in `k8s_apiserver_settings` by: `PodSecurity, Priority, StorageObjectInUseProtection, RuntimeClass, CertificateApproval, CertificateSigning, ClusterTrustBundleAttest, CertificateSubjectRestriction, DefaultIngressClass `. These are enabled by default if this flag is not specified (see [Admission Controllers Reference](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/) for more information).
+
 ## 22.0.0+1.27.8
 
 ### PLEASE READ CAREFULLY
