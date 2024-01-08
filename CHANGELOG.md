@@ -10,6 +10,10 @@
 
 - Extend `enable-admission-plugins` in `k8s_apiserver_settings` by: `PodSecurity,Priority,StorageObjectInUseProtection,RuntimeClass,CertificateApproval,CertificateSigning,ClusterTrustBundleAttest,CertificateSubjectRestriction,DefaultIngressClass`. These are enabled by default if this flag is not specified (see [Admission Controllers Reference](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/) for more information).
 
+### MOLECULE
+
+- Change IP addresses
+
 ## 22.0.0+1.27.8
 
 ### PLEASE READ CAREFULLY
