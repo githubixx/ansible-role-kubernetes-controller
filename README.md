@@ -23,6 +23,18 @@ See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-con
 
 **Recent changes:**
 
+## 23.1.0+1.28.5
+
+### MOLECULE
+
+- Change to Ubuntu 22.04 for test-assets VM
+- Adjust common names for certificates / change algo to ecdsa and algo size
+
+### OTHER CHANGES
+
+- fix permissions for temporary directory
+- adjust Github action because of Ansible Galaxy changes
+
 ## 23.0.0+1.28.5
 
 ### GENERAL
@@ -134,10 +146,6 @@ er on the Ansible controller host. Previously it was needed to prepare these fil
 - Add `haproxy` to Ubuntu 22 hosts to test new `k8s_ctl_api_endpoint_host` and `k8s_ctl_api_endpoint_port` settings
 - Add tasks to install [ansible-role-cni](https://github.com/githubixx/ansible-role-cni) and [ansible-role-runc](https://github.com/githubixx/ansible-role-runc)
 - Use `kubernetes.core.k8s_info` module instead of calling `kubectl` binary
-
-## 21.1.3+1.27.5
-
-- rename `githubixx.harden-linux` to `githubixx.harden_linux`
 
 ## Installation
 
