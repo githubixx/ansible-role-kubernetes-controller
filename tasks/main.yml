@@ -304,6 +304,15 @@
       delegate_to: "{{ k8s_ctl_delegate_to }}"
       changed_when: false
 
+    - name: Change temporary directory permissions
+      ansible.builtin.file:
+        path: "{{ k8s_ctl__tmp_dir.path }}"
+        state: directory
+        mode: "0755"
+      run_once: true
+      delegate_to: "{{ k8s_ctl_delegate_to }}"
+      changed_when: false
+
     - name: Copy kube-apiserver-to-kubelet ClusterRole
       ansible.builtin.copy:
         src: "files/kube-apiserver-to-kubelet_cluster_role.yaml"

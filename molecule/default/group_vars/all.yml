@@ -154,16 +154,48 @@ runc_bin_directory: "/usr/local/sbin"
 
 # Common name for "etcd" certificate authority certificates.
 ca_etcd_csr_cn: "etcd"
+ca_etcd_csr_key_algo: "ecdsa"
+ca_etcd_csr_key_size: "384"
 
 # Common name for "kube-apiserver" certificate authority certificate.
 ca_k8s_apiserver_csr_cn: "kubernetes"
+ca_k8s_apiserver_csr_key_algo: "ecdsa"
+ca_k8s_apiserver_csr_key_size: "384"
 
 # Common names for "etcd" server, peer and client certificates.
-etcd_server_csr_cn: "etcd"
-etcd_peer_csr_cn: "etcd"
-etcd_client_csr_cn_prefix: "etcd"
+etcd_server_csr_cn: "etcd-server"
+etcd_server_csr_key_algo: "ecdsa"
+etcd_server_csr_key_size: "384"
+
+etcd_peer_csr_cn: "etcd-peer"
+etcd_peer_csr_key_algo: "ecdsa"
+etcd_peer_csr_key_size: "384"
+
+etcd_client_csr_cn_prefix: "etcd-client"
+etcd_client_csr_key_algo: "ecdsa"
+etcd_client_csr_key_size: "384"
 
 # Common names for kube-apiserver, admin and kube-controller-manager certificates.
-k8s_apiserver_csr_cn: "kubernetes"
-k8s_admin_csr_cn: "admin"
-k8s_controller_manager_sa_csr_cn: "service-accounts"
+k8s_apiserver_csr_cn: "k8s-apiserver"
+k8s_apiserver_csr_key_algo: "ecdsa"
+k8s_apiserver_csr_key_size: "384"
+
+k8s_admin_csr_cn: "k8s-admin"
+k8s_admin_csr_key_algo: "ecdsa"
+k8s_admin_csr_key_size: "384"
+
+k8s_worker_csr_key_algo: "ecdsa"
+k8s_worker_csr_key_size: "384"
+
+k8s_controller_manager_csr_key_algo: "ecdsa"
+k8s_controller_manager_csr_key_size: "384"
+
+k8s_scheduler_csr_key_algo: "ecdsa"
+k8s_scheduler_csr_key_size: "384"
+
+k8s_controller_manager_sa_csr_cn: "k8s-service-accounts"
+k8s_controller_manager_sa_csr_key_algo: "ecdsa"
+k8s_controller_manager_sa_csr_key_size: "384"
+
+k8s_kube_proxy_csr_key_algo: "ecdsa"
+k8s_kube_proxy_csr_key_size: "384"

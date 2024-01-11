@@ -13,7 +13,7 @@ driver:
 
 platforms:
   - name: test-assets
-    box: generic/ubuntu2004
+    box: generic/ubuntu2204
     memory: 2048
     cpus: 2
     groups:
