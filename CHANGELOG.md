@@ -1,5 +1,17 @@
 # Changelog
 
+## 23.1.0+1.28.5
+
+### MOLECULE
+
+- Change to Ubuntu 22.04 for test-assets VM
+- Adjust common names for certificates / change algo to ecdsa and algo size
+
+### OTHER CHANGES
+
+- fix permissions for temporary directory
+- adjust Github action because of Ansible Galaxy changes
+
 ## 23.0.0+1.28.5
 
 ### UPDATE
