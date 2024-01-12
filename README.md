@@ -149,7 +149,7 @@ er on the Ansible controller host. Previously it was needed to prepare these fil
 
 ## Installation
 
-- Directly download from Github (Change into Ansible role directory before cloning. You can figure out the role path by using `ansible-config dump | grep DEFAULT_ROLES_PATH` command):
+- Directly download from Github (Change into Ansible roles directory before cloning. You can figure out the role path by using `ansible-config dump | grep DEFAULT_ROLES_PATH` command):
 `git clone https://github.com/githubixx/ansible-role-kubernetes-controller.git githubixx.kubernetes_controller`
 
 - Via `ansible-galaxy` command and download directly from Ansible Galaxy:
