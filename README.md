@@ -23,6 +23,13 @@ See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-con
 
 **Recent changes:**
 
+## 23.1.1+1.28.5
+
+### BUGFIX
+
+- ClusterRoleBinding `system:kube-apiserver` needs to honor `k8s_apiserver_csr_cn` value for as username
+- Because of the previous change move `files/kube-apiserver-to-kubelet_cluster_role.yaml -> templates/rbac/kube-apiserver-to-kubelet_cluster_role.yaml.j2` and `files/kube-apiserver-to-kubelet_cluster_role_binding.yaml -> templates/rbac/kube-apiserver-to-kubelet_cluster_role_binding.yaml.j2` as both files became a Jinja2 template.
+
 ## 23.1.0+1.28.5
 
 ### MOLECULE
@@ -149,7 +156,7 @@ er on the Ansible controller host. Previously it was needed to prepare these fil
 
 ## Installation
 
-- Directly download from Github (Change into Ansible role directory before cloning. You can figure out the role path by using `ansible-config dump | grep DEFAULT_ROLES_PATH` command):
+- Directly download from Github (Change into Ansible roles directory before cloning. You can figure out the role path by using `ansible-config dump | grep DEFAULT_ROLES_PATH` command):
 `git clone https://github.com/githubixx/ansible-role-kubernetes-controller.git githubixx.kubernetes_controller`
 
 - Via `ansible-galaxy` command and download directly from Ansible Galaxy:

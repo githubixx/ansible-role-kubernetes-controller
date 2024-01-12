@@ -11,4 +11,4 @@ roleRef:
 subjects:
   - apiGroup: rbac.authorization.k8s.io
     kind: User
-    name: kubernetes
+    name: {{ k8s_apiserver_csr_cn }}
