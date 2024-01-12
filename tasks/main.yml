@@ -314,8 +314,8 @@
       changed_when: false
 
     - name: Copy kube-apiserver-to-kubelet ClusterRole
-      ansible.builtin.copy:
-        src: "files/kube-apiserver-to-kubelet_cluster_role.yaml"
+      ansible.builtin.template:
+        src: "rbac/kube-apiserver-to-kubelet_cluster_role.yaml.j2"
         dest: "{{ k8s_ctl__tmp_dir.path }}/kube-apiserver-to-kubelet_cluster_role.yaml"
         mode: 0644
       run_once: true
@@ -323,8 +323,8 @@
       changed_when: false
 
     - name: Copy kube-apiserver-to-kubelet ClusterRoleBinding
-      ansible.builtin.copy:
-        src: "files/kube-apiserver-to-kubelet_cluster_role_binding.yaml"
+      ansible.builtin.template:
+        src: "rbac/kube-apiserver-to-kubelet_cluster_role_binding.yaml.j2"
         dest: "{{ k8s_ctl__tmp_dir.path }}/kube-apiserver-to-kubelet_cluster_role_binding.yaml"
         mode: 0644
       run_once: true

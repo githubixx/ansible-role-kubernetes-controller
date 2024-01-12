@@ -1,5 +1,12 @@
 # Changelog
 
+## 23.1.1+1.28.5
+
+### BUGFIX
+
+- ClusterRoleBinding `system:kube-apiserver` needs to honor `k8s_apiserver_csr_cn` value for as username
+- Because of the previous change move `files/kube-apiserver-to-kubelet_cluster_role.yaml -> templates/rbac/kube-apiserver-to-kubelet_cluster_role.yaml.j2` and `files/kube-apiserver-to-kubelet_cluster_role_binding.yaml -> templates/rbac/kube-apiserver-to-kubelet_cluster_role_binding.yaml.j2` as both files became a Jinja2 template.
+
 ## 23.1.0+1.28.5
 
 ### MOLECULE
@@ -9,14 +16,14 @@
 
 ### OTHER CHANGES
 
-- fix permissions for temporary directory
-- adjust Github action because of Ansible Galaxy changes
+- Fix permissions for temporary directory
+- Adjust Github action because of Ansible Galaxy changes
 
 ## 23.0.0+1.28.5
 
 ### UPDATE
 
-- update `k8s_release` to `1.28.5`
+- Update `k8s_release` to `1.28.5`
 
 ### BREAKING
 
