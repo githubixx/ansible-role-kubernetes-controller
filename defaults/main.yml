@@ -170,7 +170,7 @@ k8s_admin_conf_owner: "root"
 # "admin.kubeconfig" stored in this directory.
 k8s_admin_conf_group: "root"
 
-# Host where the "admin" user connects to administer the K8s cluster. 
+# Host where the "admin" user connects to administer the K8s cluster.
 # This setting is written into "admin.kubeconfig". This allows to use
 # a different host/loadbalancer as the K8s services which might use an internal
 # loadbalancer while the "admin" user connects to a different host/loadbalancer
