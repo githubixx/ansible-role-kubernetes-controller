@@ -4,7 +4,7 @@
 
 ### UPDATE
 
-- update `k8s_release` to `1.28.5`
+- update `k8s_release` to `1.28.8`
 
 ## 23.1.1+1.28.5
 
