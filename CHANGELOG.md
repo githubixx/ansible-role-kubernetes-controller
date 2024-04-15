@@ -1,5 +1,12 @@
 # Changelog
 
+## 24.0.0+1.29.3
+
+### UPDATE
+
+- update `k8s_release` to `1.29.3`
+- Molecule: use `alvistack` instead of `generic` Vagrant boxes
+
 ## 23.1.2+1.28.8
 
 ### UPDATE
