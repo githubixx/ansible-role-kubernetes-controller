@@ -1,120 +1,111 @@
 # Changelog
 
+## 24.0.0+1.29.4
+
+- **UPDATE**
+  - update `k8s_release` to `1.29.4`
+
 ## 24.0.0+1.29.3
 
-### UPDATE
-
-- update `k8s_release` to `1.29.3`
-- Molecule: use `alvistack` instead of `generic` Vagrant boxes
+- **UPDATE**
+  - update `k8s_release` to `1.29.3`
+  - Molecule: use `alvistack` instead of `generic` Vagrant boxes
 
 ## 23.1.2+1.28.8
 
-### UPDATE
-
-- update `k8s_release` to `1.28.8`
+- **UPDATE**
+  - update `k8s_release` to `1.28.8`
 
 ## 23.1.1+1.28.5
 
-### BUGFIX
-
-- ClusterRoleBinding `system:kube-apiserver` needs to honor `k8s_apiserver_csr_cn` value for as username
-- Because of the previous change move `files/kube-apiserver-to-kubelet_cluster_role.yaml -> templates/rbac/kube-apiserver-to-kubelet_cluster_role.yaml.j2` and `files/kube-apiserver-to-kubelet_cluster_role_binding.yaml -> templates/rbac/kube-apiserver-to-kubelet_cluster_role_binding.yaml.j2` as both files became a Jinja2 template.
+- **BUGFIX**
+  - ClusterRoleBinding `system:kube-apiserver` needs to honor `k8s_apiserver_csr_cn` value for as username
+  - Because of the previous change move `files/kube-apiserver-to-kubelet_cluster_role.yaml -> templates/rbac/kube-apiserver-to-kubelet_cluster_role.yaml.j2` and `files/kube-apiserver-to-kubelet_cluster_role_binding.yaml -> templates/rbac/kube-apiserver-to-kubelet_cluster_role_binding.yaml.j2` as both files became a Jinja2 template.
 
 ## 23.1.0+1.28.5
 
-### MOLECULE
+- **MOLECULE**
+  - Change to Ubuntu 22.04 for test-assets VM
+  - Adjust common names for certificates / change algo to ecdsa and algo size
 
-- Change to Ubuntu 22.04 for test-assets VM
-- Adjust common names for certificates / change algo to ecdsa and algo size
-
-### OTHER CHANGES
-
-- Fix permissions for temporary directory
-- Adjust Github action because of Ansible Galaxy changes
+- **OTHER CHANGES**
+  - Fix permissions for temporary directory
+  - Adjust Github action because of Ansible Galaxy changes
 
 ## 23.0.0+1.28.5
 
-### UPDATE
+- **UPDATE**
+  - Update `k8s_release` to `1.28.5`
 
-- Update `k8s_release` to `1.28.5`
+- **BREAKING**
+  - Extend `enable-admission-plugins` in `k8s_apiserver_settings` by: `PodSecurity,Priority,StorageObjectInUseProtection,RuntimeClass,CertificateApproval,CertificateSigning,ClusterTrustBundleAttest,CertificateSubjectRestriction,DefaultIngressClass`. These are enabled by default if this flag is not specified (see [Admission Controllers Reference](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/) for more information).
 
-### BREAKING
-
-- Extend `enable-admission-plugins` in `k8s_apiserver_settings` by: `PodSecurity,Priority,StorageObjectInUseProtection,RuntimeClass,CertificateApproval,CertificateSigning,ClusterTrustBundleAttest,CertificateSubjectRestriction,DefaultIngressClass`. These are enabled by default if this flag is not specified (see [Admission Controllers Reference](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/) for more information).
-
-### MOLECULE
-
-- Change IP addresses
+- **MOLECULE**
+  - Change IP addresses
 
 ## 22.0.0+1.27.8
 
-### PLEASE READ CAREFULLY
+- **PLEASE READ CAREFULLY**
+  This release contains quite a few potential breaking changes! So review carefully before rolling out the new version of this role! A bigger part of the whole changes are related to increase security. While most of the new variables and defaults should be just fine and should just work out of the box side effects might occur.
 
-This release contains quite a few potential breaking changes! So review carefully before rolling out the new version of this role! A bigger part of the whole changes are related to increase security. While most of the new variables and defaults should be just fine and should just work out of the box side effects might occur.
+  All the newly introduced or changed variables have detailed comments in [README](https://github.com/githubixx/ansible-role-kubernetes-controller/blob/master/README.md). So please read them carefully!
 
-All the newly introduced or changed variables have detailed comments in [README](https://github.com/githubixx/ansible-role-kubernetes-controller/blob/master/README.md). So please read them carefully!
+  This refactoring was needed to make it possible to have `githubixx.kubernetes_controller` and `githubixx.kubernetes_worker` deployed on the same host e.g. They were some intersections between the two roles that had to be fixed.
 
-This refactoring was needed to make it possible to have `githubixx.kubernetes_controller` and `githubixx.kubernetes_worker` deployed on the same host e.g. They were some intersections between the two roles that had to be fixed.
+  **Please remove** `/var/lib/kubernetes/admin.kubeconfig` on the K8s controller nodes (if you didn't change the default directory for this file). Older versions of this role created this file. It's no longer needed. It contains the `kubeconfig` (so basically the credentials file) for the `admin` user. This is a very powerful user (actually the user with the most permissions). So use with care and store the file in a secure place! `admin.kubeconfig` should only be used at the very beginning to create a new user with less permissions.
 
-**Please remove** `/var/lib/kubernetes/admin.kubeconfig` on the K8s controller nodes (if you didn't change the default directory for this file). Older versions of this role created this file. It's no longer needed. It contains the `kubeconfig` (so basically the credentials file) for the `admin` user. This is a very powerful user (actually the user with the most permissions). So use with care and store the file in a secure place! `admin.kubeconfig` should only be used at the very beginning to create a new user with less permissions.
+- **UPDATE**
+  - update `k8s_release` to `1.27.8`
 
-### UPDATE
+- **BREAKING**
+  - Rename variable `k8s_conf_dir` to `k8s_ctl_conf_dir`. Additionally the default value changed from `/usr/lib/kubernetes` to `/etc/kubernetes/controller`.
+  - Introduce variable `k8s_admin_conf_dir`. Currently it only stores `admin.kubeconfig` which is basically the credentials file of the `admin` "user". Formerly this file was stored in the directory specified in the (now removed) `k8s_config_directory` variable. The default value of `k8s_admin_conf_dir` is the same as the removed `k8s_config_directory`. Additionally to set permissions for `k8s_admin_conf_dir` the following variables were introduced: `k8s_admin_conf_dir_perm`, `k8s_admin_conf_owner` and `k8s_admin_conf_group`.
+  - Introduce variable `k8s_ctl_pki_dir`. All certificate files specified in `k8s_ctl_certificates` and `k8s_ctl_etcd_certificates` (see `vars/main.yml`) will be stored here. Related to this: Certificate related settings in `k8s_apiserver_settings` used `k8s_conf_dir` before and now use `k8s_ctl_pki_dir`. That's `client-ca-file`, `etcd-cafile`, `etcd-certfile`, `etcd-keyfile`, `kubelet-certificate-authority`, `kubelet-client-certificate`, `kubelet-client-key`, `service-account-key-file`, `service-account-signing-key-file`, `tls-cert-file` and `tls-private-key-file`. For `k8s_controller_manager_settings` that's: `cluster-signing-cert-file`, `cluster-signing-key-file`, `root-ca-file`, `requestheader-client-ca-file` and `service-account-private-key-file`. And for `k8s_scheduler_settings` that's: `requestheader-client-ca-file`.
+  - Rename variable `k8s_bin_dir` to `k8s_ctl_bin_dir`.
+  - Rename variable `k8s_release` to `k8s_ctl_release`.
+  - The default value for `k8s_interface` changed from `tap0` to `eth0`.
+  - Rename variable `k8s_controller_binaries` to `k8s_ctl_binaries`. Additionally this variable is no longer defined in `defaults/main.yml` but in `vars/main.yml`. Since this list is fixed anyways it makes no sense to allow to modify this list.
+  - Rename variable `k8s_certificates` to `k8s_ctl_certificates`.
+  - Rename variable `etcd_certificates` to `k8s_ctl_etcd_certificates`. Additionally this variable is no longer defined in `defaults/main.yml` but in `vars/main.yml`. Since this list is fixed anyways it makes no sense to allow to modify this list.
+  - Rename variable `etcd_client_port` to `k8s_ctl_etcd_client_port`.
+  - Rename variable `etcd_interface` to `k8s_ctl_etcd_interface`. Additionally the default value changed from `tap0` to `eth0`.
+  - Use `k8s_ctl_etcd_interface` variable instead of `k8s_interface` for `--etcd-servers` option in `templates/etc/systemd/system/kube-apiserver.service.j2`. Normally `etcd` and `kube-apiserver` listen on the same interface. But if someone specified `k8s_ctl_etcd_interface` (formerly `etcd_interface` in the context of this role) it was basically ignored as the value of `k8s_interface` was used instead. That's fixed now.
+  - Rename variable `k8s_controller_delegate_to` to `k8s_ctl_delegate_to`.
+  - Introduce `k8s_apiserver_conf_dir` variable. `encryption-config.yaml` is now located in `k8s_apiserver_conf_dir`.
+  - Change default value of `k8s_controller_manager_conf_dir` to `"{{ k8s_ctl_conf_dir }}/kube-controller-manager"`.
+  - Change default value of `k8s_scheduler_conf_dir` to `"{{ k8s_ctl_conf_dir }}/kube-scheduler"`.
+  - Rename `kube-controller-manager.kubeconfig` to `kubeconfig`. This affects `k8s_controller_manager_settings` and the following settings: `authentication-kubeconfig`, `authorization-kubeconfig` and `kubeconfig`.
+  - Rename `kube-scheduler.kubeconfig` to `kubeconfig`. This affects `k8s_scheduler_settings` and the following settings: `authentication-kubeconfig"` and `authorization-kubeconfig`.
+  - Added new option `encryption-provider-config-automatic-reload: "true"` to `k8s_apiserver_settings`. In case the file specified in `encryption-provider-config` changes `kube-apiserver` will automatically reload that file. This is handy if one wants to change the encryption provider (also see new variable `k8s_apiserver_encryption_provider_config`)
+  - Introduce `k8s_ctl_service_options` variable. As mentioned above already previously `kube-apiserver`, `kube-controller-manager` and `kube-scheduler` were running as user `root`. Now these services will run as `k8s_run_as_user` and `k8s_run_as_group`. Additionally `systemd` allows to limit the exposure of the system towards the unit's processes. Basically all settings below `RestartSec=5` are related to increase security and limit what the process allowed to do. So these settings reduce the attack surface quite a bit already. They're not perfect but a starting point. If you want the previous behavior just remove all settings besides `Restart` and `RestartSec`. But that also means that they'll run again as `root` user.
+  - The following variables are no longer used and can be removed: `k8s_encryption_config_directory`, `k8s_encryption_config_owner`, `k8s_encryption_config_group`, `k8s_encryption_config_directory_perm` and `k8s_encryption_config_file_perm`. Previously these values were needed to specify permissions on the Ansible controller for this file/directory. Since this file is now generated directly on the K8s controller nodes they're no longer needed. That also means you can remove `encryption-config.yaml` from Ansible controller node (like your workstation e.g.)
+  - The variable `k8s_config_directory` is gone. It's no longer in use. After the upgrade to this release you can delete this directory (if you accept the new default!) and it's content (make a backup esp. of `admin.kubeconfig` file - just in case!)
+  - Rename `k8s_ca_conf_directory` to `k8s_ctl_ca_conf_directory`
 
-- update `k8s_release` to `1.27.8`
+- **FEATURE**
+  - Introduce `k8s_run_as_user` variable. Previously all control plane services like `kube-apiserver`, `kube-scheduler` and `kube-controller-manager` run as user `root`. Securitywise that's not optimal. There is just no need to run them as `root` as long they use a listening port > `1024` which they do by default. In this version all these services will run as the user specified with `k8s_run_as_user` which is `k8s` by default. Related to this variable are the new variables `k8s_run_as_user_shell`, `k8s_run_as_user_system`, `k8s_run_as_group` and `k8s_run_as_group_system`. See [README](https://github.com/githubixx/ansible-role-kubernetes-controller/blob/master/README.md) for further information about this variables. The defaults should be just fine even for upgrading from a previous version of this role.
+  - Introduce `k8s_ctl_api_endpoint_host` and `k8s_ctl_api_endpoint_port` variables. Previously `kube-scheduler` and `kube-controller-manager` where configured to connect to the first host in the Ansible `k8s_controller` group and communicate with the `kube-apiserver` that was running there. This was hard-coded and couldn't be changed. If that host was down the K8s worker nodes didn't receive any updates. Now one can install and use a load balancer like `haproxy` e.g. that distributes requests between all `kube-apiserver`'s and takes a `kube-apiserver` out of rotation if that one is down (also see my Ansible [haproxy role](https://github.com/githubixx/ansible-role-haproxy) for that use case). The default is still to use the first host/kube-apiserver in the Ansible `k8s_controller` group. So behaviorwise nothing changed basically.
+  - Introduce `k8s_admin_api_endpoint_host` and `k8s_admin_api_endpoint_port` variables. For these two variables the same is basically true as for `k8s_ctl_api_endpoint_host` and `k8s_ctl_api_endpoint_port` variables above. But these settings are meant to be used by the `admin` user that this role creates by default. These settings are written into `admin.kubeconfig`. So it's possible to configure another host/load balancer for the `admin` user as for the K8s control plane services mentioned in the previous paragraph.
+  - Introduce `k8s_ctl_log_base_dir` and `k8s_ctl_log_base_dir_mode`. Normally  `kube-apiserver`, `kube-controller-manager` and `kube-scheduler` log to `journald`. But there are exceptions like the audit log. For this kind of log files this directory will be used as a base path.
+  - Introduce `k8s_apiserver_audit_log_dir`. Directory to store kube-apiserver audit logs.
+  - Introduce `k8s_apiserver_encryption_provider_config` variable. Previously the content of this file was hard-coded. Now it's exposed via this variable. The content of that variable and the previously hard-coded value are the same. So if you keep the default when upgrading everything stays the same in that regards. **NOTE**: Changing this configuration and deploy the changes can potentially cause quite some problems! Make sure to read [Encrypting Confidential Data at Rest](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/) and esp. [Rotating a decryption key](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/#rotating-a-decryption-key)!
+  - Add task to generate `kubeconfig` for `admin` user (previously this was a separate [playbook](https://github.com/githubixx/ansible-kubernetes-playbooks/tree/v15.0.0_r1.27.5/kubeauthconfig)).
+  - Add task to generate `kubeconfig` for `kube-controller-manager` service (previously this was a separate [playbook](https://github.com/githubixx/ansible-kubernetes-playbooks/tree/v15.0.0_r1.27.5/kubeauthconfig)).
+  - Add task to generate `kubeconfig` for `kube-scheduler` service (previously this was a separate [playbook](https://github.com/githubixx/ansible-kubernetes-playbooks/tree/v15.0.0_r1.27.5/kubeauthconfig)).
+  - When downloading the Kubernetes binaries the task checks the SHA512 checksum
+  - Make `kube-scheduler` and `kube-controller-manager` wait until `kube-apiserver` has started and is listening on a port
 
-### BREAKING
+- **OTHER CHANGES**
+  - Extend `k8s_ctl_certificates` (formerly `k8s_certificates`) list by `cert-k8s-scheduler` and `cert-k8s-controller-manager` files. This was needed as the `kubeconfig` files are now generated on the K8s controller nodes and no longer on the Ansible controller host. Previously it was needed to prepare these files upfront before installing this role. That's no longer needed. Also see **FEATURES** list above.
+  - Use `kubernetes.core.*` modules instead of `kubectl` binary
+  - Fix some `ansible-lint` issues
 
-- Rename variable `k8s_conf_dir` to `k8s_ctl_conf_dir`. Additionally the default value changed from `/usr/lib/kubernetes` to `/etc/kubernetes/controller`.
-- Introduce variable `k8s_admin_conf_dir`. Currently it only stores `admin.kubeconfig` which is basically the credentials file of the `admin` "user". Formerly this file was stored in the directory specified in the (now removed) `k8s_config_directory` variable. The default value of `k8s_admin_conf_dir` is the same as the removed `k8s_config_directory`. Additionally to set permissions for `k8s_admin_conf_dir` the following variables were introduced: `k8s_admin_conf_dir_perm`, `k8s_admin_conf_owner` and `k8s_admin_conf_group`.
-- Introduce variable `k8s_ctl_pki_dir`. All certificate files specified in `k8s_ctl_certificates` and `k8s_ctl_etcd_certificates` (see `vars/main.yml`) will be stored here. Related to this: Certificate related settings in `k8s_apiserver_settings` used `k8s_conf_dir` before and now use `k8s_ctl_pki_dir`. That's `client-ca-file`, `etcd-cafile`, `etcd-certfile`, `etcd-keyfile`, `kubelet-certificate-authority`, `kubelet-client-certificate`, `kubelet-client-key`, `service-account-key-file`, `service-account-signing-key-file`, `tls-cert-file` and `tls-private-key-file`. For `k8s_controller_manager_settings` that's: `cluster-signing-cert-file`, `cluster-signing-key-file`, `root-ca-file`, `requestheader-client-ca-file` and `service-account-private-key-file`. And for `k8s_scheduler_settings` that's: `requestheader-client-ca-file`.
-- Rename variable `k8s_bin_dir` to `k8s_ctl_bin_dir`.
-- Rename variable `k8s_release` to `k8s_ctl_release`.
-- The default value for `k8s_interface` changed from `tap0` to `eth0`.
-- Rename variable `k8s_controller_binaries` to `k8s_ctl_binaries`. Additionally this variable is no longer defined in `defaults/main.yml` but in `vars/main.yml`. Since this list is fixed anyways it makes no sense to allow to modify this list.
-- Rename variable `k8s_certificates` to `k8s_ctl_certificates`.
-- Rename variable `etcd_certificates` to `k8s_ctl_etcd_certificates`. Additionally this variable is no longer defined in `defaults/main.yml` but in `vars/main.yml`. Since this list is fixed anyways it makes no sense to allow to modify this list.
-- Rename variable `etcd_client_port` to `k8s_ctl_etcd_client_port`.
-- Rename variable `etcd_interface` to `k8s_ctl_etcd_interface`. Additionally the default value changed from `tap0` to `eth0`.
-- Use `k8s_ctl_etcd_interface` variable instead of `k8s_interface` for `--etcd-servers` option in `templates/etc/systemd/system/kube-apiserver.service.j2`. Normally `etcd` and `kube-apiserver` listen on the same interface. But if someone specified `k8s_ctl_etcd_interface` (formerly `etcd_interface` in the context of this role) it was basically ignored as the value of `k8s_interface` was used instead. That's fixed now.
-- Rename variable `k8s_controller_delegate_to` to `k8s_ctl_delegate_to`.
-- Introduce `k8s_apiserver_conf_dir` variable. `encryption-config.yaml` is now located in `k8s_apiserver_conf_dir`.
-- Change default value of `k8s_controller_manager_conf_dir` to `"{{ k8s_ctl_conf_dir }}/kube-controller-manager"`.
-- Change default value of `k8s_scheduler_conf_dir` to `"{{ k8s_ctl_conf_dir }}/kube-scheduler"`.
-- Rename `kube-controller-manager.kubeconfig` to `kubeconfig`. This affects `k8s_controller_manager_settings` and the following settings: `authentication-kubeconfig`, `authorization-kubeconfig` and `kubeconfig`.
-- Rename `kube-scheduler.kubeconfig` to `kubeconfig`. This affects `k8s_scheduler_settings` and the following settings: `authentication-kubeconfig"` and `authorization-kubeconfig`.
-- Added new option `encryption-provider-config-automatic-reload: "true"` to `k8s_apiserver_settings`. In case the file specified in `encryption-provider-config` changes `kube-apiserver` will automatically reload that file. This is handy if one wants to change the encryption provider (also see new variable `k8s_apiserver_encryption_provider_config`)
-- Introduce `k8s_ctl_service_options` variable. As mentioned above already previously `kube-apiserver`, `kube-controller-manager` and `kube-scheduler` were running as user `root`. Now these services will run as `k8s_run_as_user` and `k8s_run_as_group`. Additionally `systemd` allows to limit the exposure of the system towards the unit's processes. Basically all settings below `RestartSec=5` are related to increase security and limit what the process allowed to do. So these settings reduce the attack surface quite a bit already. They're not perfect but a starting point. If you want the previous behavior just remove all settings besides `Restart` and `RestartSec`. But that also means that they'll run again as `root` user.
-- The following variables are no longer used and can be removed: `k8s_encryption_config_directory`, `k8s_encryption_config_owner`, `k8s_encryption_config_group`, `k8s_encryption_config_directory_perm` and `k8s_encryption_config_file_perm`. Previously these values were needed to specify permissions on the Ansible controller for this file/directory. Since this file is now generated directly on the K8s controller nodes they're no longer needed. That also means you can remove `encryption-config.yaml` from Ansible controller node (like your workstation e.g.)
-- The variable `k8s_config_directory` is gone. It's no longer in use. After the upgrade to this release you can delete this directory (if you accept the new default!) and it's content (make a backup esp. of `admin.kubeconfig` file - just in case!)
-- Rename `k8s_ca_conf_directory` to `k8s_ctl_ca_conf_directory`
-
-### FEATURE
-
-- Introduce `k8s_run_as_user` variable. Previously all control plane services like `kube-apiserver`, `kube-scheduler` and `kube-controller-manager` run as user `root`. Securitywise that's not optimal. There is just no need to run them as `root` as long they use a listening port > `1024` which they do by default. In this version all these services will run as the user specified with `k8s_run_as_user` which is `k8s` by default. Related to this variable are the new variables `k8s_run_as_user_shell`, `k8s_run_as_user_system`, `k8s_run_as_group` and `k8s_run_as_group_system`. See [README](https://github.com/githubixx/ansible-role-kubernetes-controller/blob/master/README.md) for further information about this variables. The defaults should be just fine even for upgrading from a previous version of this role.
-- Introduce `k8s_ctl_api_endpoint_host` and `k8s_ctl_api_endpoint_port` variables. Previously `kube-scheduler` and `kube-controller-manager` where configured to connect to the first host in the Ansible `k8s_controller` group and communicate with the `kube-apiserver` that was running there. This was hard-coded and couldn't be changed. If that host was down the K8s worker nodes didn't receive any updates. Now one can install and use a load balancer like `haproxy` e.g. that distributes requests between all `kube-apiserver`'s and takes a `kube-apiserver` out of rotation if that one is down (also see my Ansible [haproxy role](https://github.com/githubixx/ansible-role-haproxy) for that use case). The default is still to use the first host/kube-apiserver in the Ansible `k8s_controller` group. So behaviorwise nothing changed basically.
-- Introduce `k8s_admin_api_endpoint_host` and `k8s_admin_api_endpoint_port` variables. For these two variables the same is basically true as for `k8s_ctl_api_endpoint_host` and `k8s_ctl_api_endpoint_port` variables above. But these settings are meant to be used by the `admin` user that this role creates by default. These settings are written into `admin.kubeconfig`. So it's possible to configure another host/load balancer for the `admin` user as for the K8s control plane services mentioned in the previous paragraph.
-- Introduce `k8s_ctl_log_base_dir` and `k8s_ctl_log_base_dir_mode`. Normally  `kube-apiserver`, `kube-controller-manager` and `kube-scheduler` log to `journald`. But there are exceptions like the audit log. For this kind of log files this directory will be used as a base path.
-- Introduce `k8s_apiserver_audit_log_dir`. Directory to store kube-apiserver audit logs.
-- Introduce `k8s_apiserver_encryption_provider_config` variable. Previously the content of this file was hard-coded. Now it's exposed via this variable. The content of that variable and the previously hard-coded value are the same. So if you keep the default when upgrading everything stays the same in that regards. **NOTE**: Changing this configuration and deploy the changes can potentially cause quite some problems! Make sure to read [Encrypting Confidential Data at Rest](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/) and esp. [Rotating a decryption key](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/#rotating-a-decryption-key)!
-- Add task to generate `kubeconfig` for `admin` user (previously this was a separate [playbook](https://github.com/githubixx/ansible-kubernetes-playbooks/tree/v15.0.0_r1.27.5/kubeauthconfig)).
-- Add task to generate `kubeconfig` for `kube-controller-manager` service (previously this was a separate [playbook](https://github.com/githubixx/ansible-kubernetes-playbooks/tree/v15.0.0_r1.27.5/kubeauthconfig)).
-- Add task to generate `kubeconfig` for `kube-scheduler` service (previously this was a separate [playbook](https://github.com/githubixx/ansible-kubernetes-playbooks/tree/v15.0.0_r1.27.5/kubeauthconfig)).
-- When downloading the Kubernetes binaries the task checks the SHA512 checksum
-- Make `kube-scheduler` and `kube-controller-manager` wait until `kube-apiserver` has started and is listening on a port
-
-### OTHER CHANGES
-
-- Extend `k8s_ctl_certificates` (formerly `k8s_certificates`) list by `cert-k8s-scheduler` and `cert-k8s-controller-manager` files. This was needed as the `kubeconfig` files are now generated on the K8s controller nodes and no longer on the Ansible controller host. Previously it was needed to prepare these files upfront before installing this role. That's no longer needed. Also see **FEATURES** list above.
-- Use `kubernetes.core.*` modules instead of `kubectl` binary
-- Fix some `ansible-lint` issues
-
-### MOLECULE
-
-- Updated all files to reflect the changes introduces with this version
-- Tasks for creating `kubeconfig` for `kube-controller-manager`, `kube-scheduler`, `admin` user and `encryption configuration` are no longer needed as they're now part of `kubernetes_controller` role
-- Add `haproxy` to Ubuntu 22 hosts to test new `k8s_ctl_api_endpoint_host` and `k8s_ctl_api_endpoint_port` settings
-- Add tasks to install [ansible-role-cni](https://github.com/githubixx/ansible-role-cni) and [ansible-role-runc](https://github.com/githubixx/ansible-role-runc)
-- Use `kubernetes.core.k8s_info` module instead of calling `kubectl` binary
+- **MOLECULE**
+  - Updated all files to reflect the changes introduces with this version
+  - Tasks for creating `kubeconfig` for `kube-controller-manager`, `kube-scheduler`, `admin` user and `encryption configuration` are no longer needed as they're now part of `kubernetes_controller` role
+  - Add `haproxy` to Ubuntu 22 hosts to test new `k8s_ctl_api_endpoint_host` and `k8s_ctl_api_endpoint_port` settings
+  - Add tasks to install [ansible-role-cni](https://github.com/githubixx/ansible-role-cni) and [ansible-role-runc](https://github.com/githubixx/ansible-role-runc)
+  - Use `kubernetes.core.k8s_info` module instead of calling `kubectl` binary
 
 ## 21.1.3+1.27.5
 
