@@ -1,5 +1,10 @@
 # Changelog
 
+## 24.0.1+1.29.9
+
+- **UPDATE**
+  - update `k8s_release` to `1.29.9`
+
 ## 24.0.0+1.29.4
 
 - **UPDATE**
