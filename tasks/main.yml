@@ -154,8 +154,8 @@
 
 - name: Downloading official Kubernetes binaries
   ansible.builtin.get_url:
-    url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_ctl_release }}/bin/linux/amd64/{{ item }}"
-    checksum: "sha512:https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_ctl_release }}/bin/linux/amd64/{{ item }}.sha512"
+    url: "https://dl.k8s.io/v{{ k8s_ctl_release }}/bin/linux/amd64/{{ item }}"
+    checksum: "sha512:https://dl.k8s.io/v{{ k8s_ctl_release }}/bin/linux/amd64/{{ item }}.sha512"
     dest: "{{ k8s_ctl_bin_dir }}"
     owner: "root"
     group: "root"
