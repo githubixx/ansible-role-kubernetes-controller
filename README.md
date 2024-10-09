@@ -26,6 +26,11 @@ See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-con
 
 **Recent changes:**
 
+## 24.0.2+1.29.9
+
+- **OTHER CHANGES**
+  - fix download URLs for Kubernetes binaries (see: [Download Kubernetes - Binaries](https://kubernetes.io/releases/download/#binaries)
+
 ## 24.0.1+1.29.9
 
 - **UPDATE**
