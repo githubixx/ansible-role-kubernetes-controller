@@ -1,5 +1,14 @@
 # Changelog
 
+## 25.0.0+1.30.5
+
+- **UPDATE**
+  - update `k8s_ctl_release` to `1.30.5`
+
+- **OTHER CHANGES**
+  - support Ubuntu 24.04
+  - update `.yamllint`
+
 ## 24.0.2+1.29.9
 
 - **OTHER CHANGES**
@@ -8,23 +17,23 @@
 ## 24.0.1+1.29.9
 
 - **UPDATE**
-  - update `k8s_release` to `1.29.9`
+  - update `k8s_ctl_release` to `1.29.9`
 
 ## 24.0.0+1.29.4
 
 - **UPDATE**
-  - update `k8s_release` to `1.29.4`
+  - update `k8s_ctl_release` to `1.29.4`
 
 ## 24.0.0+1.29.3
 
 - **UPDATE**
-  - update `k8s_release` to `1.29.3`
+  - update `k8s_ctl_release` to `1.29.3`
   - Molecule: use `alvistack` instead of `generic` Vagrant boxes
 
 ## 23.1.2+1.28.8
 
 - **UPDATE**
-  - update `k8s_release` to `1.28.8`
+  - update `k8s_ctl_release` to `1.28.8`
 
 ## 23.1.1+1.28.5
 
@@ -45,7 +54,7 @@
 ## 23.0.0+1.28.5
 
 - **UPDATE**
-  - Update `k8s_release` to `1.28.5`
+  - Update `k8s_ctl_release` to `1.28.5`
 
 - **BREAKING**
   - Extend `enable-admission-plugins` in `k8s_apiserver_settings` by: `PodSecurity,Priority,StorageObjectInUseProtection,RuntimeClass,CertificateApproval,CertificateSigning,ClusterTrustBundleAttest,CertificateSubjectRestriction,DefaultIngressClass`. These are enabled by default if this flag is not specified (see [Admission Controllers Reference](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/) for more information).
@@ -65,7 +74,7 @@
   **Please remove** `/var/lib/kubernetes/admin.kubeconfig` on the K8s controller nodes (if you didn't change the default directory for this file). Older versions of this role created this file. It's no longer needed. It contains the `kubeconfig` (so basically the credentials file) for the `admin` user. This is a very powerful user (actually the user with the most permissions). So use with care and store the file in a secure place! `admin.kubeconfig` should only be used at the very beginning to create a new user with less permissions.
 
 - **UPDATE**
-  - update `k8s_release` to `1.27.8`
+  - update `k8s_ctl_release` to `1.27.8`
 
 - **BREAKING**
   - Rename variable `k8s_conf_dir` to `k8s_ctl_conf_dir`. Additionally the default value changed from `/usr/lib/kubernetes` to `/etc/kubernetes/controller`.
