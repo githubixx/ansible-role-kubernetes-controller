@@ -4,17 +4,21 @@ This role is used in [Kubernetes the not so hard way with Ansible - Control plan
 
 ## Versions
 
-I tag every release and try to stay with [semantic versioning](http://semver.org). If you want to use the role I recommend to checkout the latest tag. The master branch is basically development while the tags mark stable releases. But in general I try to keep master in good shape too. A tag `24.0.1+1.29.9` means this is release `24.0.1` of this role and it's meant to be used with Kubernetes version `1.29.9` (but should work with any K8s 1.29.x release of course). If the role itself changes `X.Y.Z` before `+` will increase. If the Kubernetes version changes `X.Y.Z` after `+` will increase too. This allows to tag bugfixes and new major versions of the role while it's still developed for a specific Kubernetes release. That's especially useful for Kubernetes major releases with breaking changes.
+I tag every release and try to stay with [semantic versioning](http://semver.org). If you want to use the role I recommend to checkout the latest tag. The master branch is basically development while the tags mark stable releases. But in general I try to keep master in good shape too. A tag `25.0.0+1.30.5` means this is release `25.0.0` of this role and it's meant to be used with Kubernetes version `1.30.5` (but should work with any K8s 1.30.x release of course). If the role itself changes `X.Y.Z` before `+` will increase. If the Kubernetes version changes `X.Y.Z` after `+` will increase too. This allows to tag bugfixes and new major versions of the role while it's still developed for a specific Kubernetes release. That's especially useful for Kubernetes major releases with breaking changes.
 
 ## Requirements
 
-This role requires that you already created some certificates for Kubernetes API server (see [Kubernetes the not so hard way with Ansible - Certificate authority (CA)](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-certificate-authority/)). The role copies the certificates from `k8s_ctl_ca_conf_directory` (which is by default the same as `k8s_ca_conf_directory` used by `githubixx.kubernetes_ca` role) to the destination host. You should also setup a fully meshed VPN with e.g. WireGuard (see [Kubernetes the not so hard way with Ansible - WireGuard](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-wireguard/)) and of course an etcd cluster (see [Kubernetes the not so hard way with Ansible - etcd cluster](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-etcd/)). The WireGuard VPN Mesh is not a requirement but increases security as all traffic between the K8s hosts is encrypted by default. But as long as all hosts included have an interface where they can communicate with each other it's fine.
+This role requires that you already created some certificates for Kubernetes API server (see [Kubernetes the not so hard way with Ansible - Certificate authority (CA)](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-certificate-authority/)). The role copies the certificates from `k8s_ctl_ca_conf_directory` (which is by default the same as `k8s_ca_conf_directory` used by `githubixx.kubernetes_ca` role) to the destination host.
+
+Your hosts on which you want to install Kubernetes should be able to communicate with each other of course. To add an additional layer of security you can setup a fully meshed VPN with WireGuard e.g. (see [Kubernetes the not so hard way with Ansible - WireGuard](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-wireguard/)). This encrypts every communication between the Kubernetes nodes if the Kubernetes processes use the WireGuard interface. Using WireGuard actually makes it also easily possible to have a Kubernetes cluster that is distributed in various data centers e.g.
+
+And of course an [etcd](https://etcd.io/) cluster (see [Kubernetes the not so hard way with Ansible - etcd cluster](https://www.tauceti.blog/post/kubernetes-the-not-so-hard-way-with-ansible-etcd/)) to store the state of the Kubernetes cluster.
 
 ## Supported OS
 
-- Ubuntu 20.04 (Focal Fossa)
+- Ubuntu 20.04 (Focal Fossa) (reaches EOL April 2024 - not recommended)
 - Ubuntu 22.04 (Jammy Jellyfish)
-- Ubuntu 24.04 (Noble Numbat)
+- Ubuntu 24.04 (Noble Numbat) (recommended)
 
 ## Changelog
 
@@ -26,6 +30,11 @@ See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-con
 
 **Recent changes:**
 
+## 25.0.0+1.30.5
+
+- **UPDATE**
+  - update `k8s_ctl_release` to `1.30.5`
+
 ## 24.0.2+1.29.9
 
 - **OTHER CHANGES**
@@ -34,50 +43,18 @@ See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-con
 ## 24.0.1+1.29.9
 
 - **UPDATE**
-  - update `k8s_release` to `1.29.9`
+  - update `k8s_ctl_release` to `1.29.9`
 
 ## 24.0.0+1.29.4
 
 - **UPDATE**
-  - update `k8s_release` to `1.29.4`
+  - update `k8s_ctl_release` to `1.29.4`
 
 ## 24.0.0+1.29.3
 
 - **UPDATE**
-  - update `k8s_release` to `1.29.3`
+  - update `k8s_ctl_release` to `1.29.3`
   - Molecule: use `alvistack` instead of `generic` Vagrant boxes
-
-## 23.1.2+1.28.8
-
-- **UPDATE**
-  - update `k8s_release` to `1.28.8`
-
-## 23.1.1+1.28.5
-
-- **BUGFIX**
-  - ClusterRoleBinding `system:kube-apiserver` needs to honor `k8s_apiserver_csr_cn` value for as username
-  - Because of the previous change move `files/kube-apiserver-to-kubelet_cluster_role.yaml -> templates/rbac/kube-apiserver-to-kubelet_cluster_role.yaml.j2` and `files/kube-apiserver-to-kubelet_cluster_role_binding.yaml -> templates/rbac/kube-apiserver-to-kubelet_cluster_role_binding.yaml.j2` as both files became a Jinja2 template.
-
-## 23.1.0+1.28.5
-
-- **MOLECULE**
-  - Change to Ubuntu 22.04 for test-assets VM
-  - Adjust common names for certificates / change algo to ecdsa and algo size
-
-- **OTHER CHANGES**
-  - Fix permissions for temporary directory
-  - Adjust Github action because of Ansible Galaxy changes
-
-## 23.0.0+1.28.5
-
-- **UPDATE**
-  - Update `k8s_release` to `1.28.5`
-
-- **BREAKING**
-  - Extend `enable-admission-plugins` in `k8s_apiserver_settings` by: `PodSecurity,Priority,StorageObjectInUseProtection,RuntimeClass,CertificateApproval,CertificateSigning,ClusterTrustBundleAttest,CertificateSubjectRestriction,DefaultIngressClass`. These are enabled by default if this flag is not specified (see [Admission Controllers Reference](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/) for more information).
-
-- **MOLECULE**
-  - Change IP addresses
 
 ## Installation
 
@@ -95,7 +72,7 @@ See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-con
 roles:
   - name: githubixx.kubernetes_controller
     src: https://github.com/githubixx/ansible-role-kubernetes-controller.git
-    version: 24.0.1+1.29.9
+    version: 25.0.0+1.30.5
 ```
 
 ## Role (default) variables
@@ -125,7 +102,7 @@ k8s_ctl_pki_dir: "{{ k8s_ctl_conf_dir }}/pki"
 k8s_ctl_bin_dir: "/usr/local/bin"
 
 # The Kubernetes release.
-k8s_ctl_release: "1.29.9"
+k8s_ctl_release: "1.30.5"
 
 # The interface on which the Kubernetes services should listen on. As all cluster
 # communication should use a VPN interface the interface name is
