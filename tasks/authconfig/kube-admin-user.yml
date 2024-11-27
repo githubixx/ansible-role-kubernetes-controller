@@ -103,7 +103,7 @@
   ansible.builtin.file:
     path: "{{ k8s_admin_conf_dir }}/admin.kubeconfig"
     owner: "{{ k8s_admin_conf_owner }}"
-    group: "{{ k8s_admin_conf_owner }}"
+    group: "{{ k8s_admin_conf_group }}"
     mode: "0640"
     modification_time: "preserve"
     access_time: "preserve"
