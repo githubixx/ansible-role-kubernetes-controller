@@ -288,6 +288,9 @@ k8s_controller_manager_settings:
   "requestheader-client-ca-file": "{{ k8s_ctl_pki_dir }}/ca-k8s-apiserver.pem"
   "service-account-private-key-file": "{{ k8s_ctl_pki_dir }}/cert-k8s-controller-manager-sa-key.pem"
   "use-service-account-credentials": "true"
+  "client-ca-file": "{{ k8s_ctl_pki_dir }}/cert-k8s-apiserver.pem"
+  "tls-cert-file": "{{ k8s_ctl_pki_dir }}/cert-k8s-controller-manager.pem"
+  "tls-private-key-file": "{{ k8s_ctl_pki_dir }}/cert-k8s-controller-manager-key.pem"
 
 # The directory to store scheduler configuration.
 k8s_scheduler_conf_dir: "{{ k8s_ctl_conf_dir }}/kube-scheduler"
