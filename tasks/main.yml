@@ -119,7 +119,7 @@
   ansible.builtin.template:
     src: "templates/etc/kubernetes/controller/kube-scheduler/kube-scheduler.yaml.j2"
     dest: "{{ k8s_scheduler_conf_dir }}/kube-scheduler.yaml"
-    mode: 0440
+    mode: "0440"
     owner: "root"
     group: "{{ k8s_run_as_group }}"
   tags:
@@ -130,7 +130,7 @@
   ansible.builtin.copy:
     src: "{{ k8s_ctl_ca_conf_directory }}/{{ item }}"
     dest: "{{ k8s_ctl_pki_dir }}/{{ item }}"
-    mode: 0440
+    mode: "0440"
     owner: "root"
     group: "{{ k8s_run_as_group }}"
   with_items:
@@ -143,7 +143,7 @@
   ansible.builtin.copy:
     src: "{{ k8s_ctl_ca_conf_directory }}/{{ item }}"
     dest: "{{ k8s_ctl_pki_dir }}/{{ item }}"
-    mode: 0440
+    mode: "0440"
     owner: "root"
     group: "{{ k8s_run_as_group }}"
   with_items:
@@ -159,7 +159,7 @@
     dest: "{{ k8s_ctl_bin_dir }}"
     owner: "root"
     group: "root"
-    mode: 0755
+    mode: "0755"
   with_items:
     - "{{ k8s_ctl_binaries }}"
   notify:
@@ -194,7 +194,7 @@
   ansible.builtin.copy:
     content: "{{ k8s_apiserver_encryption_provider_config }}"
     dest: "{{ k8s_apiserver_conf_dir }}/encryption-config.yaml"
-    mode: 0660
+    mode: "0660"
     owner: "root"
     group: "{{ k8s_run_as_group }}"
   tags:
@@ -213,7 +213,7 @@
     dest: /etc/systemd/system/kube-apiserver.service
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   notify:
     - Reload systemd
     - Restart kube-apiserver
@@ -240,7 +240,7 @@
     dest: /etc/systemd/system/kube-controller-manager.service
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   notify:
     - Reload systemd
     - Restart kube-controller-manager
@@ -267,7 +267,7 @@
     dest: /etc/systemd/system/kube-scheduler.service
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   notify:
     - Reload systemd
     - Restart kube-scheduler
@@ -317,7 +317,7 @@
       ansible.builtin.template:
         src: "rbac/kube-apiserver-to-kubelet_cluster_role.yaml.j2"
         dest: "{{ k8s_ctl__tmp_dir.path }}/kube-apiserver-to-kubelet_cluster_role.yaml"
-        mode: 0644
+        mode: "0644"
       run_once: true
       delegate_to: "{{ k8s_ctl_delegate_to }}"
       changed_when: false
@@ -326,7 +326,7 @@
       ansible.builtin.template:
         src: "rbac/kube-apiserver-to-kubelet_cluster_role_binding.yaml.j2"
         dest: "{{ k8s_ctl__tmp_dir.path }}/kube-apiserver-to-kubelet_cluster_role_binding.yaml"
-        mode: 0644
+        mode: "0644"
       run_once: true
       delegate_to: "{{ k8s_ctl_delegate_to }}"
       changed_when: false
