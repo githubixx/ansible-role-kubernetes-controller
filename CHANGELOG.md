@@ -1,5 +1,14 @@
 # Changelog
 
+## 25.0.1+1.30.9
+
+- **UPDATE**
+  - update `k8s_ctl_release` to `1.30.9`
+
+- **OTHER CHANGES**
+  - update `.gitignore`
+  - fix `ansible-lint` issues
+
 ## 25.0.0+1.30.5
 
 - **UPDATE**
