@@ -302,6 +302,9 @@ k8s_scheduler_settings:
   "authentication-kubeconfig": "{{ k8s_scheduler_conf_dir }}/kubeconfig"
   "authorization-kubeconfig": "{{ k8s_scheduler_conf_dir }}/kubeconfig"
   "requestheader-client-ca-file": "{{ k8s_ctl_pki_dir }}/ca-k8s-apiserver.pem"
+  "client-ca-file": "{{ k8s_ctl_pki_dir }}/cert-k8s-apiserver.pem"
+  "tls-cert-file": "{{ k8s_ctl_pki_dir }}/cert-k8s-scheduler.pem"
+  "tls-private-key-file": "{{ k8s_ctl_pki_dir }}/cert-k8s-scheduler-key.pem"
 
 # These sandbox security/sandbox related settings will be used for
 # "kube-apiserver", "kube-scheduler" and "kube-controller-manager"
