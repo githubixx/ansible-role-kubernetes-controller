@@ -4,7 +4,7 @@ This role is used in [Kubernetes the not so hard way with Ansible - Control plan
 
 ## Versions
 
-I tag every release and try to stay with [semantic versioning](http://semver.org). If you want to use the role I recommend to checkout the latest tag. The master branch is basically development while the tags mark stable releases. But in general I try to keep master in good shape too. A tag `26.0.0+1.31.5` means this is release `26.0.0` of this role and it's meant to be used with Kubernetes version `1.31.5` (but should work with any K8s 1.31.x release of course). If the role itself changes `X.Y.Z` before `+` will increase. If the Kubernetes version changes `X.Y.Z` after `+` will increase too. This allows to tag bugfixes and new major versions of the role while it's still developed for a specific Kubernetes release. That's especially useful for Kubernetes major releases with breaking changes.
+I tag every release and try to stay with [semantic versioning](http://semver.org). If you want to use the role I recommend to checkout the latest tag. The master branch is basically development while the tags mark stable releases. But in general I try to keep master in good shape too. A tag `26.0.1+1.31.5` means this is release `26.0.1` of this role and it's meant to be used with Kubernetes version `1.31.5` (but should work with any K8s 1.31.x release of course). If the role itself changes `X.Y.Z` before `+` will increase. If the Kubernetes version changes `X.Y.Z` after `+` will increase too. This allows to tag bugfixes and new major versions of the role while it's still developed for a specific Kubernetes release. That's especially useful for Kubernetes major releases with breaking changes.
 
 ## Requirements
 
@@ -29,6 +29,12 @@ See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-con
 **IMPORTANT**: If you upgrade from a release < `22.0.0+1.27.8` please read the [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-controller/blob/master/CHANGELOG.md) carefully! Version `22.0.0+1.27.8` had quite a few breaking changes!
 
 **Recent changes:**
+
+## 26.0.1+1.31.5
+
+- **OTHER CHANGES**
+  - add flags `client-ca-file`, `tls-cert-file` and `tls-private-key-file` to `k8s_controller_manager_settings` (contribution by @hajowieland). Fixes [#69](https://github.com/githubixx/ansible-role-kubernetes-controller/issues/69)
+  - add flags `client-ca-file`, `tls-cert-file` and `tls-private-key-file` to `k8s_scheduler_settings`
 
 ## 26.0.0+1.31.5
 
@@ -75,7 +81,7 @@ See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-con
 roles:
   - name: githubixx.kubernetes_controller
     src: https://github.com/githubixx/ansible-role-kubernetes-controller.git
-    version: 26.0.0+1.31.5
+    version: 26.0.1+1.31.5
 ```
 
 ## Role (default) variables
@@ -370,6 +376,9 @@ k8s_controller_manager_settings:
   "requestheader-client-ca-file": "{{ k8s_ctl_pki_dir }}/ca-k8s-apiserver.pem"
   "service-account-private-key-file": "{{ k8s_ctl_pki_dir }}/cert-k8s-controller-manager-sa-key.pem"
   "use-service-account-credentials": "true"
+  "client-ca-file": "{{ k8s_ctl_pki_dir }}/cert-k8s-apiserver.pem"
+  "tls-cert-file": "{{ k8s_ctl_pki_dir }}/cert-k8s-controller-manager.pem"
+  "tls-private-key-file": "{{ k8s_ctl_pki_dir }}/cert-k8s-controller-manager-key.pem"
 
 # The directory to store scheduler configuration.
 k8s_scheduler_conf_dir: "{{ k8s_ctl_conf_dir }}/kube-scheduler"
@@ -381,6 +390,9 @@ k8s_scheduler_settings:
   "authentication-kubeconfig": "{{ k8s_scheduler_conf_dir }}/kubeconfig"
   "authorization-kubeconfig": "{{ k8s_scheduler_conf_dir }}/kubeconfig"
   "requestheader-client-ca-file": "{{ k8s_ctl_pki_dir }}/ca-k8s-apiserver.pem"
+  "client-ca-file": "{{ k8s_ctl_pki_dir }}/cert-k8s-apiserver.pem"
+  "tls-cert-file": "{{ k8s_ctl_pki_dir }}/cert-k8s-scheduler.pem"
+  "tls-private-key-file": "{{ k8s_ctl_pki_dir }}/cert-k8s-scheduler-key.pem"
 
 # These sandbox security/sandbox related settings will be used for
 # "kube-apiserver", "kube-scheduler" and "kube-controller-manager"

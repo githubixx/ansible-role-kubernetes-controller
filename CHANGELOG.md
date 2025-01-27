@@ -1,5 +1,11 @@
 # Changelog
 
+## 26.0.1+1.31.5
+
+- **OTHER CHANGES**
+  - add flags `client-ca-file`, `tls-cert-file` and `tls-private-key-file` to `k8s_controller_manager_settings` (contribution by @hajowieland). Fixes [#69](https://github.com/githubixx/ansible-role-kubernetes-controller/issues/69)
+  - add flags `client-ca-file`, `tls-cert-file` and `tls-private-key-file` to `k8s_scheduler_settings`
+
 ## 26.0.0+1.31.5
 
 - **UPDATE**
@@ -116,8 +122,8 @@
   - Rename `k8s_ca_conf_directory` to `k8s_ctl_ca_conf_directory`
 
 - **FEATURE**
-  - Introduce `k8s_run_as_user` variable. Previously all control plane services like `kube-apiserver`, `kube-scheduler` and `kube-controller-manager` run as user `root`. Securitywise that's not optimal. There is just no need to run them as `root` as long they use a listening port > `1024` which they do by default. In this version all these services will run as the user specified with `k8s_run_as_user` which is `k8s` by default. Related to this variable are the new variables `k8s_run_as_user_shell`, `k8s_run_as_user_system`, `k8s_run_as_group` and `k8s_run_as_group_system`. See [README](https://github.com/githubixx/ansible-role-kubernetes-controller/blob/master/README.md) for further information about this variables. The defaults should be just fine even for upgrading from a previous version of this role.
-  - Introduce `k8s_ctl_api_endpoint_host` and `k8s_ctl_api_endpoint_port` variables. Previously `kube-scheduler` and `kube-controller-manager` where configured to connect to the first host in the Ansible `k8s_controller` group and communicate with the `kube-apiserver` that was running there. This was hard-coded and couldn't be changed. If that host was down the K8s worker nodes didn't receive any updates. Now one can install and use a load balancer like `haproxy` e.g. that distributes requests between all `kube-apiserver`'s and takes a `kube-apiserver` out of rotation if that one is down (also see my Ansible [haproxy role](https://github.com/githubixx/ansible-role-haproxy) for that use case). The default is still to use the first host/kube-apiserver in the Ansible `k8s_controller` group. So behaviorwise nothing changed basically.
+  - Introduce `k8s_run_as_user` variable. Previously all control plane services like `kube-apiserver`, `kube-scheduler` and `kube-controller-manager` run as user `root`. Security-wise that's not optimal. There is just no need to run them as `root` as long they use a listening port > `1024` which they do by default. In this version all these services will run as the user specified with `k8s_run_as_user` which is `k8s` by default. Related to this variable are the new variables `k8s_run_as_user_shell`, `k8s_run_as_user_system`, `k8s_run_as_group` and `k8s_run_as_group_system`. See [README](https://github.com/githubixx/ansible-role-kubernetes-controller/blob/master/README.md) for further information about this variables. The defaults should be just fine even for upgrading from a previous version of this role.
+  - Introduce `k8s_ctl_api_endpoint_host` and `k8s_ctl_api_endpoint_port` variables. Previously `kube-scheduler` and `kube-controller-manager` where configured to connect to the first host in the Ansible `k8s_controller` group and communicate with the `kube-apiserver` that was running there. This was hard-coded and couldn't be changed. If that host was down the K8s worker nodes didn't receive any updates. Now one can install and use a load balancer like `haproxy` e.g. that distributes requests between all `kube-apiserver`'s and takes a `kube-apiserver` out of rotation if that one is down (also see my Ansible [haproxy role](https://github.com/githubixx/ansible-role-haproxy) for that use case). The default is still to use the first host/kube-apiserver in the Ansible `k8s_controller` group. So behavior-wise nothing changed basically.
   - Introduce `k8s_admin_api_endpoint_host` and `k8s_admin_api_endpoint_port` variables. For these two variables the same is basically true as for `k8s_ctl_api_endpoint_host` and `k8s_ctl_api_endpoint_port` variables above. But these settings are meant to be used by the `admin` user that this role creates by default. These settings are written into `admin.kubeconfig`. So it's possible to configure another host/load balancer for the `admin` user as for the K8s control plane services mentioned in the previous paragraph.
   - Introduce `k8s_ctl_log_base_dir` and `k8s_ctl_log_base_dir_mode`. Normally  `kube-apiserver`, `kube-controller-manager` and `kube-scheduler` log to `journald`. But there are exceptions like the audit log. For this kind of log files this directory will be used as a base path.
   - Introduce `k8s_apiserver_audit_log_dir`. Directory to store kube-apiserver audit logs.
@@ -328,7 +334,7 @@ v1.2.0_v1.8.4
 
 - update `k8s_release` to `1.14.2`
 - add all admissions plugins to `enable-admission-plugins` option that are enabled by default in K8s 1.14
-- remove `Initializers` addmission plugin (no longer available in 1.14)
+- remove `Initializers` admission plugin (no longer available in 1.14)
 
 ## 7.0.0+1.13.5
 
