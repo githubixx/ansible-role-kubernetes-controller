@@ -30,6 +30,11 @@ See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-con
 
 **Recent changes:**
 
+## 26.0.2+1.31.11
+
+- **UPDATE**
+  - update `k8s_ctl_release` to `1.31.11`
+
 ## 26.0.1+1.31.5
 
 - **OTHER CHANGES**
@@ -81,7 +86,7 @@ See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-con
 roles:
   - name: githubixx.kubernetes_controller
     src: https://github.com/githubixx/ansible-role-kubernetes-controller.git
-    version: 26.0.1+1.31.5
+    version: 26.0.2+1.31.11
 ```
 
 ## Role (default) variables
@@ -111,7 +116,7 @@ k8s_ctl_pki_dir: "{{ k8s_ctl_conf_dir }}/pki"
 k8s_ctl_bin_dir: "/usr/local/bin"
 
 # The Kubernetes release.
-k8s_ctl_release: "1.31.5"
+k8s_ctl_release: "1.31.11"
 
 # The interface on which the Kubernetes services should listen on. As all cluster
 # communication should use a VPN interface the interface name is
