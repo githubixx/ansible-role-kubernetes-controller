@@ -35,6 +35,11 @@ See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-con
 - **UPDATE**
   - update `k8s_ctl_release` to `1.32.7`
 
+## 26.0.2+1.31.11
+
+- **UPDATE**
+  - update `k8s_ctl_release` to `1.31.11`
+
 ## 26.0.1+1.31.5
 
 - **OTHER CHANGES**
