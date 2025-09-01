@@ -23,7 +23,7 @@ k8s_ctl_pki_dir: "{{ k8s_ctl_conf_dir }}/pki"
 k8s_ctl_bin_dir: "/usr/local/bin"
 
 # The Kubernetes release.
-k8s_ctl_release: "1.32.7"
+k8s_ctl_release: "1.32.8"
 
 # The interface on which the Kubernetes services should listen on. As all cluster
 # communication should use a VPN interface the interface name is
