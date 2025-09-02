@@ -23,7 +23,7 @@ k8s_ctl_pki_dir: "{{ k8s_ctl_conf_dir }}/pki"
 k8s_ctl_bin_dir: "/usr/local/bin"
 
 # The Kubernetes release.
-k8s_ctl_release: "1.31.11"
+k8s_ctl_release: "1.32.8"
 
 # The interface on which the Kubernetes services should listen on. As all cluster
 # communication should use a VPN interface the interface name is
@@ -197,7 +197,7 @@ k8s_apiserver_settings:
   "advertise-address": "{{ hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address }}"
   "bind-address": "{{ hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address }}"
   "secure-port": "6443"
-  "enable-admission-plugins": "NodeRestriction,NamespaceLifecycle,LimitRanger,ServiceAccount,TaintNodesByCondition,Priority,DefaultTolerationSeconds,DefaultStorageClass,PersistentVolumeClaimResize,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,PodSecurity,Priority,StorageObjectInUseProtection,RuntimeClass,CertificateApproval,CertificateSigning,ClusterTrustBundleAttest,CertificateSubjectRestriction,DefaultIngressClass"
+  "enable-admission-plugins": "{{ k8s_apiserver_admission_plugins | join(',') }}"
   "allow-privileged": "true"
   "authorization-mode": "Node,RBAC"
   "audit-log-maxage": "30"
@@ -225,6 +225,30 @@ k8s_apiserver_settings:
   "service-account-issuer": "https://{{ groups.k8s_controller | first }}:6443"
   "tls-cert-file": "{{ k8s_ctl_pki_dir }}/cert-k8s-apiserver.pem"
   "tls-private-key-file": "{{ k8s_ctl_pki_dir }}/cert-k8s-apiserver-key.pem"
+
+# kube-apiserver admission plugins used in "k8s_apiserver_settings" variable
+# for "enable-admission-plugins" key.
+k8s_apiserver_admission_plugins:
+  - NodeRestriction
+  - NamespaceLifecycle
+  - LimitRanger
+  - ServiceAccount
+  - TaintNodesByCondition
+  - Priority
+  - DefaultTolerationSeconds
+  - DefaultStorageClass
+  - PersistentVolumeClaimResize
+  - MutatingAdmissionWebhook
+  - ValidatingAdmissionWebhook
+  - ResourceQuota
+  - PodSecurity
+  - StorageObjectInUseProtection
+  - RuntimeClass
+  - CertificateApproval
+  - CertificateSigning
+  - ClusterTrustBundleAttest
+  - CertificateSubjectRestriction
+  - DefaultIngressClass
 
 # This is the content of "encryption-config.yaml". Used by "kube-apiserver"
 # (see "encryption-provider-config" option in "k8s_apiserver_settings").

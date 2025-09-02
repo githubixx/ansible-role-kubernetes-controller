@@ -4,7 +4,7 @@ This role is used in [Kubernetes the not so hard way with Ansible - Control plan
 
 ## Versions
 
-I tag every release and try to stay with [semantic versioning](http://semver.org). If you want to use the role I recommend to checkout the latest tag. The master branch is basically development while the tags mark stable releases. But in general I try to keep master in good shape too. A tag `26.0.1+1.31.5` means this is release `26.0.1` of this role and it's meant to be used with Kubernetes version `1.31.5` (but should work with any K8s 1.31.x release of course). If the role itself changes `X.Y.Z` before `+` will increase. If the Kubernetes version changes `X.Y.Z` after `+` will increase too. This allows to tag bugfixes and new major versions of the role while it's still developed for a specific Kubernetes release. That's especially useful for Kubernetes major releases with breaking changes.
+I tag every release and try to stay with [semantic versioning](http://semver.org). If you want to use the role I recommend to checkout the latest tag. The master branch is basically development while the tags mark stable releases. But in general I try to keep master in good shape too. A tag `27.0.0+1.32.8` means this is release `27.0.0` of this role and it's meant to be used with Kubernetes version `1.32.8` (but should work with any K8s 1.32.x release of course). If the role itself changes `X.Y.Z` before `+` will increase. If the Kubernetes version changes `X.Y.Z` after `+` will increase too. This allows to tag bugfixes and new major versions of the role while it's still developed for a specific Kubernetes release. That's especially useful for Kubernetes major releases with breaking changes.
 
 ## Requirements
 
@@ -16,7 +16,6 @@ And of course an [etcd](https://etcd.io/) cluster (see [Kubernetes the not so ha
 
 ## Supported OS
 
-- Ubuntu 20.04 (Focal Fossa) (reaches EOL April 2025 - not recommended)
 - Ubuntu 22.04 (Jammy Jellyfish)
 - Ubuntu 24.04 (Noble Numbat) (recommended)
 
@@ -29,6 +28,19 @@ See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-con
 **IMPORTANT**: If you upgrade from a release < `22.0.0+1.27.8` please read the [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-controller/blob/master/CHANGELOG.md) carefully! Version `22.0.0+1.27.8` had quite a few breaking changes!
 
 **Recent changes:**
+
+## 27.0.0+1.32.8
+
+- **BREAKING**
+  - Removed Ubuntu 20.04 because reached end of life
+  - Introduce `k8s_apiserver_admission_plugins` variable. Previously in `k8s_apiserver_settings` variable the values of `enable-admission-plugins` key was a string with list of admission plugins separated by commas. To make that string more readable `k8s_apiserver_admission_plugins` variable was introduced which is now a list of admissions plugins that is consumed by `enable-admission-plugins`. If you didn't changed `k8s_apiserver_admission_plugins` variable or used your own settings nothing changed for you.
+
+- **UPDATE**
+  - update `k8s_ctl_release` to `1.32.8`
+
+- **MOLECULE**
+  - Removed Ubuntu 20.04 because reached end of life
+  - Fix `ansible-lint` issues
 
 ## 26.0.2+1.31.11
 
@@ -46,30 +58,6 @@ See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-con
 - **UPDATE**
   - update `k8s_ctl_release` to `1.31.5`
 
-## 25.0.1+1.30.9
-
-- **UPDATE**
-  - update `k8s_ctl_release` to `1.30.9`
-
-- **OTHER CHANGES**
-  - update `.gitignore`
-  - fix `ansible-lint` issues
-
-## 25.0.0+1.30.5
-
-- **UPDATE**
-  - update `k8s_ctl_release` to `1.30.5`
-
-## 24.0.2+1.29.9
-
-- **OTHER CHANGES**
-  - fix download URLs for Kubernetes binaries (see: [Download Kubernetes - Binaries](https://kubernetes.io/releases/download/#binaries)
-
-## 24.0.1+1.29.9
-
-- **UPDATE**
-  - update `k8s_ctl_release` to `1.29.9`
-
 ## Installation
 
 - Directly download from Github (Change into Ansible roles directory before cloning. You can figure out the role path by using `ansible-config dump | grep DEFAULT_ROLES_PATH` command):
@@ -86,7 +74,7 @@ See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-con
 roles:
   - name: githubixx.kubernetes_controller
     src: https://github.com/githubixx/ansible-role-kubernetes-controller.git
-    version: 26.0.2+1.31.11
+    version: 27.0.0+1.32.8
 ```
 
 ## Role (default) variables
@@ -116,7 +104,7 @@ k8s_ctl_pki_dir: "{{ k8s_ctl_conf_dir }}/pki"
 k8s_ctl_bin_dir: "/usr/local/bin"
 
 # The Kubernetes release.
-k8s_ctl_release: "1.31.11"
+k8s_ctl_release: "1.32.8"
 
 # The interface on which the Kubernetes services should listen on. As all cluster
 # communication should use a VPN interface the interface name is
@@ -290,7 +278,7 @@ k8s_apiserver_settings:
   "advertise-address": "{{ hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address }}"
   "bind-address": "{{ hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address }}"
   "secure-port": "6443"
-  "enable-admission-plugins": "NodeRestriction,NamespaceLifecycle,LimitRanger,ServiceAccount,TaintNodesByCondition,Priority,DefaultTolerationSeconds,DefaultStorageClass,PersistentVolumeClaimResize,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,PodSecurity,Priority,StorageObjectInUseProtection,RuntimeClass,CertificateApproval,CertificateSigning,ClusterTrustBundleAttest,CertificateSubjectRestriction,DefaultIngressClass"
+  "enable-admission-plugins": "{{ k8s_apiserver_admission_plugins | join(',') }}"
   "allow-privileged": "true"
   "authorization-mode": "Node,RBAC"
   "audit-log-maxage": "30"
@@ -318,6 +306,30 @@ k8s_apiserver_settings:
   "service-account-issuer": "https://{{ groups.k8s_controller | first }}:6443"
   "tls-cert-file": "{{ k8s_ctl_pki_dir }}/cert-k8s-apiserver.pem"
   "tls-private-key-file": "{{ k8s_ctl_pki_dir }}/cert-k8s-apiserver-key.pem"
+
+# kube-apiserver admission plugins used in "k8s_apiserver_settings" variable
+# for "enable-admission-plugins" key.
+k8s_apiserver_admission_plugins:
+  - NodeRestriction
+  - NamespaceLifecycle
+  - LimitRanger
+  - ServiceAccount
+  - TaintNodesByCondition
+  - Priority
+  - DefaultTolerationSeconds
+  - DefaultStorageClass
+  - PersistentVolumeClaimResize
+  - MutatingAdmissionWebhook
+  - ValidatingAdmissionWebhook
+  - ResourceQuota
+  - PodSecurity
+  - StorageObjectInUseProtection
+  - RuntimeClass
+  - CertificateApproval
+  - CertificateSigning
+  - ClusterTrustBundleAttest
+  - CertificateSubjectRestriction
+  - DefaultIngressClass
 
 # This is the content of "encryption-config.yaml". Used by "kube-apiserver"
 # (see "encryption-provider-config" option in "k8s_apiserver_settings").
@@ -466,7 +478,7 @@ The same is true for the `kube-controller-manager` by adding entries to `k8s_con
 
 ## Testing
 
-This role has a small test setup that is created using [Molecule](https://github.com/ansible-community/molecule), libvirt (vagrant-libvirt) and QEMU/KVM. Please see my blog post [Testing Ansible roles with Molecule, libvirt (vagrant-libvirt) and QEMU/KVM](https://www.tauceti.blog/posts/testing-ansible-roles-with-molecule-libvirt-vagrant-qemu-kvm/) how to setup. The test configuration is [here](https://github.com/githubixx/ansible-role-kubernetes-controller/tree/master/molecule/default).
+This role has a small test setup that is created using [Molecule](https://github.com/ansible-community/molecule), libvirt (vagrant-libvirt) and QEMU/KVM. Please see my blog post [Testing Ansible roles with Molecule, libvirt (vagrant-libvirt) and QEMU/KVM](https://www.tauceti.blog/posts/testing-ansible-roles-with-molecule-libvirt-vagrant-qemu-kvm/) how to setup. The Molecule test configuration is in [molecule/default](https://github.com/githubixx/ansible-role-kubernetes-controller/tree/master/molecule/default).
 
 Afterwards Molecule can be executed:
 

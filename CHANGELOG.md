@@ -1,5 +1,18 @@
 # Changelog
 
+## 27.0.0+1.32.8
+
+- **BREAKING**
+  - Removed Ubuntu 20.04 because reached end of life
+  - Introduce `k8s_apiserver_admission_plugins` variable. Previously in `k8s_apiserver_settings` variable the values of `enable-admission-plugins` key was a string with list of admission plugins separated by commas. To make that string more readable `k8s_apiserver_admission_plugins` variable was introduced which is now a list of admissions plugins that is consumed by `enable-admission-plugins`. If you didn't changed `k8s_apiserver_admission_plugins` variable or used your own settings nothing changed for you.
+
+- **UPDATE**
+  - update `k8s_ctl_release` to `1.32.8`
+
+- **MOLECULE**
+  - Removed Ubuntu 20.04 because reached end of life
+  - Fix `ansible-lint` issues
+
 ## 26.0.2+1.31.11
 
 - **UPDATE**
