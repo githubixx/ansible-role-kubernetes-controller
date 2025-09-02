@@ -31,8 +31,16 @@ See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-con
 
 ## 27.0.0+1.32.8
 
+- **BREAKING**
+  - Removed Ubuntu 20.04 because reached end of life
+  - Introduce `k8s_apiserver_admission_plugins` variable. Previously in `k8s_apiserver_settings' variable the values of `enable-admission-plugins` key was a string with list of admission plugins separated by commas. To make that string more readable `k8s_apiserver_admission_plugins` variable was introduced which is now a list of admissions plugins that is consumed by `enable-admission-plugins`. If you didn't changed `k8s_apiserver_admission_plugins` variable or used your own settings nothing changed for you.
+
 - **UPDATE**
   - update `k8s_ctl_release` to `1.32.8`
+
+- **MOLECULE**
+  - Removed Ubuntu 20.04 because reached end of life
+  - Fix `ansible-lint` issues
 
 ## 26.0.2+1.31.11
 
@@ -270,7 +278,7 @@ k8s_apiserver_settings:
   "advertise-address": "{{ hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address }}"
   "bind-address": "{{ hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address }}"
   "secure-port": "6443"
-  "enable-admission-plugins": "NodeRestriction,NamespaceLifecycle,LimitRanger,ServiceAccount,TaintNodesByCondition,Priority,DefaultTolerationSeconds,DefaultStorageClass,PersistentVolumeClaimResize,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,PodSecurity,Priority,StorageObjectInUseProtection,RuntimeClass,CertificateApproval,CertificateSigning,ClusterTrustBundleAttest,CertificateSubjectRestriction,DefaultIngressClass"
+  "enable-admission-plugins": "{{ k8s_apiserver_admission_plugins | join(',') }}"
   "allow-privileged": "true"
   "authorization-mode": "Node,RBAC"
   "audit-log-maxage": "30"
@@ -298,6 +306,30 @@ k8s_apiserver_settings:
   "service-account-issuer": "https://{{ groups.k8s_controller | first }}:6443"
   "tls-cert-file": "{{ k8s_ctl_pki_dir }}/cert-k8s-apiserver.pem"
   "tls-private-key-file": "{{ k8s_ctl_pki_dir }}/cert-k8s-apiserver-key.pem"
+
+# kube-apiserver admission plugins used in "k8s_apiserver_settings" variable
+# for "enable-admission-plugins" key.
+k8s_apiserver_admission_plugins:
+  - NodeRestriction
+  - NamespaceLifecycle
+  - LimitRanger
+  - ServiceAccount
+  - TaintNodesByCondition
+  - Priority
+  - DefaultTolerationSeconds
+  - DefaultStorageClass
+  - PersistentVolumeClaimResize
+  - MutatingAdmissionWebhook
+  - ValidatingAdmissionWebhook
+  - ResourceQuota
+  - PodSecurity
+  - StorageObjectInUseProtection
+  - RuntimeClass
+  - CertificateApproval
+  - CertificateSigning
+  - ClusterTrustBundleAttest
+  - CertificateSubjectRestriction
+  - DefaultIngressClass
 
 # This is the content of "encryption-config.yaml". Used by "kube-apiserver"
 # (see "encryption-provider-config" option in "k8s_apiserver_settings").
