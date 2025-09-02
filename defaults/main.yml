@@ -226,7 +226,7 @@ k8s_apiserver_settings:
   "tls-cert-file": "{{ k8s_ctl_pki_dir }}/cert-k8s-apiserver.pem"
   "tls-private-key-file": "{{ k8s_ctl_pki_dir }}/cert-k8s-apiserver-key.pem"
 
-# kube-apiserver admission plugins used in "k8s_apiserver_settings" variable 
+# kube-apiserver admission plugins used in "k8s_apiserver_settings" variable
 # for "enable-admission-plugins" key.
 k8s_apiserver_admission_plugins:
   - NodeRestriction
