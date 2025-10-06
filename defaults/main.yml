@@ -113,7 +113,7 @@ k8s_ctl_delegate_to: "127.0.0.1"
 # variable of https://github.com/githubixx/ansible-role-kubernetes-ca
 # role). If it's not specified you'll get certificate errors in the
 # logs of the services mentioned above.
-k8s_ctl_api_endpoint_host: "{% set controller_host = groups['k8s_controller'][0] %}{{ hostvars[controller_host]['ansible_' + hostvars[controller_host]['k8s_interface']].ipv4.address }}"
+k8s_ctl_api_endpoint_host: "{{ hostvars[groups['k8s_controller'] | first]['ansible_' + hostvars[groups['k8s_controller'] | first]['k8s_interface']].ipv4.address }}"
 
 # As above just for the port. It specifies on which port the
 # Kubernetes API servers are listening. Again if there is a loadbalancer
@@ -178,7 +178,7 @@ k8s_admin_conf_group: "root"
 #
 # Besides that basically the same comments as for "k8s_ctl_api_endpoint_host"
 # variable apply.
-k8s_admin_api_endpoint_host: "{% set controller_host = groups['k8s_controller'][0] %}{{ hostvars[controller_host]['ansible_' + hostvars[controller_host]['k8s_interface']].ipv4.address }}"
+k8s_admin_api_endpoint_host: "{{ hostvars[groups['k8s_controller'] | first]['ansible_' + hostvars[groups['k8s_controller'] | first]['k8s_interface']].ipv4.address }}"
 
 # As above just for the port.
 k8s_admin_api_endpoint_port: "6443"
