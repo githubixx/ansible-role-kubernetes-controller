@@ -1,5 +1,17 @@
 # Changelog
 
+## 27.1.0+1.32.9
+
+- **UPDATE**
+  - update `k8s_ctl_release` to `1.32.9`
+
+- **OTHER CHANGES**
+  - fix for Ansible 2.19 in `kube-apiserver.service.j2`: remove `cluster_hosts()` macro and adjust `combine k8s_apiserver_settings and k8s_apiserver_settings_user` task accordingly
+  - `defaults/main.yml`: `k8s_ctl_api_endpoint_host`/`k8s_admin_api_endpoint_host` - simplify the complex default variables for endpoint hosts to avoid nested template construction
+
+- **MOLECULE**
+  - install `python3-kubernetes` package instead `kubernetes` Pip in `prepare.yml`
+
 ## 27.0.0+1.32.8
 
 - **BREAKING**
