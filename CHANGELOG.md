@@ -1,5 +1,14 @@
 # Changelog
 
+## 28.0.0+1.33.6
+
+- **UPDATE**
+  - update `k8s_ctl_release` to `1.33.6`
+  - `meta/main.yml`: set `min_ansible_version` to `2.15`
+
+- **MOLECULE**
+  - replace Ubuntu 20.04 with 24.04
+
 ## 27.1.1+1.32.9
 
 - **UPDATE**

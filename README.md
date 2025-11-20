@@ -4,7 +4,7 @@ This role is used in [Kubernetes the not so hard way with Ansible - Control plan
 
 ## Versions
 
-I tag every release and try to stay with [semantic versioning](http://semver.org). If you want to use the role I recommend to checkout the latest tag. The master branch is basically development while the tags mark stable releases. But in general I try to keep master in good shape too. A tag `27.1.1+1.32.9` means this is release `27.1.1` of this role and it's meant to be used with Kubernetes version `1.32.9` (but should work with any K8s 1.32.x release of course). If the role itself changes `X.Y.Z` before `+` will increase. If the Kubernetes version changes `X.Y.Z` after `+` will increase too. This allows to tag bugfixes and new major versions of the role while it's still developed for a specific Kubernetes release. That's especially useful for Kubernetes major releases with breaking changes.
+I tag every release and try to stay with [semantic versioning](http://semver.org). If you want to use the role I recommend to checkout the latest tag. The master branch is basically development while the tags mark stable releases. But in general I try to keep master in good shape too. A tag `28.0.0+1.33.6` means this is release `28.0.0` of this role and it's meant to be used with Kubernetes version `1.33.6` (but should work with any K8s 1.33.x release of course). If the role itself changes `X.Y.Z` before `+` will increase. If the Kubernetes version changes `X.Y.Z` after `+` will increase too. This allows to tag bugfixes and new major versions of the role while it's still developed for a specific Kubernetes release. That's especially useful for Kubernetes major releases with breaking changes.
 
 ## Requirements
 
@@ -25,9 +25,12 @@ And of course an [etcd](https://etcd.io/) cluster (see [Kubernetes the not so ha
 
 See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-controller/blob/master/CHANGELOG.md)
 
-**IMPORTANT**: If you upgrade from a release < `22.0.0+1.27.8` please read the [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-controller/blob/master/CHANGELOG.md) carefully! Version `22.0.0+1.27.8` had quite a few breaking changes!
-
 **Recent changes:**
+
+## 28.0.0+1.33.6
+
+- **UPDATE**
+  - update `k8s_ctl_release` to `1.33.6`
 
 ## 27.1.1+1.32.9
 
@@ -75,7 +78,7 @@ See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-con
 roles:
   - name: githubixx.kubernetes_controller
     src: https://github.com/githubixx/ansible-role-kubernetes-controller.git
-    version: 27.1.1+1.32.9
+    version: 28.0.0+1.33.6
 ```
 
 ## Role (default) variables
@@ -105,7 +108,7 @@ k8s_ctl_pki_dir: "{{ k8s_ctl_conf_dir }}/pki"
 k8s_ctl_bin_dir: "/usr/local/bin"
 
 # The Kubernetes release.
-k8s_ctl_release: "1.32.9"
+k8s_ctl_release: "1.33.6"
 
 # The interface on which the Kubernetes services should listen on. As all cluster
 # communication should use a VPN interface the interface name is
