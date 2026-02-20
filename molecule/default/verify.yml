@@ -56,3 +56,25 @@
         - k8s_ctl__service_enabled.rc != 0
         - k8s_ctl__service_enabled.stdout != "enabled"
       loop: "{{ k8s_ctl__services }}"
+
+- name: Verify control plane listener ports
+  hosts: k8s_controller
+  become: true
+  vars:
+    k8s_ctl__expected_listeners:
+      - name: kube-apiserver
+        port: 6443
+      - name: kube-controller-manager
+        port: 10257
+      - name: kube-scheduler
+        port: 10259
+  tasks:
+    - name: Check listener port is open
+      ansible.builtin.shell: >
+        ss -H -ltn "sport = :{{ item.port }}" | grep -q "LISTEN"
+      register: k8s_ctl__listener_check
+      changed_when: false
+      failed_when: k8s_ctl__listener_check.rc != 0
+      loop: "{{ k8s_ctl__expected_listeners }}"
+      loop_control:
+        label: "{{ item.name }}:{{ item.port }}"
