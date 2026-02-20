@@ -1,5 +1,5 @@
 ---
-# Copyright (C) 2023 Robert Wimmer
+# Copyright (C) 2023-2026 Robert Wimmer
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Verify setup
@@ -29,3 +29,30 @@
       ansible.builtin.assert:
         that:
           - k8s__namespaces_count|int == 4
+
+- name: Verify control plane service health
+  hosts: k8s_controller
+  become: true
+  vars:
+    k8s_ctl__services:
+      - kube-apiserver
+      - kube-controller-manager
+      - kube-scheduler
+  tasks:
+    - name: Check service is active
+      ansible.builtin.command: "systemctl is-active {{ item }}"
+      register: k8s_ctl__service_active
+      changed_when: false
+      failed_when:
+        - k8s_ctl__service_active.rc != 0
+        - k8s_ctl__service_active.stdout != "active"
+      loop: "{{ k8s_ctl__services }}"
+
+    - name: Check service is enabled
+      ansible.builtin.command: "systemctl is-enabled {{ item }}"
+      register: k8s_ctl__service_enabled
+      changed_when: false
+      failed_when:
+        - k8s_ctl__service_enabled.rc != 0
+        - k8s_ctl__service_enabled.stdout != "enabled"
+      loop: "{{ k8s_ctl__services }}"
