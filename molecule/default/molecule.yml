@@ -1,5 +1,5 @@
 ---
-# Copyright (C) 2023 Robert Wimmer
+# Copyright (C) 2023-2026 Robert Wimmer
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 dependency:
@@ -13,7 +13,7 @@ driver:
 
 platforms:
   - name: test-assets
-    box: alvistack/ubuntu-24.04
+    box: githubixx/ubuntu-24.04
     memory: 2048
     cpus: 2
     groups:
@@ -26,7 +26,7 @@ platforms:
         type: static
         ip: 172.16.10.5
   - name: test-controller1
-    box: alvistack/ubuntu-22.04
+    box: githubixx/ubuntu-22.04
     memory: 2048
     cpus: 2
     groups:
@@ -42,7 +42,7 @@ platforms:
         type: static
         ip: 172.16.10.10
   - name: test-controller2
-    box: alvistack/ubuntu-22.04
+    box: githubixx/ubuntu-24.04
     memory: 2048
     cpus: 2
     groups:
@@ -58,7 +58,7 @@ platforms:
         type: static
         ip: 172.16.10.20
   - name: test-controller3
-    box: alvistack/ubuntu-24.04
+    box: githubixx/ubuntu-24.04
     memory: 2048
     cpus: 2
     groups:
@@ -74,7 +74,7 @@ platforms:
         type: static
         ip: 172.16.10.30
   - name: test-worker1
-    box: alvistack/ubuntu-22.04
+    box: githubixx/ubuntu-22.04
     memory: 2048
     cpus: 2
     groups:
@@ -88,7 +88,7 @@ platforms:
         type: static
         ip: 172.16.10.100
   - name: test-worker2
-    box: alvistack/ubuntu-24.04
+    box: githubixx/ubuntu-24.04
     memory: 2048
     cpus: 2
     groups:
