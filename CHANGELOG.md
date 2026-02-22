@@ -1,5 +1,13 @@
 # Changelog
 
+## 29.0.0+1.34.4
+
+- **UPDATE**
+  - update `k8s_ctl_release` to `1.34.4`
+
+- **MOLECULE**
+  - use own [githubixx Vagrant boxes](https://portal.cloud.hashicorp.com/vagrant/discover/githubixx)
+
 ## 28.0.0+1.33.6
 
 - **UPDATE**
