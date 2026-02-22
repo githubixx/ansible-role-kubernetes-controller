@@ -103,3 +103,110 @@
       failed_when:
         - k8s_ctl__apiserver_readyz.rc != 0
         - k8s_ctl__apiserver_readyz.stdout is not search("ok")
+
+- name: Verify control plane artifacts on controllers
+  hosts: k8s_controller
+  become: true
+  vars:
+    k8s_ctl__run_as_group: "{{ k8s_run_as_group | default('k8s') }}"
+    k8s_ctl__conf_dir: "{{ k8s_ctl_conf_dir | default('/etc/kubernetes/controller') }}"
+    k8s_ctl__controller_manager_conf_dir: "{{ k8s_controller_manager_conf_dir | default(k8s_ctl__conf_dir + '/kube-controller-manager') }}"
+    k8s_ctl__scheduler_conf_dir: "{{ k8s_scheduler_conf_dir | default(k8s_ctl__conf_dir + '/kube-scheduler') }}"
+    k8s_ctl__bin_dir: "{{ k8s_ctl_bin_dir | default('/usr/local/bin') }}"
+    k8s_ctl__pki_dir: "{{ k8s_ctl_pki_dir | default('/etc/kubernetes/controller/pki') }}"
+    k8s_ctl__required_binaries:
+      - kube-apiserver
+      - kube-controller-manager
+      - kube-scheduler
+      - kubectl
+    k8s_ctl__required_certificates:
+      - ca-k8s-apiserver.pem
+      - cert-k8s-apiserver.pem
+      - cert-k8s-apiserver-key.pem
+      - ca-etcd.pem
+      - cert-k8s-apiserver-etcd.pem
+      - cert-k8s-apiserver-etcd-key.pem
+    k8s_ctl__component_kubeconfigs:
+      - path: "{{ k8s_ctl__controller_manager_conf_dir }}/kubeconfig"
+        owner: root
+        group: "{{ k8s_ctl__run_as_group }}"
+        mode: "0640"
+      - path: "{{ k8s_ctl__scheduler_conf_dir }}/kubeconfig"
+        owner: root
+        group: "{{ k8s_ctl__run_as_group }}"
+        mode: "0640"
+  tasks:
+    - name: Check required binaries exist and are executable
+      ansible.builtin.stat:
+        path: "{{ k8s_ctl__bin_dir }}/{{ item }}"
+      register: k8s_ctl__binary_stat
+      loop: "{{ k8s_ctl__required_binaries }}"
+
+    - name: Assert required binaries are present and executable
+      ansible.builtin.assert:
+        that:
+          - item.stat.exists
+          - item.stat.isreg
+          - item.stat.executable
+      loop: "{{ k8s_ctl__binary_stat.results }}"
+      loop_control:
+        label: "{{ item.stat.path }}"
+
+    - name: Check required certificates exist with expected ownership and mode
+      ansible.builtin.stat:
+        path: "{{ k8s_ctl__pki_dir }}/{{ item }}"
+      register: k8s_ctl__certificate_stat
+      loop: "{{ k8s_ctl__required_certificates }}"
+
+    - name: Assert required certificates state
+      ansible.builtin.assert:
+        that:
+          - item.stat.exists
+          - item.stat.isreg
+          - item.stat.pw_name == 'root'
+          - item.stat.gr_name == k8s_ctl__run_as_group
+          - item.stat.mode == '0440'
+      loop: "{{ k8s_ctl__certificate_stat.results }}"
+      loop_control:
+        label: "{{ item.stat.path }}"
+
+    - name: Check component kubeconfigs state
+      ansible.builtin.stat:
+        path: "{{ item.path }}"
+      register: k8s_ctl__component_kubeconfig_stat
+      loop: "{{ k8s_ctl__component_kubeconfigs }}"
+
+    - name: Assert component kubeconfigs ownership and mode
+      ansible.builtin.assert:
+        that:
+          - item.stat.exists
+          - item.stat.isreg
+          - item.stat.pw_name == item.item.owner
+          - item.stat.gr_name == item.item.group
+          - item.stat.mode == item.item.mode
+      loop: "{{ k8s_ctl__component_kubeconfig_stat.results }}"
+      loop_control:
+        label: "{{ item.stat.path }}"
+
+- name: Verify admin kubeconfig artifact on test-assets
+  hosts: test-assets
+  become: true
+  vars:
+    k8s_ctl__admin_conf_dir: "{{ k8s_admin_conf_dir | default('/root/k8s/configs') }}"
+    k8s_ctl__admin_conf_owner: "{{ k8s_admin_conf_owner | default('root') }}"
+    k8s_ctl__admin_conf_group: "{{ k8s_admin_conf_group | default('root') }}"
+    k8s_ctl__admin_kubeconfig: "{{ k8s_ctl__admin_conf_dir }}/admin.kubeconfig"
+  tasks:
+    - name: Check admin kubeconfig state
+      ansible.builtin.stat:
+        path: "{{ k8s_ctl__admin_kubeconfig }}"
+      register: k8s_ctl__admin_kubeconfig_stat
+
+    - name: Assert admin kubeconfig ownership and mode
+      ansible.builtin.assert:
+        that:
+          - k8s_ctl__admin_kubeconfig_stat.stat.exists
+          - k8s_ctl__admin_kubeconfig_stat.stat.isreg
+          - k8s_ctl__admin_kubeconfig_stat.stat.pw_name == k8s_ctl__admin_conf_owner
+          - k8s_ctl__admin_kubeconfig_stat.stat.gr_name == k8s_ctl__admin_conf_group
+          - k8s_ctl__admin_kubeconfig_stat.stat.mode == '0640'
