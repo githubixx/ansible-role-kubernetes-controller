@@ -210,3 +210,46 @@
           - k8s_ctl__admin_kubeconfig_stat.stat.pw_name == k8s_ctl__admin_conf_owner
           - k8s_ctl__admin_kubeconfig_stat.stat.gr_name == k8s_ctl__admin_conf_group
           - k8s_ctl__admin_kubeconfig_stat.stat.mode == '0640'
+
+- name: Verify kube-apiserver-to-kubelet RBAC resources
+  hosts: test-assets
+  vars:
+    k8s_ctl__admin_conf_dir: "{{ k8s_admin_conf_dir | default('/root/k8s/configs') }}"
+    k8s_ctl__admin_kubeconfig: "{{ k8s_ctl__admin_conf_dir }}/admin.kubeconfig"
+    k8s_ctl__apiserver_cn: "{{ k8s_apiserver_csr_cn | default('k8s-apiserver') }}"
+  tasks:
+    - name: Fetch kube-apiserver-to-kubelet ClusterRole
+      kubernetes.core.k8s_info:
+        api_version: rbac.authorization.k8s.io/v1
+        kind: ClusterRole
+        name: system:kube-apiserver-to-kubelet
+        kubeconfig: "{{ k8s_ctl__admin_kubeconfig }}"
+      register: k8s_ctl__cluster_role_info
+
+    - name: Assert kube-apiserver-to-kubelet ClusterRole exists
+      ansible.builtin.assert:
+        that:
+          - k8s_ctl__cluster_role_info.resources | length == 1
+
+    - name: Fetch kube-apiserver-to-kubelet ClusterRoleBinding
+      kubernetes.core.k8s_info:
+        api_version: rbac.authorization.k8s.io/v1
+        kind: ClusterRoleBinding
+        name: system:kube-apiserver
+        kubeconfig: "{{ k8s_ctl__admin_kubeconfig }}"
+      register: k8s_ctl__cluster_role_binding_info
+
+    - name: Assert kube-apiserver-to-kubelet ClusterRoleBinding wiring
+      ansible.builtin.assert:
+        that:
+          - k8s_ctl__cluster_role_binding_info.resources | length == 1
+          - k8s_ctl__cluster_role_binding_info.resources[0].roleRef.kind == 'ClusterRole'
+          - k8s_ctl__cluster_role_binding_info.resources[0].roleRef.name == 'system:kube-apiserver-to-kubelet'
+          - >-
+            (
+              k8s_ctl__cluster_role_binding_info.resources[0].subjects | default([])
+              | selectattr('kind', 'equalto', 'User')
+              | selectattr('name', 'equalto', k8s_ctl__apiserver_cn)
+              | list
+              | length
+            ) == 1
