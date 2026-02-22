@@ -78,3 +78,28 @@
       loop: "{{ k8s_ctl__expected_listeners }}"
       loop_control:
         label: "{{ item.name }}:{{ item.port }}"
+
+- name: Verify Kubernetes API health endpoints
+  hosts: test-assets
+  tasks:
+    - name: Check kube-apiserver livez endpoint
+      ansible.builtin.command: >
+        kubectl
+        --kubeconfig={{ k8s_admin_conf_dir }}/admin.kubeconfig
+        get --raw=/livez
+      register: k8s_ctl__apiserver_livez
+      changed_when: false
+      failed_when:
+        - k8s_ctl__apiserver_livez.rc != 0
+        - k8s_ctl__apiserver_livez.stdout is not search("ok")
+
+    - name: Check kube-apiserver readyz endpoint
+      ansible.builtin.command: >
+        kubectl
+        --kubeconfig={{ k8s_admin_conf_dir }}/admin.kubeconfig
+        get --raw=/readyz
+      register: k8s_ctl__apiserver_readyz
+      changed_when: false
+      failed_when:
+        - k8s_ctl__apiserver_readyz.rc != 0
+        - k8s_ctl__apiserver_readyz.stdout is not search("ok")
