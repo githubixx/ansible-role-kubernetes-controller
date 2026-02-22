@@ -211,6 +211,45 @@
           - k8s_ctl__admin_kubeconfig_stat.stat.gr_name == k8s_ctl__admin_conf_group
           - k8s_ctl__admin_kubeconfig_stat.stat.mode == '0640'
 
+- name: Verify admin kubeconfig functional access
+  hosts: test-assets
+  vars:
+    k8s_ctl__admin_conf_dir: "{{ k8s_admin_conf_dir | default('/root/k8s/configs') }}"
+    k8s_ctl__admin_kubeconfig: "{{ k8s_ctl__admin_conf_dir }}/admin.kubeconfig"
+  tasks:
+    - name: Check admin kubeconfig is authorized to list nodes
+      ansible.builtin.command: >
+        kubectl
+        --kubeconfig={{ k8s_ctl__admin_kubeconfig }}
+        auth can-i list nodes
+      register: k8s_ctl__admin_can_i_list_nodes
+      changed_when: false
+      failed_when:
+        - k8s_ctl__admin_can_i_list_nodes.rc != 0
+        - k8s_ctl__admin_can_i_list_nodes.stdout | trim != 'yes'
+
+    - name: Check admin kubeconfig can fetch node list
+      ansible.builtin.command: >
+        kubectl
+        --kubeconfig={{ k8s_ctl__admin_kubeconfig }}
+        get nodes -o name
+      register: k8s_ctl__admin_get_nodes
+      changed_when: false
+      failed_when:
+        - k8s_ctl__admin_get_nodes.rc != 0
+        - k8s_ctl__admin_get_nodes.stdout_lines | length < 1
+
+    - name: Check admin kubeconfig can fetch cluster version endpoint
+      ansible.builtin.command: >
+        kubectl
+        --kubeconfig={{ k8s_ctl__admin_kubeconfig }}
+        get --raw=/version
+      register: k8s_ctl__admin_version_raw
+      changed_when: false
+      failed_when:
+        - k8s_ctl__admin_version_raw.rc != 0
+        - k8s_ctl__admin_version_raw.stdout is not search('"major"')
+
 - name: Verify kube-apiserver-to-kubelet RBAC resources
   hosts: test-assets
   vars:
