@@ -1,5 +1,5 @@
 ---
-# Copyright (C) 2023 Robert Wimmer
+# Copyright (C) 2023-2026 Robert Wimmer
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Update cache
@@ -112,3 +112,26 @@
     - name: Include CNI role
       ansible.builtin.include_role:
         name: githubixx.cni
+
+- name: Verify etcd readiness before control plane converge
+  hosts: k8s_etcd
+  remote_user: vagrant
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Assert etcd service is active
+      ansible.builtin.assert:
+        that:
+          - "'etcd.service' in ansible_facts.services"
+          - "ansible_facts.services['etcd.service'].state == 'running'"
+
+    - name: Check etcd endpoint port is listening
+      ansible.builtin.shell: set -o pipefail && ss -H -ltn "sport = :2379" | grep -q "LISTEN"
+      args:
+        executable: /bin/bash
+      register: k8s_ctl__etcd_listener_before_converge
+      changed_when: false
+      failed_when: k8s_ctl__etcd_listener_before_converge.rc != 0

@@ -1,5 +1,5 @@
 ---
-# Copyright (C) 2023 Robert Wimmer
+# Copyright (C) 2023-2026 Robert Wimmer
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Verify setup
@@ -29,3 +29,330 @@
       ansible.builtin.assert:
         that:
           - k8s__namespaces_count|int == 4
+
+- name: Verify control plane service health
+  hosts: k8s_controller
+  become: true
+  vars:
+    k8s_ctl__services:
+      - kube-apiserver
+      - kube-controller-manager
+      - kube-scheduler
+  tasks:
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Assert service is active and enabled
+      ansible.builtin.assert:
+        that:
+          - "(item + '.service') in ansible_facts.services"
+          - "ansible_facts.services[item + '.service'].state == 'running'"
+          - "ansible_facts.services[item + '.service'].status is search('^enabled')"
+      loop: "{{ k8s_ctl__services }}"
+
+- name: Verify control plane listener ports
+  hosts: k8s_controller
+  become: true
+  vars:
+    k8s_ctl__expected_listeners:
+      - name: kube-apiserver
+        port: 6443
+      - name: kube-controller-manager
+        port: 10257
+      - name: kube-scheduler
+        port: 10259
+  tasks:
+    - name: Check listener port is open
+      ansible.builtin.shell: >
+        set -o pipefail && ss -H -ltn "sport = :{{ item.port }}" | grep -q "LISTEN"
+      args:
+        executable: /bin/bash
+      register: k8s_ctl__listener_check
+      changed_when: false
+      failed_when: k8s_ctl__listener_check.rc != 0
+      loop: "{{ k8s_ctl__expected_listeners }}"
+      loop_control:
+        label: "{{ item.name }}:{{ item.port }}"
+
+- name: Verify Kubernetes API health endpoints
+  hosts: test-assets
+  tasks:
+    - name: Check kube-apiserver livez endpoint
+      ansible.builtin.command: >
+        kubectl
+        --kubeconfig={{ k8s_admin_conf_dir }}/admin.kubeconfig
+        get --raw=/livez
+      register: k8s_ctl__apiserver_livez
+      changed_when: false
+      failed_when:
+        - k8s_ctl__apiserver_livez.rc != 0
+        - k8s_ctl__apiserver_livez.stdout is not search("ok")
+
+    - name: Check kube-apiserver readyz endpoint
+      ansible.builtin.command: >
+        kubectl
+        --kubeconfig={{ k8s_admin_conf_dir }}/admin.kubeconfig
+        get --raw=/readyz
+      register: k8s_ctl__apiserver_readyz
+      changed_when: false
+      failed_when:
+        - k8s_ctl__apiserver_readyz.rc != 0
+        - k8s_ctl__apiserver_readyz.stdout is not search("ok")
+
+- name: Verify control plane artifacts on controllers
+  hosts: k8s_controller
+  become: true
+  vars:
+    k8s_ctl__run_as_group: "{{ k8s_run_as_group | default('k8s') }}"
+    k8s_ctl__conf_dir: "{{ k8s_ctl_conf_dir | default('/etc/kubernetes/controller') }}"
+    k8s_ctl__controller_manager_conf_dir: "{{ k8s_controller_manager_conf_dir | default(k8s_ctl__conf_dir + '/kube-controller-manager') }}"
+    k8s_ctl__scheduler_conf_dir: "{{ k8s_scheduler_conf_dir | default(k8s_ctl__conf_dir + '/kube-scheduler') }}"
+    k8s_ctl__bin_dir: "{{ k8s_ctl_bin_dir | default('/usr/local/bin') }}"
+    k8s_ctl__pki_dir: "{{ k8s_ctl_pki_dir | default('/etc/kubernetes/controller/pki') }}"
+    k8s_ctl__required_binaries:
+      - kube-apiserver
+      - kube-controller-manager
+      - kube-scheduler
+      - kubectl
+    k8s_ctl__required_certificates:
+      - ca-k8s-apiserver.pem
+      - cert-k8s-apiserver.pem
+      - cert-k8s-apiserver-key.pem
+      - ca-etcd.pem
+      - cert-k8s-apiserver-etcd.pem
+      - cert-k8s-apiserver-etcd-key.pem
+    k8s_ctl__component_kubeconfigs:
+      - path: "{{ k8s_ctl__controller_manager_conf_dir }}/kubeconfig"
+        owner: root
+        group: "{{ k8s_ctl__run_as_group }}"
+        mode: "0640"
+      - path: "{{ k8s_ctl__scheduler_conf_dir }}/kubeconfig"
+        owner: root
+        group: "{{ k8s_ctl__run_as_group }}"
+        mode: "0640"
+  tasks:
+    - name: Check required binaries exist and are executable
+      ansible.builtin.stat:
+        path: "{{ k8s_ctl__bin_dir }}/{{ item }}"
+      register: k8s_ctl__binary_stat
+      loop: "{{ k8s_ctl__required_binaries }}"
+
+    - name: Assert required binaries are present and executable
+      ansible.builtin.assert:
+        that:
+          - item.stat.exists
+          - item.stat.isreg
+          - item.stat.executable
+      loop: "{{ k8s_ctl__binary_stat.results }}"
+      loop_control:
+        label: "{{ item.stat.path }}"
+
+    - name: Check required certificates exist with expected ownership and mode
+      ansible.builtin.stat:
+        path: "{{ k8s_ctl__pki_dir }}/{{ item }}"
+      register: k8s_ctl__certificate_stat
+      loop: "{{ k8s_ctl__required_certificates }}"
+
+    - name: Assert required certificates state
+      ansible.builtin.assert:
+        that:
+          - item.stat.exists
+          - item.stat.isreg
+          - item.stat.pw_name == 'root'
+          - item.stat.gr_name == k8s_ctl__run_as_group
+          - item.stat.mode == '0440'
+      loop: "{{ k8s_ctl__certificate_stat.results }}"
+      loop_control:
+        label: "{{ item.stat.path }}"
+
+    - name: Check component kubeconfigs state
+      ansible.builtin.stat:
+        path: "{{ item.path }}"
+      register: k8s_ctl__component_kubeconfig_stat
+      loop: "{{ k8s_ctl__component_kubeconfigs }}"
+
+    - name: Assert component kubeconfigs ownership and mode
+      ansible.builtin.assert:
+        that:
+          - item.stat.exists
+          - item.stat.isreg
+          - item.stat.pw_name == item.item.owner
+          - item.stat.gr_name == item.item.group
+          - item.stat.mode == item.item.mode
+      loop: "{{ k8s_ctl__component_kubeconfig_stat.results }}"
+      loop_control:
+        label: "{{ item.stat.path }}"
+
+- name: Verify admin kubeconfig artifact on test-assets
+  hosts: test-assets
+  become: true
+  vars:
+    k8s_ctl__admin_conf_dir: "{{ k8s_admin_conf_dir | default('/root/k8s/configs') }}"
+    k8s_ctl__admin_conf_owner: "{{ k8s_admin_conf_owner | default('root') }}"
+    k8s_ctl__admin_conf_group: "{{ k8s_admin_conf_group | default('root') }}"
+    k8s_ctl__admin_kubeconfig: "{{ k8s_ctl__admin_conf_dir }}/admin.kubeconfig"
+  tasks:
+    - name: Check admin kubeconfig state
+      ansible.builtin.stat:
+        path: "{{ k8s_ctl__admin_kubeconfig }}"
+      register: k8s_ctl__admin_kubeconfig_stat
+
+    - name: Assert admin kubeconfig ownership and mode
+      ansible.builtin.assert:
+        that:
+          - k8s_ctl__admin_kubeconfig_stat.stat.exists
+          - k8s_ctl__admin_kubeconfig_stat.stat.isreg
+          - k8s_ctl__admin_kubeconfig_stat.stat.pw_name == k8s_ctl__admin_conf_owner
+          - k8s_ctl__admin_kubeconfig_stat.stat.gr_name == k8s_ctl__admin_conf_group
+          - k8s_ctl__admin_kubeconfig_stat.stat.mode == '0640'
+
+- name: Verify admin kubeconfig functional access
+  hosts: test-assets
+  vars:
+    k8s_ctl__admin_conf_dir: "{{ k8s_admin_conf_dir | default('/root/k8s/configs') }}"
+    k8s_ctl__admin_kubeconfig: "{{ k8s_ctl__admin_conf_dir }}/admin.kubeconfig"
+  tasks:
+    - name: Check admin kubeconfig is authorized to list nodes
+      ansible.builtin.command: >
+        kubectl
+        --kubeconfig={{ k8s_ctl__admin_kubeconfig }}
+        auth can-i list nodes
+      register: k8s_ctl__admin_can_i_list_nodes
+      changed_when: false
+      failed_when:
+        - k8s_ctl__admin_can_i_list_nodes.rc != 0
+        - k8s_ctl__admin_can_i_list_nodes.stdout | trim != 'yes'
+
+    - name: Check admin kubeconfig can fetch node list
+      ansible.builtin.command: >
+        kubectl
+        --kubeconfig={{ k8s_ctl__admin_kubeconfig }}
+        get nodes -o name
+      register: k8s_ctl__admin_get_nodes
+      changed_when: false
+      failed_when:
+        - k8s_ctl__admin_get_nodes.rc != 0
+        - k8s_ctl__admin_get_nodes.stdout_lines | length < 1
+
+    - name: Check admin kubeconfig can fetch cluster version endpoint
+      ansible.builtin.command: >
+        kubectl
+        --kubeconfig={{ k8s_ctl__admin_kubeconfig }}
+        get --raw=/version
+      register: k8s_ctl__admin_version_raw
+      changed_when: false
+      failed_when:
+        - k8s_ctl__admin_version_raw.rc != 0
+        - k8s_ctl__admin_version_raw.stdout is not search('"major"')
+
+- name: Verify kube-apiserver-to-kubelet RBAC resources
+  hosts: test-assets
+  vars:
+    k8s_ctl__admin_conf_dir: "{{ k8s_admin_conf_dir | default('/root/k8s/configs') }}"
+    k8s_ctl__admin_kubeconfig: "{{ k8s_ctl__admin_conf_dir }}/admin.kubeconfig"
+    k8s_ctl__apiserver_cn: "{{ k8s_apiserver_csr_cn | default('k8s-apiserver') }}"
+  tasks:
+    - name: Fetch kube-apiserver-to-kubelet ClusterRole
+      kubernetes.core.k8s_info:
+        api_version: rbac.authorization.k8s.io/v1
+        kind: ClusterRole
+        name: system:kube-apiserver-to-kubelet
+        kubeconfig: "{{ k8s_ctl__admin_kubeconfig }}"
+      register: k8s_ctl__cluster_role_info
+
+    - name: Assert kube-apiserver-to-kubelet ClusterRole exists
+      ansible.builtin.assert:
+        that:
+          - k8s_ctl__cluster_role_info.resources | length == 1
+
+    - name: Fetch kube-apiserver-to-kubelet ClusterRoleBinding
+      kubernetes.core.k8s_info:
+        api_version: rbac.authorization.k8s.io/v1
+        kind: ClusterRoleBinding
+        name: system:kube-apiserver
+        kubeconfig: "{{ k8s_ctl__admin_kubeconfig }}"
+      register: k8s_ctl__cluster_role_binding_info
+
+    - name: Assert kube-apiserver-to-kubelet ClusterRoleBinding wiring
+      ansible.builtin.assert:
+        that:
+          - k8s_ctl__cluster_role_binding_info.resources | length == 1
+          - k8s_ctl__cluster_role_binding_info.resources[0].roleRef.kind == 'ClusterRole'
+          - k8s_ctl__cluster_role_binding_info.resources[0].roleRef.name == 'system:kube-apiserver-to-kubelet'
+          - >-
+            (
+              k8s_ctl__cluster_role_binding_info.resources[0].subjects | default([])
+              | selectattr('kind', 'equalto', 'User')
+              | selectattr('name', 'equalto', k8s_ctl__apiserver_cn)
+              | list
+              | length
+            ) == 1
+
+- name: Verify dependency readiness after converge
+  hosts: k8s_etcd
+  become: true
+  tasks:
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Assert etcd service is active after converge
+      ansible.builtin.assert:
+        that:
+          - "'etcd.service' in ansible_facts.services"
+          - "ansible_facts.services['etcd.service'].state == 'running'"
+
+    - name: Check etcd endpoint port is listening after converge
+      ansible.builtin.shell: set -o pipefail && ss -H -ltn "sport = :2379" | grep -q "LISTEN"
+      args:
+        executable: /bin/bash
+      register: k8s_ctl__etcd_listener_after_converge
+      changed_when: false
+      failed_when: k8s_ctl__etcd_listener_after_converge.rc != 0
+
+- name: Verify kube-apiserver readiness across controllers
+  hosts: k8s_controller
+  become: true
+  vars:
+    k8s_ctl__conf_dir: "{{ k8s_ctl_conf_dir | default('/etc/kubernetes/controller') }}"
+    k8s_ctl__controller_manager_conf_dir: "{{ k8s_controller_manager_conf_dir | default(k8s_ctl__conf_dir + '/kube-controller-manager') }}"
+    k8s_ctl__apiserver_bind_address: >-
+      {{
+        ansible_facts
+        .get((k8s_interface | default('eth0')), {})
+        .get('ipv4', {})
+        .get('address', ansible_facts.get('default_ipv4', {}).get('address', '127.0.0.1'))
+      }}
+    k8s_ctl__apiserver_secure_port: >-
+      {{
+        (k8s_apiserver_settings['secure-port'])
+        if (k8s_apiserver_settings is defined and 'secure-port' in k8s_apiserver_settings)
+        else '6443'
+      }}
+  tasks:
+    - name: Check local kube-apiserver readyz endpoint
+      ansible.builtin.uri:
+        url: "https://{{ k8s_ctl__apiserver_bind_address }}:{{ k8s_ctl__apiserver_secure_port }}/readyz"
+        method: GET
+        return_content: true
+        validate_certs: false
+      register: k8s_ctl__apiserver_local_readyz
+      changed_when: false
+      failed_when:
+        - k8s_ctl__apiserver_local_readyz.status != 200
+        - k8s_ctl__apiserver_local_readyz.content is not search('ok')
+
+    - name: Check apiserver readyz verbose reports etcd ok
+      ansible.builtin.command: >
+        kubectl
+        --kubeconfig={{ k8s_ctl__controller_manager_conf_dir }}/kubeconfig
+        get --raw=/readyz?verbose
+      register: k8s_ctl__apiserver_readyz_verbose
+      changed_when: false
+      failed_when:
+        - k8s_ctl__apiserver_readyz_verbose.rc != 0
+        - k8s_ctl__apiserver_readyz_verbose.stdout is not search('etcd')
+        - k8s_ctl__apiserver_readyz_verbose.stdout is not search('ok')
+
+# TODO: log-pattern verification intentionally removed for now.
+# Reintroduce as a separate verify play when patterns are finalized,
+# e.g. check recent journald output for control-plane units.

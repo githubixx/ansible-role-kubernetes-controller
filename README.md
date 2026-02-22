@@ -4,7 +4,7 @@ This role is used in [Kubernetes the not so hard way with Ansible - Control plan
 
 ## Versions
 
-I tag every release and try to stay with [semantic versioning](http://semver.org). If you want to use the role I recommend to checkout the latest tag. The master branch is basically development while the tags mark stable releases. But in general I try to keep master in good shape too. A tag `28.0.0+1.33.6` means this is release `28.0.0` of this role and it's meant to be used with Kubernetes version `1.33.6` (but should work with any K8s 1.33.x release of course). If the role itself changes `X.Y.Z` before `+` will increase. If the Kubernetes version changes `X.Y.Z` after `+` will increase too. This allows to tag bugfixes and new major versions of the role while it's still developed for a specific Kubernetes release. That's especially useful for Kubernetes major releases with breaking changes.
+I tag every release and try to stay with [semantic versioning](http://semver.org). If you want to use the role I recommend to checkout the latest tag. The master branch is basically development while the tags mark stable releases. But in general I try to keep master in good shape too. A tag `29.0.0+1.34.4` means this is release `29.0.0` of this role and it's meant to be used with Kubernetes version `1.34.4` (but should work with any K8s 1.34.x release of course). If the role itself changes `X.Y.Z` before `+` will increase. If the Kubernetes version changes `X.Y.Z` after `+` will increase too. This allows to tag bugfixes and new major versions of the role while it's still developed for a specific Kubernetes release. That's especially useful for Kubernetes major releases with breaking changes.
 
 ## Requirements
 
@@ -26,6 +26,19 @@ And of course an [etcd](https://etcd.io/) cluster (see [Kubernetes the not so ha
 See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-controller/blob/master/CHANGELOG.md)
 
 **Recent changes:**
+
+## 29.0.0+1.34.4
+
+- **UPDATE**
+  - update `k8s_ctl_release` to `1.34.4`
+
+- **OTHER**
+  - replace injected `ansible_*` facts usage with `ansible_facts[...]` (prepares for ansible-core 2.24 where `INJECT_FACTS_AS_VARS` default changes)
+
+- **MOLECULE**
+  - use own [githubixx Vagrant boxes](https://portal.cloud.hashicorp.com/vagrant/discover/githubixx)
+  - fix linter warnings
+  - add more checks in `verify.yml`
 
 ## 28.0.0+1.33.6
 
@@ -78,7 +91,7 @@ See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-con
 roles:
   - name: githubixx.kubernetes_controller
     src: https://github.com/githubixx/ansible-role-kubernetes-controller.git
-    version: 28.0.0+1.33.6
+    version: 29.0.0+1.34.4
 ```
 
 ## Role (default) variables
@@ -108,7 +121,7 @@ k8s_ctl_pki_dir: "{{ k8s_ctl_conf_dir }}/pki"
 k8s_ctl_bin_dir: "/usr/local/bin"
 
 # The Kubernetes release.
-k8s_ctl_release: "1.33.6"
+k8s_ctl_release: "1.34.4"
 
 # The interface on which the Kubernetes services should listen on. As all cluster
 # communication should use a VPN interface the interface name is
@@ -198,7 +211,7 @@ k8s_ctl_delegate_to: "127.0.0.1"
 # variable of https://github.com/githubixx/ansible-role-kubernetes-ca
 # role). If it's not specified you'll get certificate errors in the
 # logs of the services mentioned above.
-k8s_ctl_api_endpoint_host: "{% set controller_host = groups['k8s_controller'][0] %}{{ hostvars[controller_host]['ansible_' + hostvars[controller_host]['k8s_interface']].ipv4.address }}"
+k8s_ctl_api_endpoint_host: "{% set controller_host = groups['k8s_controller'][0] %}{{ hostvars[controller_host].ansible_facts.get(hostvars[controller_host]['k8s_interface'] | default('eth0'), {}).get('ipv4', {}).get('address', hostvars[controller_host].ansible_facts.get('default_ipv4', {}).get('address')) }}"
 
 # As above just for the port. It specifies on which port the
 # Kubernetes API servers are listening. Again if there is a loadbalancer
@@ -263,7 +276,7 @@ k8s_admin_conf_group: "root"
 #
 # Besides that basically the same comments as for "k8s_ctl_api_endpoint_host"
 # variable apply.
-k8s_admin_api_endpoint_host: "{% set controller_host = groups['k8s_controller'][0] %}{{ hostvars[controller_host]['ansible_' + hostvars[controller_host]['k8s_interface']].ipv4.address }}"
+k8s_admin_api_endpoint_host: "{% set controller_host = groups['k8s_controller'][0] %}{{ hostvars[controller_host].ansible_facts.get(hostvars[controller_host]['k8s_interface'] | default('eth0'), {}).get('ipv4', {}).get('address', hostvars[controller_host].ansible_facts.get('default_ipv4', {}).get('address')) }}"
 
 # As above just for the port.
 k8s_admin_api_endpoint_port: "6443"
@@ -279,8 +292,8 @@ k8s_apiserver_conf_dir: "{{ k8s_ctl_conf_dir }}/kube-apiserver"
 # "kube-apiserver" daemon settings (can be overridden or additional added by defining
 # "k8s_apiserver_settings_user")
 k8s_apiserver_settings:
-  "advertise-address": "{{ hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address }}"
-  "bind-address": "{{ hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address }}"
+  "advertise-address": "{{ hostvars[inventory_hostname].ansible_facts.get(k8s_interface | default('eth0'), {}).get('ipv4', {}).get('address', hostvars[inventory_hostname].ansible_facts.get('default_ipv4', {}).get('address')) }}"
+  "bind-address": "{{ hostvars[inventory_hostname].ansible_facts.get(k8s_interface | default('eth0'), {}).get('ipv4', {}).get('address', hostvars[inventory_hostname].ansible_facts.get('default_ipv4', {}).get('address')) }}"
   "secure-port": "6443"
   "enable-admission-plugins": "{{ k8s_apiserver_admission_plugins | join(',') }}"
   "allow-privileged": "true"
@@ -381,7 +394,7 @@ k8s_controller_manager_conf_dir: "{{ k8s_ctl_conf_dir }}/kube-controller-manager
 # K8s controller manager settings (can be overridden or additional added by defining
 # "k8s_controller_manager_settings_user")
 k8s_controller_manager_settings:
-  "bind-address": "{{ hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address }}"
+  "bind-address": "{{ hostvars[inventory_hostname].ansible_facts.get(k8s_interface | default('eth0'), {}).get('ipv4', {}).get('address', hostvars[inventory_hostname].ansible_facts.get('default_ipv4', {}).get('address')) }}"
   "secure-port": "10257"
   "cluster-cidr": "10.200.0.0/16"
   "allocate-node-cidrs": "true"
@@ -406,7 +419,7 @@ k8s_scheduler_conf_dir: "{{ k8s_ctl_conf_dir }}/kube-scheduler"
 
 # kube-scheduler settings
 k8s_scheduler_settings:
-  "bind-address": "{{ hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address }}"
+  "bind-address": "{{ hostvars[inventory_hostname].ansible_facts.get(k8s_interface | default('eth0'), {}).get('ipv4', {}).get('address', hostvars[inventory_hostname].ansible_facts.get('default_ipv4', {}).get('address')) }}"
   "config": "{{ k8s_scheduler_conf_dir }}/kube-scheduler.yaml"
   "authentication-kubeconfig": "{{ k8s_scheduler_conf_dir }}/kubeconfig"
   "authorization-kubeconfig": "{{ k8s_scheduler_conf_dir }}/kubeconfig"
