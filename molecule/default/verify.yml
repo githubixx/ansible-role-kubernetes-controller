@@ -64,7 +64,9 @@
   tasks:
     - name: Check listener port is open
       ansible.builtin.shell: >
-        ss -H -ltn "sport = :{{ item.port }}" | grep -q "LISTEN"
+        set -o pipefail && ss -H -ltn "sport = :{{ item.port }}" | grep -q "LISTEN"
+      args:
+        executable: /bin/bash
       register: k8s_ctl__listener_check
       changed_when: false
       failed_when: k8s_ctl__listener_check.rc != 0
@@ -300,7 +302,9 @@
           - "ansible_facts.services['etcd.service'].state == 'running'"
 
     - name: Check etcd endpoint port is listening after converge
-      ansible.builtin.shell: ss -H -ltn "sport = :2379" | grep -q "LISTEN"
+      ansible.builtin.shell: set -o pipefail && ss -H -ltn "sport = :2379" | grep -q "LISTEN"
+      args:
+        executable: /bin/bash
       register: k8s_ctl__etcd_listener_after_converge
       changed_when: false
       failed_when: k8s_ctl__etcd_listener_after_converge.rc != 0
@@ -326,14 +330,16 @@
       }}
   tasks:
     - name: Check local kube-apiserver readyz endpoint
-      ansible.builtin.command: >
-        curl --silent --show-error --fail --insecure
-        https://{{ k8s_ctl__apiserver_bind_address }}:{{ k8s_ctl__apiserver_secure_port }}/readyz
+      ansible.builtin.uri:
+        url: "https://{{ k8s_ctl__apiserver_bind_address }}:{{ k8s_ctl__apiserver_secure_port }}/readyz"
+        method: GET
+        return_content: true
+        validate_certs: false
       register: k8s_ctl__apiserver_local_readyz
       changed_when: false
       failed_when:
-        - k8s_ctl__apiserver_local_readyz.rc != 0
-        - k8s_ctl__apiserver_local_readyz.stdout is not search('ok')
+        - k8s_ctl__apiserver_local_readyz.status != 200
+        - k8s_ctl__apiserver_local_readyz.content is not search('ok')
 
     - name: Check apiserver readyz verbose reports etcd ok
       ansible.builtin.command: >

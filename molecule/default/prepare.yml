@@ -119,16 +119,19 @@
   become: true
   gather_facts: false
   tasks:
-    - name: Check etcd service is active
-      ansible.builtin.command: systemctl is-active etcd
-      register: k8s_ctl__etcd_active_before_converge
-      changed_when: false
-      failed_when:
-        - k8s_ctl__etcd_active_before_converge.rc != 0
-        - k8s_ctl__etcd_active_before_converge.stdout != "active"
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Assert etcd service is active
+      ansible.builtin.assert:
+        that:
+          - "'etcd.service' in ansible_facts.services"
+          - "ansible_facts.services['etcd.service'].state == 'running'"
 
     - name: Check etcd endpoint port is listening
-      ansible.builtin.shell: ss -H -ltn "sport = :2379" | grep -q "LISTEN"
+      ansible.builtin.shell: set -o pipefail && ss -H -ltn "sport = :2379" | grep -q "LISTEN"
+      args:
+        executable: /bin/bash
       register: k8s_ctl__etcd_listener_before_converge
       changed_when: false
       failed_when: k8s_ctl__etcd_listener_before_converge.rc != 0
