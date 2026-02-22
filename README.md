@@ -27,6 +27,19 @@ See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-con
 
 **Recent changes:**
 
+## 29.0.0+1.34.4
+
+- **UPDATE**
+  - update `k8s_ctl_release` to `1.34.4`
+
+- **OTHER**
+  - replace injected `ansible_*` facts usage with `ansible_facts[...]` (prepares for ansible-core 2.24 where `INJECT_FACTS_AS_VARS` default changes)
+
+- **MOLECULE**
+  - use own [githubixx Vagrant boxes](https://portal.cloud.hashicorp.com/vagrant/discover/githubixx)
+  - fix linter warnings
+  - add more checks in `verify.yml`
+
 ## 28.0.0+1.33.6
 
 - **UPDATE**
@@ -198,7 +211,7 @@ k8s_ctl_delegate_to: "127.0.0.1"
 # variable of https://github.com/githubixx/ansible-role-kubernetes-ca
 # role). If it's not specified you'll get certificate errors in the
 # logs of the services mentioned above.
-k8s_ctl_api_endpoint_host: "{% set controller_host = groups['k8s_controller'][0] %}{{ hostvars[controller_host]['ansible_' + hostvars[controller_host]['k8s_interface']].ipv4.address }}"
+k8s_ctl_api_endpoint_host: "{% set controller_host = groups['k8s_controller'][0] %}{{ hostvars[controller_host].ansible_facts.get(hostvars[controller_host]['k8s_interface'] | default('eth0'), {}).get('ipv4', {}).get('address', hostvars[controller_host].ansible_facts.get('default_ipv4', {}).get('address')) }}"
 
 # As above just for the port. It specifies on which port the
 # Kubernetes API servers are listening. Again if there is a loadbalancer
@@ -263,7 +276,7 @@ k8s_admin_conf_group: "root"
 #
 # Besides that basically the same comments as for "k8s_ctl_api_endpoint_host"
 # variable apply.
-k8s_admin_api_endpoint_host: "{% set controller_host = groups['k8s_controller'][0] %}{{ hostvars[controller_host]['ansible_' + hostvars[controller_host]['k8s_interface']].ipv4.address }}"
+k8s_admin_api_endpoint_host: "{% set controller_host = groups['k8s_controller'][0] %}{{ hostvars[controller_host].ansible_facts.get(hostvars[controller_host]['k8s_interface'] | default('eth0'), {}).get('ipv4', {}).get('address', hostvars[controller_host].ansible_facts.get('default_ipv4', {}).get('address')) }}"
 
 # As above just for the port.
 k8s_admin_api_endpoint_port: "6443"
@@ -279,8 +292,8 @@ k8s_apiserver_conf_dir: "{{ k8s_ctl_conf_dir }}/kube-apiserver"
 # "kube-apiserver" daemon settings (can be overridden or additional added by defining
 # "k8s_apiserver_settings_user")
 k8s_apiserver_settings:
-  "advertise-address": "{{ hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address }}"
-  "bind-address": "{{ hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address }}"
+  "advertise-address": "{{ hostvars[inventory_hostname].ansible_facts.get(k8s_interface | default('eth0'), {}).get('ipv4', {}).get('address', hostvars[inventory_hostname].ansible_facts.get('default_ipv4', {}).get('address')) }}"
+  "bind-address": "{{ hostvars[inventory_hostname].ansible_facts.get(k8s_interface | default('eth0'), {}).get('ipv4', {}).get('address', hostvars[inventory_hostname].ansible_facts.get('default_ipv4', {}).get('address')) }}"
   "secure-port": "6443"
   "enable-admission-plugins": "{{ k8s_apiserver_admission_plugins | join(',') }}"
   "allow-privileged": "true"
@@ -381,7 +394,7 @@ k8s_controller_manager_conf_dir: "{{ k8s_ctl_conf_dir }}/kube-controller-manager
 # K8s controller manager settings (can be overridden or additional added by defining
 # "k8s_controller_manager_settings_user")
 k8s_controller_manager_settings:
-  "bind-address": "{{ hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address }}"
+  "bind-address": "{{ hostvars[inventory_hostname].ansible_facts.get(k8s_interface | default('eth0'), {}).get('ipv4', {}).get('address', hostvars[inventory_hostname].ansible_facts.get('default_ipv4', {}).get('address')) }}"
   "secure-port": "10257"
   "cluster-cidr": "10.200.0.0/16"
   "allocate-node-cidrs": "true"
@@ -406,7 +419,7 @@ k8s_scheduler_conf_dir: "{{ k8s_ctl_conf_dir }}/kube-scheduler"
 
 # kube-scheduler settings
 k8s_scheduler_settings:
-  "bind-address": "{{ hostvars[inventory_hostname]['ansible_' + k8s_interface].ipv4.address }}"
+  "bind-address": "{{ hostvars[inventory_hostname].ansible_facts.get(k8s_interface | default('eth0'), {}).get('ipv4', {}).get('address', hostvars[inventory_hostname].ansible_facts.get('default_ipv4', {}).get('address')) }}"
   "config": "{{ k8s_scheduler_conf_dir }}/kube-scheduler.yaml"
   "authentication-kubeconfig": "{{ k8s_scheduler_conf_dir }}/kubeconfig"
   "authorization-kubeconfig": "{{ k8s_scheduler_conf_dir }}/kubeconfig"

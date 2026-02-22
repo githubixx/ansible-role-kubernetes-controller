@@ -5,8 +5,13 @@
 - **UPDATE**
   - update `k8s_ctl_release` to `1.34.4`
 
+- **OTHER**
+  - replace injected `ansible_*` facts usage with `ansible_facts[...]` (prepares for ansible-core 2.24 where `INJECT_FACTS_AS_VARS` default changes)
+
 - **MOLECULE**
   - use own [githubixx Vagrant boxes](https://portal.cloud.hashicorp.com/vagrant/discover/githubixx)
+  - fix linter warnings
+  - add more checks in `verify.yml`
 
 ## 28.0.0+1.33.6
 
