@@ -1,5 +1,17 @@
 # Changelog
 
+## 30.0.0+1.35.5
+
+- **UPDATE**
+  - update `k8s_ctl_release` to `1.35.5`
+
+- **UPGRADE NOTES**
+  - Kubernetes 1.35 expects cgroup v2 for default kubelet behavior. This role does not manage kubelet configuration, so verify worker and kubelet hosts before upgrading the cluster.
+  - Kubernetes 1.35 requires `create` permission for `pods/exec`, `pods/attach`, and `pods/portforward` upgrade paths. Review user-facing RBAC outside this role if those operations are used.
+  - **IMPORTANT**: While not part of this role but as `kube-apiserver` depends on `etcd`: If you use `etcd` for Kubernetes and want to upgrade to `etcd` `v3.6` you **DEFINITELY** want to upgrade to `etcd` `v3.6.26` first! For further information:
+    - [Avoiding Zombie Cluster Members When Upgrading to etcd v3.6](https://kubernetes.io/blog/2025/12/21/preventing-etcd-zombies/)
+    - [Fix zombie members in v3store](https://github.com/etcd-io/etcd/pull/20995)
+
 ## 29.0.0+1.34.4
 
 - **UPDATE**

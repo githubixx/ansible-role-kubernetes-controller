@@ -4,7 +4,7 @@ This role is used in [Kubernetes the not so hard way with Ansible - Control plan
 
 ## Versions
 
-I tag every release and try to stay with [semantic versioning](http://semver.org). If you want to use the role I recommend to checkout the latest tag. The master branch is basically development while the tags mark stable releases. But in general I try to keep master in good shape too. A tag `29.0.0+1.34.4` means this is release `29.0.0` of this role and it's meant to be used with Kubernetes version `1.34.4` (but should work with any K8s 1.34.x release of course). If the role itself changes `X.Y.Z` before `+` will increase. If the Kubernetes version changes `X.Y.Z` after `+` will increase too. This allows to tag bugfixes and new major versions of the role while it's still developed for a specific Kubernetes release. That's especially useful for Kubernetes major releases with breaking changes.
+I tag every release and try to stay with [semantic versioning](http://semver.org). If you want to use the role I recommend to checkout the latest tag. The master branch is basically development while the tags mark stable releases. But in general I try to keep master in good shape too. A tag `30.0.0+1.35.5` means this is release `30.0.0` of this role and it's meant to be used with Kubernetes version `1.35.5` (but should work with any K8s 1.35.x release of course). If the role itself changes `X.Y.Z` before `+` will increase. If the Kubernetes version changes `X.Y.Z` after `+` will increase too. This allows to tag bugfixes and new major versions of the role while it's still developed for a specific Kubernetes release. That's especially useful for Kubernetes major releases with breaking changes.
 
 ## Requirements
 
@@ -26,6 +26,18 @@ And of course an [etcd](https://etcd.io/) cluster (see [Kubernetes the not so ha
 See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-controller/blob/master/CHANGELOG.md)
 
 **Recent changes:**
+
+## 30.0.0+1.35.5
+
+- **UPDATE**
+  - update `k8s_ctl_release` to `1.35.5`
+
+- **UPGRADE NOTES**
+  - Kubernetes 1.35 expects cgroup v2 for default kubelet behavior. This role only manages the control plane, but cluster operators should verify worker and kubelet hosts are already on cgroup v2 before upgrading.
+  - Kubernetes 1.35 requires `create` permission for `pods/exec`, `pods/attach`, and `pods/portforward` upgrade paths. Review user-facing RBAC in adjacent roles or cluster manifests if you rely on those operations.
+  - **IMPORTANT**: While not part of this role but as `kube-apiserver` depends on `etcd`: If you use `etcd` for Kubernetes and want to upgrade to `etcd` `v3.6` you **DEFINITELY** want to upgrade to `etcd` `v3.6.26` first! For further information:
+    - [Avoiding Zombie Cluster Members When Upgrading to etcd v3.6](https://kubernetes.io/blog/2025/12/21/preventing-etcd-zombies/)
+    - [Fix zombie members in v3store](https://github.com/etcd-io/etcd/pull/20995)
 
 ## 29.0.0+1.34.4
 
@@ -91,7 +103,7 @@ See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-con
 roles:
   - name: githubixx.kubernetes_controller
     src: https://github.com/githubixx/ansible-role-kubernetes-controller.git
-    version: 29.0.0+1.34.4
+    version: 30.0.0+1.35.5
 ```
 
 ## Role (default) variables
@@ -121,7 +133,7 @@ k8s_ctl_pki_dir: "{{ k8s_ctl_conf_dir }}/pki"
 k8s_ctl_bin_dir: "/usr/local/bin"
 
 # The Kubernetes release.
-k8s_ctl_release: "1.34.4"
+k8s_ctl_release: "1.35.5"
 
 # The interface on which the Kubernetes services should listen on. As all cluster
 # communication should use a VPN interface the interface name is
