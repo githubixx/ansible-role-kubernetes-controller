@@ -4,7 +4,7 @@ This role is used in [Kubernetes the not so hard way with Ansible - Control plan
 
 ## Versions
 
-I tag every release and try to stay with [semantic versioning](http://semver.org). If you want to use the role I recommend to checkout the latest tag. The master branch is basically development while the tags mark stable releases. But in general I try to keep master in good shape too. A tag `30.0.0+1.35.5` means this is release `30.0.0` of this role and it's meant to be used with Kubernetes version `1.35.5` (but should work with any K8s 1.35.x release of course). If the role itself changes `X.Y.Z` before `+` will increase. If the Kubernetes version changes `X.Y.Z` after `+` will increase too. This allows to tag bugfixes and new major versions of the role while it's still developed for a specific Kubernetes release. That's especially useful for Kubernetes major releases with breaking changes.
+I tag every release and try to stay with [semantic versioning](http://semver.org). If you want to use the role I recommend to checkout the latest tag. The master branch is basically development while the tags mark stable releases. But in general I try to keep master in good shape too. A tag `31.0.0+1.36.6` means this is release `31.0.0` of this role and it's meant to be used with Kubernetes version `1.36.6` (but should work with any K8s 1.36.x release of course). If the role itself changes `X.Y.Z` before `+` will increase. If the Kubernetes version changes `X.Y.Z` after `+` will increase too. This allows to tag bugfixes and new major versions of the role while it's still developed for a specific Kubernetes release. That's especially useful for Kubernetes major releases with breaking changes.
 
 ## Requirements
 
@@ -18,6 +18,7 @@ And of course an [etcd](https://etcd.io/) cluster (see [Kubernetes the not so ha
 
 - Ubuntu 22.04 (Jammy Jellyfish)
 - Ubuntu 24.04 (Noble Numbat) (recommended)
+- Ubuntu 26.04 (Resolute Raccoon)
 
 ## Changelog
 
@@ -26,6 +27,28 @@ And of course an [etcd](https://etcd.io/) cluster (see [Kubernetes the not so ha
 See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-controller/blob/master/CHANGELOG.md)
 
 **Recent changes:**
+
+## 31.0.0+1.36.6
+
+- **UPDATE**
+  - update `k8s_ctl_release` to `1.36.6`
+  - add Ubuntu 26.04 support
+  - add explicit `nodes/pods`, `nodes/healthz`, and `nodes/configz` permissions to the API-server-to-kubelet ClusterRole for stable fine-grained kubelet authorization; preserve existing permissions and binding
+  - create the admin kubeconfig directory on the configured delegation host
+
+- **MOLECULE**
+  - use Ubuntu 26.04 for `test-controller3` and add `test-worker3` with Ubuntu 26.04
+  - verify exact control-plane binary, kubectl, and API server versions, kubelet RBAC permissions, and control-plane leader election leases
+  - fail health and admin access checks when either the request fails or its response is invalid
+  - store the admin kubeconfig under `/home/vagrant/k8s/configs`, owned by `vagrant`, and symlink `/home/vagrant/.kube/config` for default kubectl access
+
+- **UPGRADE NOTES**
+  - Keep the existing audit log defaults of 30 days, 3 backups, and 100 MB. In Kubernetes 1.36, overriding `audit-log-maxsize` to `0` disables rotation; upstream retention defaults do not replace this role's explicit settings.
+  - Kubernetes 1.36 enables direct WebSocket streaming to supporting kubelets by default. Keep the API server's kubelet client certificates and proxy permissions when customizing settings.
+  - Kubeconfigs still embed certificates. Automatic reload of file-based CA roots in Kubernetes 1.36 does not rotate embedded CA data; regenerate kubeconfigs when rotating their CA.
+  - **IMPORTANT**: While not part of this role but as `kube-apiserver` depends on `etcd`: If you use `etcd` for Kubernetes and want to upgrade to `etcd` `v3.6` you **DEFINITELY** want to upgrade to `etcd` `v3.6.26` first! For further information:
+    - [Avoiding Zombie Cluster Members When Upgrading to etcd v3.6](https://kubernetes.io/blog/2025/12/21/preventing-etcd-zombies/)
+    - [Fix zombie members in v3store](https://github.com/etcd-io/etcd/pull/20995)
 
 ## 30.0.0+1.35.5
 
@@ -103,7 +126,7 @@ See full [CHANGELOG.md](https://github.com/githubixx/ansible-role-kubernetes-con
 roles:
   - name: githubixx.kubernetes_controller
     src: https://github.com/githubixx/ansible-role-kubernetes-controller.git
-    version: 30.0.0+1.35.5
+    version: 31.0.0+1.36.6
 ```
 
 ## Role (default) variables
@@ -133,7 +156,7 @@ k8s_ctl_pki_dir: "{{ k8s_ctl_conf_dir }}/pki"
 k8s_ctl_bin_dir: "/usr/local/bin"
 
 # The Kubernetes release.
-k8s_ctl_release: "1.35.5"
+k8s_ctl_release: "1.36.6"
 
 # The interface on which the Kubernetes services should listen on. As all cluster
 # communication should use a VPN interface the interface name is
@@ -515,10 +538,17 @@ Afterwards Molecule can be executed:
 molecule converge
 ```
 
-This will setup a few virtual machines (VM) with supported Ubuntu OS and installs an Kubernetes cluster but without the worker nodes (so no nodes with `kube-proxy` and `kubelet` installed). A small verification step is also included:
+This will setup seven virtual machines (VM) covering Ubuntu 22.04, 24.04, and 26.04, including an Ubuntu 26.04 controller and worker-designated host. It installs a Kubernetes control plane but does not install `kube-proxy` or `kubelet` on the worker-designated hosts. Verification therefore permits an empty node list while checking admin API access. A small verification step is also included:
 
 ```bash
 molecule verify
+```
+
+On `test-assets`, the admin kubeconfig is owned by `vagrant` at `/home/vagrant/k8s/configs/admin.kubeconfig`. The symlink `/home/vagrant/.kube/config` lets that user run `kubectl` without `--kubeconfig`:
+
+```bash
+sudo -iu vagrant
+kubectl get namespaces
 ```
 
 To clean up run

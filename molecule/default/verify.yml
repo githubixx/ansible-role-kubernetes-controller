@@ -85,8 +85,8 @@
       register: k8s_ctl__apiserver_livez
       changed_when: false
       failed_when:
-        - k8s_ctl__apiserver_livez.rc != 0
-        - k8s_ctl__apiserver_livez.stdout is not search("ok")
+        k8s_ctl__apiserver_livez.rc != 0 or
+        k8s_ctl__apiserver_livez.stdout | trim != 'ok'
 
     - name: Check kube-apiserver readyz endpoint
       ansible.builtin.command: >
@@ -96,8 +96,8 @@
       register: k8s_ctl__apiserver_readyz
       changed_when: false
       failed_when:
-        - k8s_ctl__apiserver_readyz.rc != 0
-        - k8s_ctl__apiserver_readyz.stdout is not search("ok")
+        k8s_ctl__apiserver_readyz.rc != 0 or
+        k8s_ctl__apiserver_readyz.stdout | trim != 'ok'
 
 - name: Verify control plane artifacts on controllers
   hosts: k8s_controller
@@ -109,6 +109,8 @@
     k8s_ctl__scheduler_conf_dir: "{{ k8s_scheduler_conf_dir | default(k8s_ctl__conf_dir + '/kube-scheduler') }}"
     k8s_ctl__bin_dir: "{{ k8s_ctl_bin_dir | default('/usr/local/bin') }}"
     k8s_ctl__pki_dir: "{{ k8s_ctl_pki_dir | default('/etc/kubernetes/controller/pki') }}"
+    k8s_ctl__role_defaults: "{{ lookup('ansible.builtin.file', playbook_dir + '/../../defaults/main.yml') | from_yaml }}"
+    k8s_ctl__expected_release: "{{ k8s_ctl_release | default(k8s_ctl__role_defaults.k8s_ctl_release) }}"
     k8s_ctl__required_binaries:
       - kube-apiserver
       - kube-controller-manager
@@ -146,6 +148,34 @@
       loop: "{{ k8s_ctl__binary_stat.results }}"
       loop_control:
         label: "{{ item.stat.path }}"
+
+    - name: Check control plane binary versions
+      ansible.builtin.command:
+        argv:
+          - "{{ k8s_ctl__bin_dir }}/{{ item }}"
+          - --version
+      loop: "{{ k8s_ctl__required_binaries | difference(['kubectl']) }}"
+      register: k8s_ctl__component_version
+      changed_when: false
+      failed_when:
+        k8s_ctl__component_version.rc != 0 or
+        k8s_ctl__component_version.stdout | trim != 'Kubernetes v' + k8s_ctl__expected_release
+
+    - name: Read kubectl client version
+      ansible.builtin.command:
+        argv:
+          - "{{ k8s_ctl__bin_dir }}/kubectl"
+          - version
+          - --client
+          - --output=json
+      register: k8s_ctl__kubectl_version
+      changed_when: false
+
+    - name: Assert kubectl client version matches the requested release
+      ansible.builtin.assert:
+        that:
+          - (k8s_ctl__kubectl_version.stdout | from_json).clientVersion.gitVersion == 'v' + k8s_ctl__expected_release
+        fail_msg: "kubectl must be v{{ k8s_ctl__expected_release }}: {{ k8s_ctl__kubectl_version.stdout }}"
 
     - name: Check required certificates exist with expected ownership and mode
       ansible.builtin.stat:
@@ -192,6 +222,19 @@
     k8s_ctl__admin_conf_group: "{{ k8s_admin_conf_group | default('root') }}"
     k8s_ctl__admin_kubeconfig: "{{ k8s_ctl__admin_conf_dir }}/admin.kubeconfig"
   tasks:
+    - name: Check admin kubeconfig directory state
+      ansible.builtin.stat:
+        path: "{{ k8s_ctl__admin_conf_dir }}"
+      register: k8s_ctl__admin_conf_dir_stat
+
+    - name: Assert admin kubeconfig directory ownership and mode
+      ansible.builtin.assert:
+        that:
+          - k8s_ctl__admin_conf_dir_stat.stat.isdir
+          - k8s_ctl__admin_conf_dir_stat.stat.pw_name == k8s_ctl__admin_conf_owner
+          - k8s_ctl__admin_conf_dir_stat.stat.gr_name == k8s_ctl__admin_conf_group
+          - k8s_ctl__admin_conf_dir_stat.stat.mode == (k8s_admin_conf_dir_perm | default('0700'))
+
     - name: Check admin kubeconfig state
       ansible.builtin.stat:
         path: "{{ k8s_ctl__admin_kubeconfig }}"
@@ -206,12 +249,41 @@
           - k8s_ctl__admin_kubeconfig_stat.stat.gr_name == k8s_ctl__admin_conf_group
           - k8s_ctl__admin_kubeconfig_stat.stat.mode == '0640'
 
+    - name: Check the vagrant user default kubeconfig symlink
+      ansible.builtin.stat:
+        path: /home/vagrant/.kube/config
+        follow: false
+      register: k8s_ctl__vagrant_kubeconfig_stat
+
+    - name: Assert the vagrant user default kubeconfig links to the admin kubeconfig
+      ansible.builtin.assert:
+        that:
+          - k8s_ctl__vagrant_kubeconfig_stat.stat.islnk
+          - k8s_ctl__vagrant_kubeconfig_stat.stat.lnk_source == k8s_ctl__admin_kubeconfig
+          - k8s_ctl__vagrant_kubeconfig_stat.stat.pw_name == 'vagrant'
+          - k8s_ctl__vagrant_kubeconfig_stat.stat.gr_name == 'vagrant'
+
 - name: Verify admin kubeconfig functional access
   hosts: test-assets
   vars:
     k8s_ctl__admin_conf_dir: "{{ k8s_admin_conf_dir | default('/root/k8s/configs') }}"
     k8s_ctl__admin_kubeconfig: "{{ k8s_ctl__admin_conf_dir }}/admin.kubeconfig"
+    k8s_ctl__role_defaults: "{{ lookup('ansible.builtin.file', playbook_dir + '/../../defaults/main.yml') | from_yaml }}"
+    k8s_ctl__expected_release: "{{ k8s_ctl_release | default(k8s_ctl__role_defaults.k8s_ctl_release) }}"
   tasks:
+    - name: Read API server version using the vagrant user default kubeconfig
+      become: true
+      become_user: vagrant
+      ansible.builtin.command: kubectl get --raw=/version
+      register: k8s_ctl__vagrant_version_raw
+      changed_when: false
+
+    - name: Assert kubectl works for vagrant without an explicit kubeconfig
+      ansible.builtin.assert:
+        that:
+          - (k8s_ctl__vagrant_version_raw.stdout | from_json).gitVersion == 'v' + k8s_ctl__expected_release
+        fail_msg: "kubectl must work as vagrant using /home/vagrant/.kube/config: {{ k8s_ctl__vagrant_version_raw.stdout }}"
+
     - name: Check admin kubeconfig is authorized to list nodes
       ansible.builtin.command: >
         kubectl
@@ -220,19 +292,25 @@
       register: k8s_ctl__admin_can_i_list_nodes
       changed_when: false
       failed_when:
-        - k8s_ctl__admin_can_i_list_nodes.rc != 0
-        - k8s_ctl__admin_can_i_list_nodes.stdout | trim != 'yes'
+        k8s_ctl__admin_can_i_list_nodes.rc != 0 or
+        k8s_ctl__admin_can_i_list_nodes.stdout | trim != 'yes'
 
     - name: Check admin kubeconfig can fetch node list
       ansible.builtin.command: >
         kubectl
         --kubeconfig={{ k8s_ctl__admin_kubeconfig }}
-        get nodes -o name
+        get --raw=/api/v1/nodes
       register: k8s_ctl__admin_get_nodes
       changed_when: false
-      failed_when:
-        - k8s_ctl__admin_get_nodes.rc != 0
-        - k8s_ctl__admin_get_nodes.stdout_lines | length < 1
+
+    - name: Assert admin kubeconfig returned a node list
+      ansible.builtin.assert:
+        that:
+          - k8s_ctl__node_list.kind == 'NodeList'
+          - k8s_ctl__node_list['items'] is sequence
+        fail_msg: "Expected a NodeList from the admin kubeconfig: {{ k8s_ctl__admin_get_nodes.stdout }}"
+      vars:
+        k8s_ctl__node_list: "{{ k8s_ctl__admin_get_nodes.stdout | from_json }}"
 
     - name: Check admin kubeconfig can fetch cluster version endpoint
       ansible.builtin.command: >
@@ -241,9 +319,35 @@
         get --raw=/version
       register: k8s_ctl__admin_version_raw
       changed_when: false
-      failed_when:
-        - k8s_ctl__admin_version_raw.rc != 0
-        - k8s_ctl__admin_version_raw.stdout is not search('"major"')
+
+    - name: Assert API server version matches the requested release
+      ansible.builtin.assert:
+        that:
+          - (k8s_ctl__admin_version_raw.stdout | from_json).gitVersion == 'v' + k8s_ctl__expected_release
+        fail_msg: "API server must be v{{ k8s_ctl__expected_release }}: {{ k8s_ctl__admin_version_raw.stdout }}"
+
+    - name: Fetch control plane leader election leases
+      kubernetes.core.k8s_info:
+        api_version: coordination.k8s.io/v1
+        kind: Lease
+        namespace: kube-system
+        name: "{{ item }}"
+        kubeconfig: "{{ k8s_ctl__admin_kubeconfig }}"
+      loop:
+        - kube-controller-manager
+        - kube-scheduler
+      register: k8s_ctl__leader_leases
+
+    - name: Assert control plane components have acquired leader election leases
+      ansible.builtin.assert:
+        that:
+          - item.resources | length == 1
+          - item.resources[0].spec.holderIdentity | default('') | length > 0
+          - item.resources[0].spec.renewTime is defined
+        fail_msg: "Missing leader election lease or holder for {{ item.item }}"
+      loop: "{{ k8s_ctl__leader_leases.results }}"
+      loop_control:
+        label: "{{ item.item }}"
 
 - name: Verify kube-apiserver-to-kubelet RBAC resources
   hosts: test-assets
@@ -264,6 +368,27 @@
       ansible.builtin.assert:
         that:
           - k8s_ctl__cluster_role_info.resources | length == 1
+
+    - name: Assert kube-apiserver-to-kubelet permissions include fine-grained subresources
+      ansible.builtin.assert:
+        that:
+          - >-
+            item in (
+              k8s_ctl__cluster_role_info.resources[0].rules
+              | selectattr('apiGroups', 'equalto', [''])
+              | selectattr('verbs', 'contains', '*')
+              | map(attribute='resources') | flatten
+            )
+        fail_msg: "Missing kubelet permission for {{ item }}"
+      loop:
+        - nodes/proxy
+        - nodes/stats
+        - nodes/log
+        - nodes/spec
+        - nodes/metrics
+        - nodes/pods
+        - nodes/healthz
+        - nodes/configz
 
     - name: Fetch kube-apiserver-to-kubelet ClusterRoleBinding
       kubernetes.core.k8s_info:
@@ -313,6 +438,8 @@
   hosts: k8s_controller
   become: true
   vars:
+    k8s_ctl__role_defaults: "{{ lookup('ansible.builtin.file', playbook_dir + '/../../defaults/main.yml') | from_yaml }}"
+    k8s_ctl__expected_release: "{{ k8s_ctl_release | default(k8s_ctl__role_defaults.k8s_ctl_release) }}"
     k8s_ctl__conf_dir: "{{ k8s_ctl_conf_dir | default('/etc/kubernetes/controller') }}"
     k8s_ctl__controller_manager_conf_dir: "{{ k8s_controller_manager_conf_dir | default(k8s_ctl__conf_dir + '/kube-controller-manager') }}"
     k8s_ctl__apiserver_bind_address: >-
@@ -338,8 +465,23 @@
       register: k8s_ctl__apiserver_local_readyz
       changed_when: false
       failed_when:
-        - k8s_ctl__apiserver_local_readyz.status != 200
-        - k8s_ctl__apiserver_local_readyz.content is not search('ok')
+        k8s_ctl__apiserver_local_readyz.status != 200 or
+        k8s_ctl__apiserver_local_readyz.content | trim != 'ok'
+
+    - name: Read local kube-apiserver version
+      ansible.builtin.uri:
+        url: "https://{{ k8s_ctl__apiserver_bind_address }}:{{ k8s_ctl__apiserver_secure_port }}/version"
+        method: GET
+        return_content: true
+        validate_certs: false
+      register: k8s_ctl__apiserver_local_version
+      changed_when: false
+
+    - name: Assert each running API server matches the requested release
+      ansible.builtin.assert:
+        that:
+          - k8s_ctl__apiserver_local_version.json.gitVersion == 'v' + k8s_ctl__expected_release
+        fail_msg: "Local API server must be v{{ k8s_ctl__expected_release }}: {{ k8s_ctl__apiserver_local_version.content }}"
 
     - name: Check apiserver readyz verbose reports etcd ok
       ansible.builtin.command: >
@@ -349,9 +491,9 @@
       register: k8s_ctl__apiserver_readyz_verbose
       changed_when: false
       failed_when:
-        - k8s_ctl__apiserver_readyz_verbose.rc != 0
-        - k8s_ctl__apiserver_readyz_verbose.stdout is not search('etcd')
-        - k8s_ctl__apiserver_readyz_verbose.stdout is not search('ok')
+        k8s_ctl__apiserver_readyz_verbose.rc != 0 or
+        '[+]etcd ok' not in k8s_ctl__apiserver_readyz_verbose.stdout or
+        'readyz check passed' not in k8s_ctl__apiserver_readyz_verbose.stdout
 
 # TODO: log-pattern verification intentionally removed for now.
 # Reintroduce as a separate verify play when patterns are finalized,

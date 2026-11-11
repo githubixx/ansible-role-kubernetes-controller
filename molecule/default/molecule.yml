@@ -58,12 +58,12 @@ platforms:
         type: static
         ip: 172.16.10.20
   - name: test-controller3
-    box: githubixx/ubuntu-24.04
+    box: githubixx/ubuntu-26.04
     memory: 2048
     cpus: 2
     groups:
       - vpn
-      - ubuntu24
+      - ubuntu26
       - k8s_controller
       - k8s_worker
       - k8s_etcd
@@ -101,6 +101,20 @@ platforms:
         network_name: private_network
         type: static
         ip: 172.16.10.110
+  - name: test-worker3
+    box: githubixx/ubuntu-26.04
+    memory: 2048
+    cpus: 2
+    groups:
+      - vpn
+      - ubuntu26
+      - k8s_worker
+      - k8s
+    interfaces:
+      - auto_config: true
+        network_name: private_network
+        type: static
+        ip: 172.16.10.120
 
 provisioner:
   name: ansible
