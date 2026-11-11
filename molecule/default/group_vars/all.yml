@@ -126,15 +126,15 @@ k8s_config_cluster_name: "k8s"
 
 # Directory where "admin.kubeconfig" (the credentials file) for the "admin"
 # user is stored
-k8s_admin_conf_dir: "{{ '~/k8s/configs' | expanduser }}"
+k8s_admin_conf_dir: "/home/vagrant/k8s/configs"
 # Permissions for the directory specified in "k8s_admin_conf_dir"
 k8s_admin_conf_dir_perm: "0700"
 # Owner of the directory specified in "k8s_admin_conf_dir" and for
 # "admin.kubeconfig" stored in this directory.
-k8s_admin_conf_owner: "root"
+k8s_admin_conf_owner: "vagrant"
 # Group of the directory specified in "k8s_admin_conf_dir" and for
 # "admin.kubeconfig" stored in this directory.
-k8s_admin_conf_group: "root"
+k8s_admin_conf_group: "vagrant"
 
 # Run Kubernetes control plane services as the following user.
 k8s_run_as_user: "k8s"

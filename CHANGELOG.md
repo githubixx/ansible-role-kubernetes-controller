@@ -1,5 +1,27 @@
 # Changelog
 
+## 31.0.0+1.36.6
+
+- **UPDATE**
+  - update `k8s_ctl_release` to `1.36.6`
+  - add Ubuntu 26.04 support
+  - add explicit `nodes/pods`, `nodes/healthz`, and `nodes/configz` permissions to the API-server-to-kubelet ClusterRole for stable fine-grained kubelet authorization; preserve existing permissions and binding
+  - create the admin kubeconfig directory on the configured delegation host
+
+- **MOLECULE**
+  - use Ubuntu 26.04 for `test-controller3` and add `test-worker3` with Ubuntu 26.04
+  - verify exact control-plane binary, kubectl, and API server versions, kubelet RBAC permissions, and control-plane leader election leases
+  - fail health and admin access checks when either the request fails or its response is invalid
+  - store the admin kubeconfig under `/home/vagrant/k8s/configs`, owned by `vagrant`, and symlink `/home/vagrant/.kube/config` for default kubectl access
+
+- **UPGRADE NOTES**
+  - Keep the existing audit log defaults of 30 days, 3 backups, and 100 MB. In Kubernetes 1.36, overriding `audit-log-maxsize` to `0` disables rotation; upstream retention defaults do not replace this role's explicit settings.
+  - Kubernetes 1.36 enables direct WebSocket streaming to supporting kubelets by default. Keep the API server's kubelet client certificates and proxy permissions when customizing settings.
+  - Kubeconfigs still embed certificates. Automatic reload of file-based CA roots in Kubernetes 1.36 does not rotate embedded CA data; regenerate kubeconfigs when rotating their CA.
+  - **IMPORTANT**: While not part of this role but as `kube-apiserver` depends on `etcd`: If you use `etcd` for Kubernetes and want to upgrade to `etcd` `v3.6` you **DEFINITELY** want to upgrade to `etcd` `v3.6.26` first! For further information:
+    - [Avoiding Zombie Cluster Members When Upgrading to etcd v3.6](https://kubernetes.io/blog/2025/12/21/preventing-etcd-zombies/)
+    - [Fix zombie members in v3store](https://github.com/etcd-io/etcd/pull/20995)
+
 ## 30.0.0+1.35.5
 
 - **UPDATE**

@@ -11,6 +11,28 @@
       ansible.builtin.include_role:
         name: githubixx.kubernetes_controller
 
+- name: Configure kubectl for the vagrant user
+  hosts: k8s_assets
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Create the vagrant user kubectl configuration directory
+      ansible.builtin.file:
+        path: /home/vagrant/.kube
+        state: directory
+        owner: vagrant
+        group: vagrant
+        mode: "0700"
+
+    - name: Link the admin kubeconfig as the vagrant user default
+      ansible.builtin.file:
+        src: "{{ k8s_admin_conf_dir }}/admin.kubeconfig"
+        dest: /home/vagrant/.kube/config
+        state: link
+        follow: false
+        owner: vagrant
+        group: vagrant
+
 # - name: Taint Kubernetes control plane nodes
 #   hosts: k8s_assets
 #   become: true
